@@ -168,13 +168,21 @@ declare class NeoPromise<T> implements PromiseLike<T> {
     private _tag;
     constructor(executor: PromiseExecutor<T>);
     static all(iterable: NeoPromise<any>[]): NeoPromise<any[]>;
+<<<<<<< HEAD
     catch<TResult>(onRejected: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<TResult | any>;
+=======
+    catch<TResult>(onRejected: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<T | TResult>;
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
     private checkState;
     private reject;
     static reject(reason: any): NeoPromise<any>;
     private resolve;
     static resolve<T>(value: T | PromiseLike<T>): NeoPromise<T>;
+<<<<<<< HEAD
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2>;
+=======
+    then<TResult1 = T, TResult2 = never>(onFulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>, onRejected?: (reason: any) => TResult2 | PromiseLike<TResult2>): PromiseLike<TResult1 | TResult2>;
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 }
 declare namespace Neo {
     class Uint160 extends UintVariable {
@@ -810,14 +818,20 @@ declare namespace ThinNeo {
     class ZoroTransaction {
         type: ZoroTransactionType;
         version: number;
+<<<<<<< HEAD
         nonce: number;
         Account: Neo.Uint160;
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         attributes: ZoroAttribute[];
         witnesses: ZoroWitness[];
         SerializeUnsigned(writer: Neo.IO.BinaryWriter): void;
         Serialize(writer: Neo.IO.BinaryWriter): void;
         extdata: ZoroIExtData;
+<<<<<<< HEAD
         static GetNonce(): number;
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         DeserializeUnsigned(ms: Neo.IO.BinaryReader): void;
         Deserialize(ms: Neo.IO.BinaryReader): void;
         GetMessage(): Uint8Array;

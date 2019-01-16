@@ -159,18 +159,38 @@ namespace ThinNeo
     {
         public type: ZoroTransactionType;
         public version: number;
+<<<<<<< HEAD
         public nonce:number;
         public Account:Neo.Uint160;
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         public attributes: ZoroAttribute[];
         public witnesses: ZoroWitness[];//见证人
         public SerializeUnsigned(writer: Neo.IO.BinaryWriter): void
         {
+<<<<<<< HEAD
             writer.writeByte(this.type);
             writer.writeByte(this.version);
             writer.writeUint64(Neo.Uint64.parse(this.nonce + ""));
             writer.writeVarString(this.Account.toString());
             this.extdata.Serialize(this, writer);
 
+=======
+            if (this.type == ZoroTransactionType.ContractTransaction ||
+                this.type == ZoroTransactionType.IssueTransaction)//每个交易类型有一些自己独特的处理
+            {
+                //ContractTransaction 就是最常见的转账交易
+                //他没有自己的独特处理
+            }
+            else if (this.type == ZoroTransactionType.InvocationTransaction)
+            {
+                this.extdata.Serialize(this, writer);
+            }
+            else
+            {
+                throw new Error("未编写针对这个交易类型的代码");
+            }
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             //#region write attribute
             var countAttributes = this.attributes.length;
             writer.writeVarInt(countAttributes);
@@ -232,6 +252,7 @@ namespace ThinNeo
         }
         public extdata: ZoroIExtData;
 
+<<<<<<< HEAD
         public static GetNonce():number{
             var random = Math.random() << 32;
             var nonce = random | parseInt(Date.UTC.toString());
@@ -246,6 +267,29 @@ namespace ThinNeo
             this.Account = Neo.Uint160.parse(ms.readVarString());
             this.extdata.Deserialize(this, ms);
 
+=======
+        public DeserializeUnsigned(ms: Neo.IO.BinaryReader): void
+        {
+            if (this.type == ZoroTransactionType.ContractTransaction
+                || this.type == ZoroTransactionType.IssueTransaction)//每个交易类型有一些自己独特的处理
+            {
+                //ContractTransaction 就是最常见的合约交易，
+                //他没有自己的独特处理
+                this.extdata = null;
+            }
+            else if (this.type == ZoroTransactionType.InvocationTransaction)
+            {
+                this.extdata = new ZoroInvokeTransData();
+            }
+            else
+            {
+                throw new Error("未编写针对这个交易类型的代码");
+            }
+            if (this.extdata != null)
+            {
+                this.extdata.Deserialize(this, ms);
+            }
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             //attributes
             var countAttributes = ms.readVarInt();
             this.attributes = [];//new Attribute[countAttributes];

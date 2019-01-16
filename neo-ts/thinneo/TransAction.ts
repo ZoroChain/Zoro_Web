@@ -193,7 +193,7 @@ namespace ThinNeo
             this.nonce = reader.readUint32();
         }
     }
-
+   
     export class Transaction
     {
         public type: TransactionType;
@@ -488,17 +488,17 @@ namespace ThinNeo
         //增加个人账户见证人（就是用这个人的私钥对交易签个名，signdata传进来）
         public AddWitness(signdata: Uint8Array, pubkey: Uint8Array, addrs: string): void
         {
-            {//额外的验证
-                var msg = this.GetMessage();
+            // {//额外的验证
+            //     var msg = this.GetMessage();
 
-                var bsign = ThinNeo.Helper.VerifySignature(msg, signdata, pubkey);
-                if (bsign == false)
-                    throw new Error("wrong sign");
+            //     var bsign = ThinNeo.Helper.VerifySignature(msg, signdata, pubkey);
+            //     if (bsign == false)
+            //         throw new Error("wrong sign");
 
-                var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
-                if (addr != addrs)
-                    throw new Error("wrong script");
-            }
+            //     var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
+            //     if (addr != addrs)
+            //         throw new Error("wrong script");
+            // }
 
             var vscript = ThinNeo.Helper.GetAddressCheckScriptFromPublicKey(pubkey);
 

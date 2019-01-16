@@ -2337,9 +2337,16 @@ var WebBrowser;
             });
         }
     }
+<<<<<<< HEAD
     WWW.api = "http://115.159.68.43:59908/api/testnet/";
     WWW.apiaggr = "http://115.159.68.43:59999/api/testnet/";
     WWW.rpc = "http://47.91.210.16:20333";
+=======
+    WWW.api = "http://115.159.53.39:59908/api/testnet/";
+    WWW.apiaggr = "http://115.159.53.39:59999/api/testnet/";
+    //static rpc: string = "http://115.159.53.39:20333/";
+    WWW.rpc = "http://localhost:20333/";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
     WWW.neoRpc = "http://47.52.192.77:20332";
     WWW.neoGetUTXO = "https://api.nel.group/api/testnet/";
     WWW.rpcName = "";
@@ -3473,10 +3480,79 @@ var WebBrowser;
     }
     WebBrowser.Appchains = Appchains;
 })(WebBrowser || (WebBrowser = {}));
+<<<<<<< HEAD
 /// <reference path="../tools/wwwtool.ts"/>
 /// <reference path="../../lib/neo-ts.d.ts"/>
 var WebBrowser;
 /// <reference path="../tools/wwwtool.ts"/>
+=======
+/// <reference path="../../lib/neo-ts.d.ts"/>
+var WebBrowser;
+/// <reference path="../../lib/neo-ts.d.ts"/>
+(function (WebBrowser) {
+    class WebHelper {
+        static getScriptBuilderCreate(type, ..._params) {
+            var sb = new ThinNeo.ScriptBuilder();
+            switch (type) {
+                case Nep5Type.Neo:
+                    sb.EmitPushString(_params[0]);
+                    sb.EmitPushString(_params[1]);
+                    sb.EmitPushString(_params[2]);
+                    sb.EmitPushString(_params[3]);
+                    sb.EmitPushString(_params[4]);
+                    sb.EmitPushNumber(new Neo.BigInteger(_params[5]));
+                    sb.EmitPushBytes(_params[6]);
+                    sb.EmitPushBytes(_params[7]);
+                    var contract = new Uint8Array(_params[8]);
+                    sb.EmitPushBytes(contract);
+                    sb.EmitSysCall("Neo.Contract.Create");
+                    break;
+                case Nep5Type.Zoro:
+                    sb.EmitPushString(_params[0]);
+                    sb.EmitPushString(_params[1]);
+                    sb.EmitPushString(_params[2]);
+                    sb.EmitPushString(_params[3]);
+                    sb.EmitPushString(_params[4]);
+                    sb.EmitPushNumber(new Neo.BigInteger(_params[5]));
+                    sb.EmitPushBytes(_params[6]);
+                    sb.EmitPushBytes(_params[7]);
+                    var contract = new Uint8Array(_params[8]);
+                    sb.EmitPushBytes(contract);
+                    sb.EmitSysCall("Zoro.Contract.Create");
+                    break;
+                case Nep5Type.NativeNep5:
+                    var amount = _params[2] * Math.pow(10, _params[1]);
+                    var script = ThinNeo.Helper.GetAddressCheckScriptFromPublicKey(_params[0]);
+                    var scripthash = Neo.Cryptography.Sha256.computeHash(script);
+                    scripthash = Neo.Cryptography.RIPEMD160.computeHash(scripthash);
+                    var ss = new Neo.Uint160(scripthash).toString();
+                    sb.EmitPushString(ss);
+                    sb.EmitPushBytes(_params[0]);
+                    sb.EmitPushNumber(new Neo.BigInteger(_params[1]));
+                    sb.EmitPushNumber(new Neo.BigInteger(amount));
+                    sb.EmitPushString(_params[3]);
+                    sb.EmitPushString(_params[4]);
+                    sb.EmitSysCall("Zoro.NativeNEP5.Create");
+                    break;
+            }
+            return sb;
+        }
+    }
+    WebBrowser.WebHelper = WebHelper;
+    let Nep5Type;
+    (function (Nep5Type) {
+        Nep5Type[Nep5Type["Neo"] = 0] = "Neo";
+        Nep5Type[Nep5Type["Zoro"] = 1] = "Zoro";
+        Nep5Type[Nep5Type["NativeNep5"] = 2] = "NativeNep5";
+    })(Nep5Type = WebBrowser.Nep5Type || (WebBrowser.Nep5Type = {}));
+})(WebBrowser || (WebBrowser = {}));
+/// <reference path="../tools/wwwtool.ts"/>
+/// <reference path="../tools/WebHelper.ts"/>
+/// <reference path="../../lib/neo-ts.d.ts"/>
+var WebBrowser;
+/// <reference path="../tools/wwwtool.ts"/>
+/// <reference path="../tools/WebHelper.ts"/>
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 /// <reference path="../../lib/neo-ts.d.ts"/>
 (function (WebBrowser) {
     class AppChainTool {
@@ -3584,6 +3660,50 @@ var WebBrowser;
             select.selectedIndex = num - 1;
             return select;
         }
+<<<<<<< HEAD
+=======
+        static SendNativeContract(presion, totalsupply, symbol, name, chainHash, pubkey, prikey) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var sb = new ThinNeo.ScriptBuilder();
+                sb = WebBrowser.WebHelper.getScriptBuilderCreate(WebBrowser.Nep5Type.NativeNep5, pubkey, presion, totalsupply, symbol, name);
+                var scripthash = Neo.Cryptography.Sha256.computeHash(sb.ToArray());
+                scripthash = Neo.Cryptography.RIPEMD160.computeHash(scripthash);
+                alert(new Neo.Uint160(scripthash).toString());
+                var postArray = [];
+                postArray.push(chainHash);
+                postArray.push(sb.ToArray().toHexString());
+                var result = yield WebBrowser.WWW.rpc_invokeScript(postArray);
+                var gas = Neo.Fixed8.parse(result["gas_consumed"].toString());
+                var extdata = new ThinNeo.ZoroInvokeTransData();
+                extdata.script = sb.ToArray();
+                extdata.gasLimit = gas;
+                extdata.gasPrice = Neo.Fixed8.One;
+                var pubkeyScriptHash = Neo.Cryptography.Sha256.computeHash(ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
+                pubkeyScriptHash = Neo.Cryptography.RIPEMD160.computeHash(pubkeyScriptHash);
+                extdata.ScriptHash = new Neo.Uint160(pubkeyScriptHash);
+                var tran = new ThinNeo.ZoroTransaction();
+                tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+                tran.version = 2;
+                tran.attributes = [];
+                // tran.attributes[0] = new ThinNeo.Attribute();
+                // tran.attributes[0].usage = ThinNeo.TransactionAttributeUsage.Script;
+                // tran.attributes[0].data = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);          
+                tran.extdata = extdata;
+                var msg = tran.GetMessage();
+                var signdata = ThinNeo.Helper.Sign(msg, prikey);
+                tran.AddWitness(signdata, pubkey, ThinNeo.Helper.GetAddressFromPublicKey(pubkey));
+                var data = tran.GetRawData();
+                var rawdata = data.toHexString();
+                var postRawArray = [];
+                postRawArray.push(chainHash);
+                postRawArray.push(rawdata);
+                var NativeNep5Result = yield WebBrowser.WWW.rpc_sendrawtransaction(postRawArray);
+                alert(JSON.stringify(NativeNep5Result));
+                //NativeNep5 Hash
+                return new Neo.Uint160(scripthash);
+            });
+        }
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         static SendContract(need_storage, need_canCharge, description, email, auther, version, name, ContractAvm, chainHash, pubkey, prikey) {
             return __awaiter(this, void 0, void 0, function* () {
                 var parameter__list = "0710".hexToBytes();
@@ -3596,6 +3716,7 @@ var WebBrowser;
                 nep4 = nep4;
                 canCharge = need_canCharge ? canCharge : 4;
                 var ss = storage | nep4 | canCharge;
+<<<<<<< HEAD
                 sb.EmitPushString(description);
                 sb.EmitPushString(email);
                 sb.EmitPushString(auther);
@@ -3607,6 +3728,13 @@ var WebBrowser;
                 var contract = new Uint8Array(ContractAvm);
                 sb.EmitPushBytes(contract);
                 sb.EmitSysCall("Neo.Contract.Create");
+=======
+                if (chainHash == "NEO")
+                    sb = WebBrowser.WebHelper.getScriptBuilderCreate(WebBrowser.Nep5Type.Neo, description, email, auther, version, name, ss, return_type, parameter__list, ContractAvm);
+                else {
+                    sb = WebBrowser.WebHelper.getScriptBuilderCreate(WebBrowser.Nep5Type.Zoro, description, email, auther, version, name, ss, return_type, parameter__list, ContractAvm);
+                }
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 var scriptPublish = sb.ToArray().toHexString();
                 var postArray = [];
                 postArray.push(chainHash);
@@ -3951,6 +4079,7 @@ var WebBrowser;
         PageName[PageName["TxMessage"] = 8] = "TxMessage";
     })(PageName = WebBrowser.PageName || (WebBrowser.PageName = {}));
 })(WebBrowser || (WebBrowser = {}));
+<<<<<<< HEAD
 /// <reference path="../tools/wwwtool.ts"/>
 /// <reference path="../../lib/neo-ts.d.ts"/>
 var WebBrowser;
@@ -4296,14 +4425,24 @@ var WebBrowser;
 /// <reference path="./GUIRoute.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
 /// <reference path="../tools/Test.ts"/>
+=======
+/// <reference path="./Base.ts"/>
+/// <reference path="./GUIRoute.ts"/>
+var WebBrowser;
+/// <reference path="./Base.ts"/>
+/// <reference path="./GUIRoute.ts"/>
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 (function (WebBrowser) {
     class GUI_Login {
         constructor(div) {
             this.div = div;
         }
         showUI() {
+<<<<<<< HEAD
             //Test.ZoroTransfer();
             WebBrowser.Test.Transfer();
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             this.login();
         }
         hideUI() {
@@ -4312,6 +4451,7 @@ var WebBrowser;
             this.div.removeChild(this.div.firstChild);
             var loginbackground = document.createElement('div');
             this.div.appendChild(loginbackground);
+<<<<<<< HEAD
             WebBrowser.CSSTool.loginbackground_set(this.div);
             var name = document.createElement('h3');
             name.textContent = "登陆你的钱包";
@@ -4363,6 +4503,22 @@ var WebBrowser;
             uploadFiles.appendChild(btn);
             btn.textContent = "登陆";
             WebBrowser.CSSTool.btn_set(btn);
+=======
+            var name = document.createElement('h3');
+            name.textContent = "登陆你的钱包";
+            name.style.color = "#ffffff";
+            loginbackground.appendChild(name);
+            var file = document.createElement("input");
+            loginbackground.appendChild(file);
+            file.type = "file";
+            var password = document.createElement("input");
+            loginbackground.appendChild(password);
+            password.type = "password";
+            password.title = "输入密码";
+            var btn = document.createElement("button");
+            loginbackground.appendChild(btn);
+            btn.textContent = "登陆";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             btn.onclick = () => {
                 if (wallet.accounts.length > 0 && wallet.accounts[0].nep2key != null) {
                     let nepkey = wallet.accounts[0].nep2key;
@@ -4370,7 +4526,10 @@ var WebBrowser;
                     ThinNeo.Helper.GetPrivateKeyFromNep2(nepkey, password.value, s.N, s.r, s.p, (info, result) => {
                         if (info == "finish") {
                             WebBrowser.GUITool.prikey = result;
+<<<<<<< HEAD
                             var wif = ThinNeo.Helper.GetWifFromPrivateKey(WebBrowser.GUITool.prikey);
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                             WebBrowser.GUITool.pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(WebBrowser.GUITool.prikey);
                             WebBrowser.GUITool.address = ThinNeo.Helper.GetAddressFromPublicKey(WebBrowser.GUITool.pubkey);
                             WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
@@ -4379,12 +4538,19 @@ var WebBrowser;
                 }
             };
             var createWallet = document.createElement("button");
+<<<<<<< HEAD
             uploadFiles.appendChild(createWallet);
+=======
+            loginbackground.appendChild(createWallet);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             createWallet.textContent = "创建钱包";
             createWallet.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Wallet);
             };
+<<<<<<< HEAD
             WebBrowser.CSSTool.createWallet_set(createWallet);
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             var wallet;
             var reader = new FileReader();
             reader.onload = (e) => {
@@ -4395,8 +4561,11 @@ var WebBrowser;
             file.onchange = (ev) => {
                 if (file.files.length > 0)
                     if (file.files[0].name.includes(".json")) {
+<<<<<<< HEAD
                         putIn.textContent = file.files[0].name;
                         fileTip.textContent = '';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                         reader.readAsText(file.files[0]);
                     }
             };
@@ -4405,10 +4574,15 @@ var WebBrowser;
     WebBrowser.GUI_Login = GUI_Login;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="./Base.ts"/>
+<<<<<<< HEAD
 /// <reference path="../tools/CSSTools.ts"/>
 var WebBrowser;
 /// <reference path="./Base.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
+=======
+var WebBrowser;
+/// <reference path="./Base.ts"/>
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 (function (WebBrowser) {
     class GUI_Wallet {
         constructor(div) {
@@ -4428,6 +4602,7 @@ var WebBrowser;
             name.textContent = "创建您的钱包";
             name.style.color = "#ffffff";
             loginbackground.appendChild(name);
+<<<<<<< HEAD
             WebBrowser.CSSTool.name_set(name);
             var uploadFiles = document.createElement("div"); //外层div
             loginbackground.appendChild(uploadFiles);
@@ -4465,6 +4640,23 @@ var WebBrowser;
             uploadFiles.appendChild(create);
             create.textContent = "新建";
             WebBrowser.CSSTool.btn_set(create);
+=======
+            var walletName = document.createElement("input");
+            loginbackground.appendChild(walletName);
+            walletName.type = "text";
+            walletName.title = "输入钱包名";
+            var password = document.createElement("input");
+            loginbackground.appendChild(password);
+            password.type = "password";
+            password.title = "输入密码";
+            var repassword = document.createElement("input");
+            loginbackground.appendChild(repassword);
+            repassword.type = "password";
+            repassword.title = "重复密码";
+            var create = document.createElement('button');
+            loginbackground.appendChild(create);
+            create.textContent = "新建";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             create.onclick = () => {
                 try {
                     var array = new Uint8Array(32);
@@ -4498,10 +4690,15 @@ var WebBrowser;
                 }
             };
             var returnLogin = document.createElement('a');
+<<<<<<< HEAD
             uploadFiles.appendChild(returnLogin);
             returnLogin.textContent = "返回登录>>";
             returnLogin.style.paddingTop = '5px';
             returnLogin.style.display = 'block';
+=======
+            loginbackground.appendChild(returnLogin);
+            returnLogin.textContent = "返回登录>>";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             returnLogin.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Login);
             };
@@ -4514,6 +4711,7 @@ var WebBrowser;
             name.textContent = "您的钱包文件已创建";
             name.style.color = "#ffffff";
             loginbackground.appendChild(name);
+<<<<<<< HEAD
             WebBrowser.CSSTool.name_set(name);
             var uploadFiles = document.createElement("div"); //外层div
             loginbackground.appendChild(uploadFiles);
@@ -4534,6 +4732,19 @@ var WebBrowser;
             uploadFiles.appendChild(downLoad);
             downLoad.textContent = "下载文件";
             WebBrowser.CSSTool.btn_set(downLoad);
+=======
+            var text1 = document.createElement('h5');
+            text1.textContent = "点击“下载”来保存您的文件";
+            text1.style.color = "#eeeeee";
+            loginbackground.appendChild(text1);
+            var text2 = document.createElement('h5');
+            text2.textContent = "不要丢失！如果丢失，将无法恢复";
+            text2.style.color = "#eeeeee";
+            loginbackground.appendChild(text2);
+            var downLoad = document.createElement('button');
+            loginbackground.appendChild(downLoad);
+            downLoad.textContent = "下载文件";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             var b = true;
             downLoad.onclick = () => {
                 var downurl = document.createElement("a");
@@ -4547,10 +4758,15 @@ var WebBrowser;
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
             };
             var returnLogin = document.createElement('a');
+<<<<<<< HEAD
             uploadFiles.appendChild(returnLogin);
             returnLogin.textContent = "返回登录>>";
             returnLogin.style.paddingTop = "5px";
             returnLogin.style.display = "block";
+=======
+            loginbackground.appendChild(returnLogin);
+            returnLogin.textContent = "返回登录>>";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             returnLogin.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Login);
             };
@@ -4559,10 +4775,15 @@ var WebBrowser;
     WebBrowser.GUI_Wallet = GUI_Wallet;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="./Base.ts"/>
+<<<<<<< HEAD
 /// <reference path="../tools/CSSTools.ts"/>
 var WebBrowser;
 /// <reference path="./Base.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
+=======
+var WebBrowser;
+/// <reference path="./Base.ts"/>
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 (function (WebBrowser) {
     class GUI_Asset {
         constructor(div) {
@@ -4578,6 +4799,7 @@ var WebBrowser;
                 if (div.firstChild)
                     div.removeChild(div.firstChild);
                 var zoroChainBackGround = document.createElement('div');
+<<<<<<< HEAD
                 zoroChainBackGround.style.width = "1140px";
                 zoroChainBackGround.style.margin = '0 auto';
                 div.appendChild(zoroChainBackGround);
@@ -4674,6 +4896,73 @@ var WebBrowser;
                 NBCPData.textContent = bcpnum;
                 NBCP.appendChild(NBCPTitle);
                 NBCP.appendChild(NBCPData);
+=======
+                zoroChainBackGround.style.width = "100%";
+                zoroChainBackGround.style.cssFloat = "left";
+                div.appendChild(zoroChainBackGround);
+                //zoro
+                var zoroChain = document.createElement('div');
+                zoroChain.style.width = "30%";
+                zoroChain.style.cssFloat = "left";
+                zoroChainBackGround.appendChild(zoroChain);
+                var name = document.createElement('span');
+                name.style.width = "100%";
+                name.style.cssFloat = "left";
+                name.style.color = "#eeeeee";
+                name.textContent = 'ZORO CHAIN';
+                zoroChain.appendChild(name);
+                var BCP = document.createElement('span');
+                BCP.style.width = "100%";
+                BCP.style.cssFloat = "left";
+                var bcpnum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.zoroBCP, WebBrowser.GUITool.address, "0000000000000000000000000000000000000000");
+                BCP.style.color = "#eeeeee";
+                BCP.textContent = 'BCP = ' + bcpnum;
+                zoroChain.appendChild(BCP);
+                //neo
+                var neoChain = document.createElement('div');
+                neoChain.style.width = "30%";
+                neoChain.style.cssFloat = "left";
+                zoroChainBackGround.appendChild(neoChain);
+                var name = document.createElement('span');
+                name.style.width = "100%";
+                name.style.cssFloat = "left";
+                name.style.color = "#eeeeee";
+                name.textContent = 'NEO CHAIN';
+                neoChain.appendChild(name);
+                var utxo = yield WebBrowser.WWW.rpc_getUTXO(WebBrowser.GUITool.address);
+                var GAS = document.createElement('span');
+                GAS.style.width = "100%";
+                GAS.style.cssFloat = "left";
+                GAS.style.color = "#eeeeee";
+                GAS.textContent = 'GAS = ' + WebBrowser.AppChainTool.GAS;
+                neoChain.appendChild(GAS);
+                var CGAS = document.createElement('span');
+                CGAS.style.width = "100%";
+                CGAS.style.cssFloat = "left";
+                CGAS.style.color = "#eeeeee";
+                var CgasNum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.CGAS, WebBrowser.GUITool.address);
+                CGAS.textContent = 'CGAS = ' + CgasNum;
+                neoChain.appendChild(CGAS);
+                var NEO = document.createElement('span');
+                NEO.style.width = "100%";
+                NEO.style.cssFloat = "left";
+                NEO.style.color = "#eeeeee";
+                NEO.textContent = 'NEO = ' + WebBrowser.AppChainTool.NEO;
+                neoChain.appendChild(NEO);
+                var CNEO = document.createElement('span');
+                CNEO.style.width = "100%";
+                CNEO.style.cssFloat = "left";
+                CNEO.style.color = "#eeeeee";
+                var CneoNum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.CNEO, WebBrowser.GUITool.address);
+                CNEO.textContent = 'CNEO = ' + CneoNum;
+                neoChain.appendChild(CNEO);
+                var NBCP = document.createElement('span');
+                NBCP.style.width = "100%";
+                NBCP.style.cssFloat = "left";
+                NBCP.style.color = "#eeeeee";
+                var bcpnum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.neoBCP, WebBrowser.GUITool.address);
+                NBCP.textContent = 'BCP = ' + bcpnum;
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 neoChain.appendChild(NBCP);
                 //appchain
                 let title = WebBrowser.GUI_Route.instance.getUI(WebBrowser.PageName.Title);
@@ -4703,10 +4992,15 @@ var WebBrowser;
     WebBrowser.GUI_Asset = GUI_Asset;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="./Base.ts"/>
+<<<<<<< HEAD
 /// <reference path="../tools/CSSTools.ts"/>
 var WebBrowser;
 /// <reference path="./Base.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
+=======
+var WebBrowser;
+/// <reference path="./Base.ts"/>
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 (function (WebBrowser) {
     class GUI_Charge {
         constructor(div) {
@@ -4733,6 +5027,7 @@ var WebBrowser;
             downBackGround.style.width = "100%";
             downBackGround.style.cssFloat = "left";
             chargeBackGround.appendChild(downBackGround);
+<<<<<<< HEAD
             var transfer = document.createElement("div");
             WebBrowser.CSSTool.transfer_set(transfer);
             upBackGround.appendChild(transfer);
@@ -4764,6 +5059,32 @@ var WebBrowser;
             chainCharge.onclick = () => {
                 this.chainCharge(downBackGround);
                 $(chainCharge).css({ "borderTop": "1px solid #C8AB73", "background": '#3C3E4B' }).siblings().css({ "borderTop": "1px solid #333542", "background": "#333542" });
+=======
+            var normalcharge = document.createElement("button");
+            upBackGround.appendChild(normalcharge);
+            normalcharge.style.cssFloat = "left";
+            normalcharge.style.width = "33%";
+            normalcharge.textContent = "普通转账";
+            normalcharge.onclick = () => {
+                this.normalCharge(downBackGround);
+            };
+            normalcharge.click();
+            var singlecharge = document.createElement("button");
+            upBackGround.appendChild(singlecharge);
+            singlecharge.style.cssFloat = "left";
+            singlecharge.style.width = "33%";
+            singlecharge.textContent = "单链转账";
+            singlecharge.onclick = () => {
+                this.singleCharge(downBackGround);
+            };
+            var chainCharge = document.createElement("button");
+            upBackGround.appendChild(chainCharge);
+            chainCharge.style.cssFloat = "left";
+            chainCharge.style.width = "33%";
+            chainCharge.textContent = "跨链转账";
+            chainCharge.onclick = () => {
+                this.chainCharge(downBackGround);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             };
         }
         singleCharge(div) {
@@ -4771,6 +5092,7 @@ var WebBrowser;
                 if (div.firstChild)
                     div.removeChild(div.firstChild);
                 var singlebackground = document.createElement('div');
+<<<<<<< HEAD
                 WebBrowser.CSSTool.normalbackground_set(singlebackground);
                 div.appendChild(singlebackground);
                 var top = document.createElement("div");
@@ -4800,11 +5122,29 @@ var WebBrowser;
                 var coinNum = document.createElement('span');
                 balance.appendChild(coinNum);
                 coinNum.style.color = "#C8AB73";
+=======
+                div.appendChild(singlebackground);
+                var asset = document.createElement('span');
+                singlebackground.appendChild(asset);
+                asset.style.color = "#eeeeee";
+                asset.textContent = "链名";
+                var select = document.createElement("select");
+                singlebackground.appendChild(select);
+                WebBrowser.AppChainTool.getChain(select);
+                var coin = document.createElement('span');
+                singlebackground.appendChild(coin);
+                coin.style.color = "#eeeeee";
+                coin.textContent = "余额";
+                var coinNum = document.createElement('span');
+                singlebackground.appendChild(coinNum);
+                coinNum.style.color = "#eeeeee";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 coinNum.textContent = yield WebBrowser.CoinTool.getGold("default", WebBrowser.GUITool.address, "NEO");
                 select.onchange = (e) => __awaiter(this, void 0, void 0, function* () {
                     coinNum.textContent = yield WebBrowser.CoinTool.getGold("default", WebBrowser.GUITool.address, select.childNodes[select.selectedIndex].value);
                 });
                 var button = document.createElement("button");
+<<<<<<< HEAD
                 balance.appendChild(button);
                 button.textContent = "刷新";
                 WebBrowser.CSSTool.break_set(button);
@@ -4844,6 +5184,28 @@ var WebBrowser;
                 btnSend.textContent = "发送";
                 WebBrowser.CSSTool.btn_set(btnSend);
                 btnSend.style.width = '50%';
+=======
+                singlebackground.appendChild(button);
+                button.textContent = "刷新";
+                button.onclick = () => __awaiter(this, void 0, void 0, function* () {
+                    coinNum.textContent = yield WebBrowser.CoinTool.getGold("default", WebBrowser.GUITool.address, select.childNodes[select.selectedIndex].value);
+                });
+                var addrText = document.createElement('span');
+                singlebackground.appendChild(addrText);
+                addrText.style.color = "#eeeeee";
+                addrText.textContent = "地址";
+                var addr = document.createElement('input');
+                singlebackground.appendChild(addr);
+                var goldText = document.createElement('span');
+                singlebackground.appendChild(goldText);
+                goldText.style.color = "#eeeeee";
+                goldText.textContent = "金额";
+                var gold = document.createElement('input');
+                singlebackground.appendChild(gold);
+                var btnSend = document.createElement('button');
+                singlebackground.appendChild(btnSend);
+                btnSend.textContent = "发送";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
                     if (coinNum.textContent == "0")
                         return;
@@ -4862,17 +5224,25 @@ var WebBrowser;
                 if (div.firstChild)
                     div.removeChild(div.firstChild);
                 var normalbackground = document.createElement('div');
+<<<<<<< HEAD
                 WebBrowser.CSSTool.normalbackground_set(normalbackground);
                 div.appendChild(normalbackground);
                 var up = document.createElement('div');
                 up.style.width = '100%';
                 up.style.overflow = 'hidden';
                 up.style.margin = '15px 0';
+=======
+                div.appendChild(normalbackground);
+                var up = document.createElement('div');
+                up.style.width = "100%";
+                up.style.cssFloat = "left";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 normalbackground.appendChild(up);
                 var asset = document.createElement('span');
                 up.appendChild(asset);
                 asset.style.color = "#eeeeee";
                 asset.textContent = "资产";
+<<<<<<< HEAD
                 WebBrowser.CSSTool.flowLeft_set(asset);
                 var select = WebBrowser.CoinTool.ZoroAsset();
                 select.style.marginLeft = '20px';
@@ -4891,10 +5261,22 @@ var WebBrowser;
                 var coinNum = document.createElement('span');
                 balance.appendChild(coinNum);
                 coinNum.style.color = "#C8AB73";
+=======
+                var select = WebBrowser.CoinTool.ZoroAsset();
+                up.appendChild(select);
+                var coin = document.createElement('span');
+                up.appendChild(coin);
+                coin.style.color = "#eeeeee";
+                coin.textContent = "余额";
+                var coinNum = document.createElement('span');
+                up.appendChild(coinNum);
+                coinNum.style.color = "#eeeeee";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 coinNum.textContent = yield WebBrowser.CoinTool.getGold(select.childNodes[select.selectedIndex].value, WebBrowser.GUITool.address, WebBrowser.AppChainTool.RootChain);
                 select.onchange = () => __awaiter(this, void 0, void 0, function* () {
                     coinNum.textContent = yield WebBrowser.CoinTool.getGold(select.childNodes[select.selectedIndex].value, WebBrowser.GUITool.address, WebBrowser.AppChainTool.RootChain);
                 });
+<<<<<<< HEAD
                 var address = document.createElement("div");
                 address.style.textAlign = 'left';
                 address.style.margin = '20px 0';
@@ -4926,6 +5308,23 @@ var WebBrowser;
                 btnSend.textContent = "发送";
                 WebBrowser.CSSTool.btn_set(btnSend);
                 btnSend.style.width = '50%';
+=======
+                var addrText = document.createElement('span');
+                normalbackground.appendChild(addrText);
+                addrText.style.color = "#eeeeee";
+                addrText.textContent = "地址";
+                var addr = document.createElement('input');
+                normalbackground.appendChild(addr);
+                var goldText = document.createElement('span');
+                normalbackground.appendChild(goldText);
+                goldText.style.color = "#eeeeee";
+                goldText.textContent = "金额";
+                var gold = document.createElement('input');
+                normalbackground.appendChild(gold);
+                var btnSend = document.createElement('button');
+                normalbackground.appendChild(btnSend);
+                btnSend.textContent = "发送";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
                     if (coinNum.textContent == "0")
                         return;
@@ -4950,6 +5349,7 @@ var WebBrowser;
                 if (div.firstChild)
                     div.removeChild(div.firstChild);
                 var chainbackground = document.createElement('div');
+<<<<<<< HEAD
                 WebBrowser.CSSTool.normalbackground_set(chainbackground);
                 div.appendChild(chainbackground);
                 var top = document.createElement("div");
@@ -5015,6 +5415,41 @@ var WebBrowser;
                 chainbackground.appendChild(btnSend);
                 WebBrowser.CSSTool.btn_set(btnSend);
                 btnSend.style.width = '50%';
+=======
+                div.appendChild(chainbackground);
+                var asset = document.createElement('span');
+                chainbackground.appendChild(asset);
+                asset.style.color = "#eeeeee";
+                asset.textContent = "方法";
+                var funcSelect = WebBrowser.CoinTool.ZoroFunction();
+                chainbackground.appendChild(funcSelect);
+                var asset = document.createElement('span');
+                chainbackground.appendChild(asset);
+                asset.style.color = "#eeeeee";
+                asset.textContent = "资产";
+                var coinSelect = document.createElement('select');
+                var sitem = document.createElement("option");
+                sitem.text = "BCP";
+                sitem.value = "BCP";
+                coinSelect.appendChild(sitem);
+                chainbackground.appendChild(coinSelect);
+                var coin = document.createElement('span');
+                chainbackground.appendChild(coin);
+                coin.style.color = "#eeeeee";
+                coin.textContent = "余额";
+                var coinNum = document.createElement('span');
+                chainbackground.appendChild(coinNum);
+                coinNum.style.color = "#eeeeee";
+                coinNum.textContent = yield WebBrowser.CoinTool.getGold(funcSelect.childNodes[funcSelect.selectedIndex].value, WebBrowser.GUITool.address, WebBrowser.GUITool.chainHash);
+                var goldText = document.createElement('span');
+                chainbackground.appendChild(goldText);
+                goldText.style.color = "#eeeeee";
+                goldText.textContent = "金额";
+                var gold = document.createElement('input');
+                chainbackground.appendChild(gold);
+                var btnSend = document.createElement('button');
+                chainbackground.appendChild(btnSend);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 btnSend.textContent = "发送";
                 btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
                     if (coinNum.textContent == "0")
@@ -5052,6 +5487,7 @@ var WebBrowser;
         mainAppChain(div) {
             if (div.firstChild)
                 div.removeChild(div.firstChild);
+<<<<<<< HEAD
             div.style.background = '#333542';
             div.style.position = 'relative';
             div.style.overflow = 'hidden';
@@ -5104,6 +5540,32 @@ var WebBrowser;
             pbutton.style.right = '0';
             pbutton.style.lineHeight = '30px';
             WebBrowser.CSSTool.break_set(pbutton);
+=======
+            var appChainBackGround = document.createElement('div');
+            appChainBackGround.style.width = "100%";
+            appChainBackGround.style.cssFloat = "left";
+            div.appendChild(appChainBackGround);
+            var appChainText = document.createElement('span');
+            appChainText.style.color = "#eeeeee";
+            appChainText.textContent = "应用链";
+            appChainBackGround.appendChild(appChainText);
+            var appChainName = document.createElement('span');
+            appChainName.style.color = "#eeeeee";
+            appChainName.textContent = "应用链名称";
+            appChainBackGround.appendChild(appChainName);
+            var name = document.createElement('input');
+            appChainBackGround.appendChild(name);
+            var pubkeyList = document.createElement('span');
+            pubkeyList.style.color = "#eeeeee";
+            pubkeyList.textContent = "共识节点数量";
+            appChainBackGround.appendChild(pubkeyList);
+            var pubkeyListNumber = document.createElement('input');
+            pubkeyListNumber.type = "number";
+            appChainBackGround.appendChild(pubkeyListNumber);
+            var pbutton = document.createElement("button");
+            appChainBackGround.appendChild(pbutton);
+            pbutton.textContent = "确认";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             pbutton.onkeyup = () => {
                 if (pbutton.value.length == 1) {
                     pbutton.value = pbutton.value.replace(/[^1-9]/g, '');
@@ -5121,7 +5583,10 @@ var WebBrowser;
                 }
             };
             var back = document.createElement("div");
+<<<<<<< HEAD
             $(back).addClass("back");
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             appChainBackGround.appendChild(back);
             var pubkey = [];
             pbutton.onclick = () => {
@@ -5133,6 +5598,7 @@ var WebBrowser;
                     back.removeChild(back.firstChild);
                 }
                 for (let i = 0; i < parseInt(pubkeyListNumber.value); i++) {
+<<<<<<< HEAD
                     var pkey1 = document.createElement('span'), pkeyDiv = document.createElement("div");
                     pkey1.style.color = "#eeeeee";
                     pkey1.textContent = "选择公钥" + (i + 1);
@@ -5173,6 +5639,24 @@ var WebBrowser;
             ipbutton.style.right = '0';
             ipbutton.style.lineHeight = '30px';
             WebBrowser.CSSTool.break_set(ipbutton);
+=======
+                    var pkey1 = document.createElement('span');
+                    pkey1.style.color = "#eeeeee";
+                    pkey1.textContent = "选择公钥" + (i + 1);
+                    back.appendChild(pkey1);
+                    pubkey.push(WebBrowser.AppChainTool.createSelect(back, "pubkey", i + 1));
+                }
+            };
+            var ipList = document.createElement('span');
+            ipList.style.color = "#eeeeee";
+            ipList.textContent = "种子节点数量";
+            appChainBackGround.appendChild(ipList);
+            var ipListNumber = document.createElement('input');
+            ipListNumber.type = "number";
+            appChainBackGround.appendChild(ipListNumber);
+            var ipbutton = document.createElement("button");
+            appChainBackGround.appendChild(ipbutton);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             ipbutton.textContent = "确认";
             ipbutton.onkeyup = () => {
                 if (ipbutton.value.length == 1) {
@@ -5203,6 +5687,7 @@ var WebBrowser;
                     backip.removeChild(backip.firstChild);
                 }
                 for (let i = 0; i < parseInt(ipListNumber.value); i++) {
+<<<<<<< HEAD
                     var seed1 = document.createElement('span'), seedDiv = document.createElement("div");
                     seed1.style.color = "#eeeeee";
                     seed1.textContent = "选择种子地址" + (i + 1);
@@ -5223,14 +5708,27 @@ var WebBrowser;
                     WebBrowser.CSSTool.addr_set(port1);
                     port1.style.width = '230px';
                     seedDiv.appendChild(port1);
+=======
+                    var seed1 = document.createElement('span');
+                    seed1.style.color = "#eeeeee";
+                    seed1.textContent = "选择种子地址" + (i + 1);
+                    backip.appendChild(seed1);
+                    ip.push(WebBrowser.AppChainTool.createSelect(backip, "ip", i + 1));
+                    let port1 = document.createElement('input');
+                    port1.value = "15000";
+                    backip.appendChild(port1);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                     port.push(port1);
                 }
             };
             var btnCreate = document.createElement('button');
             btnCreate.textContent = "创建";
+<<<<<<< HEAD
             WebBrowser.CSSTool.btn_set(btnCreate);
             btnCreate.style.width = '50%';
             btnCreate.style.margin = '20px 0';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             btnCreate.onclick = () => {
                 var listpubkey = [];
                 for (let i = 0; i < parseInt(pubkeyListNumber.value); i++) {
@@ -5264,13 +5762,17 @@ var WebBrowser;
         mainContract(div) {
             if (div.firstChild)
                 div.removeChild(div.firstChild);
+<<<<<<< HEAD
             div.style.overflow = 'hidden';
             div.style.background = '#333542';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             var contractBackGround = document.createElement('div');
             contractBackGround.style.width = "100%";
             contractBackGround.style.cssFloat = "left";
             div.appendChild(contractBackGround);
             var upBackGround = document.createElement('div');
+<<<<<<< HEAD
             WebBrowser.CSSTool.transfer_set(upBackGround);
             contractBackGround.appendChild(upBackGround);
             var downBackGround = document.createElement('div');
@@ -5287,10 +5789,27 @@ var WebBrowser;
             putContract.onclick = () => {
                 this.putContract(downBackGround);
                 $(putContract).css({ "borderTop": "1px solid #C8AB73", "background": '#3C3E4B' }).siblings().css({ "borderTop": "1px solid #333542", "background": "#333542" });
+=======
+            upBackGround.style.width = "100%";
+            upBackGround.style.cssFloat = "left";
+            contractBackGround.appendChild(upBackGround);
+            var downBackGround = document.createElement('div');
+            downBackGround.style.width = "100%";
+            downBackGround.style.cssFloat = "left";
+            contractBackGround.appendChild(downBackGround);
+            var putContract = document.createElement("button");
+            upBackGround.appendChild(putContract);
+            putContract.style.cssFloat = "left";
+            putContract.style.width = "33%";
+            putContract.textContent = "发布合约";
+            putContract.onclick = () => {
+                this.putContract(downBackGround);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             };
             putContract.click();
             var useContract = document.createElement("button");
             upBackGround.appendChild(useContract);
+<<<<<<< HEAD
             upBackGround.appendChild(useContract);
             WebBrowser.CSSTool.transfer_btn(useContract);
             WebBrowser.CSSTool.flowLeft_set(useContract);
@@ -5308,11 +5827,27 @@ var WebBrowser;
             invokeContract.onclick = () => {
                 this.useContract(downBackGround, false);
                 $(invokeContract).css({ "borderTop": "1px solid #C8AB73", "background": '#3C3E4B' }).siblings().css({ "borderTop": "1px solid #333542", "background": "#333542" });
+=======
+            useContract.style.cssFloat = "left";
+            useContract.style.width = "33%";
+            useContract.textContent = "调用合约";
+            useContract.onclick = () => {
+                this.useContract(downBackGround, true);
+            };
+            var invokeContract = document.createElement("button");
+            upBackGround.appendChild(invokeContract);
+            invokeContract.style.cssFloat = "left";
+            invokeContract.style.width = "33%";
+            invokeContract.textContent = "预调用合约";
+            invokeContract.onclick = () => {
+                this.useContract(downBackGround, false);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             };
         }
         putContract(div) {
             if (div.firstChild)
                 div.removeChild(div.firstChild);
+<<<<<<< HEAD
             div.style.marginBottom = '30px';
             var contractBackGround = document.createElement('div');
             contractBackGround.style.width = "100%";
@@ -5493,12 +6028,74 @@ var WebBrowser;
                         reader.readAsArrayBuffer(file.files[0]);
                     }
             };
+=======
+            var contractBackGround = document.createElement('div');
+            contractBackGround.style.width = "100%";
+            contractBackGround.style.cssFloat = "left";
+            div.appendChild(contractBackGround);
+            var asset = document.createElement('span');
+            contractBackGround.appendChild(asset);
+            asset.style.color = "#eeeeee";
+            asset.textContent = "链名";
+            var select = document.createElement("select");
+            contractBackGround.appendChild(select);
+            WebBrowser.AppChainTool.getChain(select);
+            var chooseNative = document.createElement("div");
+            contractBackGround.appendChild(chooseNative);
+            var nativeBackGround = document.createElement('div');
+            chooseNative.appendChild(nativeBackGround);
+            var BoolNativeNep5 = null;
+            select.onchange = () => {
+                if (select.childNodes[select.selectedIndex].value != "NEO") {
+                    if (chooseNative.firstChild)
+                        chooseNative.removeChild(chooseNative.firstChild);
+                    var nativeBackGround = document.createElement('div');
+                    chooseNative.appendChild(nativeBackGround);
+                    var nativeName = document.createElement('span');
+                    nativeBackGround.appendChild(nativeName);
+                    nativeName.style.color = "#eeeeee";
+                    nativeName.textContent = "选择是否NativeNep5类型";
+                    BoolNativeNep5 = document.createElement('input');
+                    BoolNativeNep5.type = "checkbox";
+                    BoolNativeNep5.checked = false;
+                    nativeBackGround.appendChild(BoolNativeNep5);
+                    var nativeBackGround2 = document.createElement('div');
+                    nativeBackGround.appendChild(nativeBackGround2);
+                    BoolNativeNep5.onchange = () => {
+                        if (BoolNativeNep5.checked) {
+                            if (nativeBackGround2)
+                                nativeBackGround.removeChild(nativeBackGround2);
+                            nativeBackGround2 = document.createElement('div');
+                            nativeBackGround.appendChild(nativeBackGround2);
+                            this.createNativeContract(nativeBackGround2, select);
+                        }
+                        else {
+                            if (nativeBackGround2)
+                                nativeBackGround.removeChild(nativeBackGround2);
+                            nativeBackGround2 = document.createElement('div');
+                            nativeBackGround.appendChild(nativeBackGround2);
+                            this.createContract(nativeBackGround2, select);
+                        }
+                    };
+                    this.createContract(nativeBackGround2, select);
+                }
+                else {
+                    if (chooseNative.firstChild)
+                        chooseNative.removeChild(chooseNative.firstChild);
+                    var nativeBackGround = document.createElement('div');
+                    chooseNative.appendChild(nativeBackGround);
+                    this.createContract(nativeBackGround, select);
+                }
+            };
+            this.createContract(nativeBackGround, select);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         }
         useContract(div, use) {
             if (div.firstChild)
                 div.removeChild(div.firstChild);
             var contractBackGround = document.createElement('div');
             contractBackGround.style.width = "100%";
+<<<<<<< HEAD
             div.appendChild(contractBackGround);
             var assetModel = document.createElement("div");
             WebBrowser.CSSTool.handle_set(assetModel);
@@ -5533,6 +6130,26 @@ var WebBrowser;
             hash_lable.appendChild(label_con);
             var hashBackGround = document.createElement("div");
             WebBrowser.CSSTool.handle_set(hashBackGround);
+=======
+            contractBackGround.style.cssFloat = "left";
+            div.appendChild(contractBackGround);
+            var asset = document.createElement('span');
+            contractBackGround.appendChild(asset);
+            asset.style.color = "#eeeeee";
+            asset.textContent = "链名";
+            var select = document.createElement("select");
+            contractBackGround.appendChild(select);
+            WebBrowser.AppChainTool.getChain(select);
+            var fillinText = document.createElement("span");
+            fillinText.style.color = "#eeeeee";
+            fillinText.textContent = "手动输入合约hash";
+            contractBackGround.appendChild(fillinText);
+            var HashFilein = document.createElement("input");
+            HashFilein.type = "checkbox";
+            HashFilein.checked = true;
+            contractBackGround.appendChild(HashFilein);
+            var hashBackGround = document.createElement("div");
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             contractBackGround.appendChild(hashBackGround);
             var ContractAvm = null;
             var contractHash = null;
@@ -5541,10 +6158,13 @@ var WebBrowser;
             fileText.textContent = "合约hash";
             hashBackGround.appendChild(fileText);
             ContractAvm = document.createElement("input");
+<<<<<<< HEAD
             WebBrowser.CSSTool.addr_set(ContractAvm);
             WebBrowser.CSSTool.flowRight_set(ContractAvm);
             ContractAvm.style.width = '80%';
             ContractAvm.placeholder = '请输入合约hash';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             hashBackGround.appendChild(ContractAvm);
             HashFilein.onchange = () => {
                 while (hashBackGround.children.length > 0) {
@@ -5556,14 +6176,18 @@ var WebBrowser;
                     fileText.textContent = "合约hash";
                     hashBackGround.appendChild(fileText);
                     ContractAvm = document.createElement("input");
+<<<<<<< HEAD
                     WebBrowser.CSSTool.addr_set(ContractAvm);
                     WebBrowser.CSSTool.flowRight_set(ContractAvm);
                     ContractAvm.style.width = '80%';
                     ContractAvm.placeholder = '请输入合约hash';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                     hashBackGround.appendChild(ContractAvm);
                 }
                 else {
                     ContractAvm = null;
+<<<<<<< HEAD
                     var firstFile = document.createElement("div");
                     var putIn = document.createElement("div");
                     putIn.textContent = "请选择avm文件";
@@ -5586,6 +6210,15 @@ var WebBrowser;
                     // $(fileTip).attr("id","fileTip");
                     // hashBackGround.appendChild(fileTip);
                     // CSSTool.fileTip_set(fileTip);
+=======
+                    var fileText = document.createElement("span");
+                    fileText.style.color = "#eeeeee";
+                    fileText.textContent = "选择.avm文件";
+                    hashBackGround.appendChild(fileText);
+                    var file = document.createElement('input');
+                    file.type = "file";
+                    hashBackGround.appendChild(file);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                     var reader = new FileReader();
                     reader.onload = (e) => {
                         contractHash = reader.result;
@@ -5594,7 +6227,10 @@ var WebBrowser;
                     file.onchange = (ev) => {
                         if (file.files.length > 0)
                             if (file.files[0].name.includes(".avm")) {
+<<<<<<< HEAD
                                 putIn.textContent = file.files[0].name;
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                                 reader.readAsArrayBuffer(file.files[0]);
                             }
                     };
@@ -5604,8 +6240,11 @@ var WebBrowser;
             contractBackGround.appendChild(methodBackGround);
             var btnAddMethod = document.createElement("button");
             btnAddMethod.textContent = "AddMethod";
+<<<<<<< HEAD
             WebBrowser.CSSTool.addMethod_btn(btnAddMethod);
             btnAddMethod.style.marginLeft = '73px';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             contractBackGround.appendChild(btnAddMethod);
             var JsonMethod = [];
             btnAddMethod.onclick = () => {
@@ -5613,7 +6252,10 @@ var WebBrowser;
                 JsonMethod.push(json);
                 var params = [];
                 var singleMethodBackGround = document.createElement("div");
+<<<<<<< HEAD
                 WebBrowser.CSSTool.handle_set(singleMethodBackGround);
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 methodBackGround.appendChild(singleMethodBackGround);
                 var methodText = document.createElement("span");
                 methodText.style.color = "#eeeeee";
@@ -5621,6 +6263,7 @@ var WebBrowser;
                 singleMethodBackGround.appendChild(methodText);
                 var methodInput = document.createElement("input");
                 singleMethodBackGround.appendChild(methodInput);
+<<<<<<< HEAD
                 WebBrowser.CSSTool.addr_set(methodInput);
                 WebBrowser.CSSTool.flowRight_set(methodInput);
                 methodInput.style.width = '80%';
@@ -5638,22 +6281,39 @@ var WebBrowser;
                 btnAddParams.onclick = () => {
                     var singleParamsBackGround = document.createElement("div");
                     WebBrowser.CSSTool.handle_set(singleParamsBackGround);
+=======
+                json["methodName"] = methodInput;
+                json["params"] = params;
+                var paramsBackGround = document.createElement("div");
+                singleMethodBackGround.appendChild(paramsBackGround);
+                var btnAddParams = document.createElement("button");
+                btnAddParams.textContent = "AddParams";
+                singleMethodBackGround.appendChild(btnAddParams);
+                btnAddParams.onclick = () => {
+                    var singleParamsBackGround = document.createElement("div");
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                     paramsBackGround.appendChild(singleParamsBackGround);
                     var paramsText = document.createElement("span");
                     paramsText.style.color = "#eeeeee";
                     paramsText.textContent = "参数";
                     singleParamsBackGround.appendChild(paramsText);
                     var paramsInput = document.createElement("input");
+<<<<<<< HEAD
                     WebBrowser.CSSTool.addr_set(paramsInput);
                     WebBrowser.CSSTool.flowRight_set(paramsInput);
                     paramsInput.style.width = '80%';
                     paramsInput.placeholder = '请输入参数';
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                     singleParamsBackGround.appendChild(paramsInput);
                     params.push(paramsInput);
                 };
                 var btnSubParams = document.createElement("button");
+<<<<<<< HEAD
                 WebBrowser.CSSTool.subParams_btn(btnSubParams);
                 WebBrowser.CSSTool.flowRight_set(btnSubParams);
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                 btnSubParams.textContent = "SubParams";
                 singleMethodBackGround.appendChild(btnSubParams);
                 btnSubParams.onclick = () => {
@@ -5662,20 +6322,28 @@ var WebBrowser;
                 };
             };
             var btnSubMethod = document.createElement("button");
+<<<<<<< HEAD
             WebBrowser.CSSTool.subParams_btn(btnSubMethod);
             WebBrowser.CSSTool.flowRight_set(btnSubMethod);
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             btnSubMethod.textContent = "SubMethod";
             contractBackGround.appendChild(btnSubMethod);
             btnSubMethod.onclick = () => {
                 methodBackGround.removeChild(methodBackGround.lastChild);
                 JsonMethod.pop();
             };
+<<<<<<< HEAD
             var btnSend = document.createElement('div');
             WebBrowser.CSSTool.btn_set(btnSend);
             btnSend.style.width = '50%';
             btnSend.textContent = "send";
             btnSend.style.margin = '15px auto';
             btnSend.style.cursor = 'pointer';
+=======
+            var btnSend = document.createElement('button');
+            btnSend.textContent = "send";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             contractBackGround.appendChild(btnSend);
             var txText = document.createElement("span");
             txText.style.color = "#eeeeee";
@@ -5711,6 +6379,130 @@ var WebBrowser;
                 txText.textContent = (use ? "txid = " : "invokeMessage = ") + txMessage;
             });
         }
+<<<<<<< HEAD
+=======
+        createContract(nativeBackGround, select) {
+            var ContractText = document.createElement('span');
+            ContractText.style.color = "#eeeeee";
+            ContractText.textContent = "合约";
+            nativeBackGround.appendChild(ContractText);
+            var storageName = document.createElement('span');
+            storageName.style.color = "#eeeeee";
+            storageName.textContent = "storage";
+            nativeBackGround.appendChild(storageName);
+            var need_storage = document.createElement('input');
+            need_storage.type = "checkbox";
+            need_storage.checked = false;
+            nativeBackGround.appendChild(need_storage);
+            var canChargeName = document.createElement('span');
+            canChargeName.style.color = "#eeeeee";
+            canChargeName.textContent = "canCharge";
+            nativeBackGround.appendChild(canChargeName);
+            var need_canCharge = document.createElement('input');
+            need_canCharge.type = "checkbox";
+            need_canCharge.checked = false;
+            nativeBackGround.appendChild(need_canCharge);
+            var nameText = document.createElement('span');
+            nameText.style.color = "#eeeeee";
+            nameText.textContent = "NAME";
+            nativeBackGround.appendChild(nameText);
+            var name = document.createElement('input');
+            name.value = "name";
+            nativeBackGround.appendChild(name);
+            var versionText = document.createElement('span');
+            versionText.style.color = "#eeeeee";
+            versionText.textContent = "VERSION";
+            nativeBackGround.appendChild(versionText);
+            var version = document.createElement('input');
+            version.value = "1.0";
+            nativeBackGround.appendChild(version);
+            var autherText = document.createElement('span');
+            autherText.style.color = "#eeeeee";
+            autherText.textContent = "AUTHOR";
+            nativeBackGround.appendChild(autherText);
+            var auther = document.createElement('input');
+            auther.value = "auther";
+            nativeBackGround.appendChild(auther);
+            var emailText = document.createElement('span');
+            emailText.style.color = "#eeeeee";
+            emailText.textContent = "EMAIL";
+            nativeBackGround.appendChild(emailText);
+            var email = document.createElement('input');
+            email.value = "email";
+            nativeBackGround.appendChild(email);
+            var descriptionText = document.createElement('span');
+            descriptionText.style.color = "#eeeeee";
+            descriptionText.textContent = "DESCRIPTION";
+            nativeBackGround.appendChild(descriptionText);
+            var description = document.createElement('input');
+            description.value = "description";
+            nativeBackGround.appendChild(description);
+            var fileText = document.createElement('span');
+            fileText.style.color = "#eeeeee";
+            fileText.textContent = "FILE";
+            nativeBackGround.appendChild(fileText);
+            var file = document.createElement('input');
+            file.type = "file";
+            nativeBackGround.appendChild(file);
+            var btnSend = document.createElement('button');
+            btnSend.textContent = "send";
+            nativeBackGround.appendChild(btnSend);
+            var ContractAvm = null;
+            btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
+                if (!ContractAvm) {
+                    alert("it can be .avm file.");
+                    return;
+                }
+                WebBrowser.AppChainTool.SendContract(need_storage.checked, need_canCharge.checked, description.value, email.value, auther.value, version.value, name.value, ContractAvm, select.childNodes[select.selectedIndex].value, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.prikey);
+            });
+            var reader = new FileReader();
+            reader.onload = (e) => {
+                ContractAvm = reader.result;
+            };
+            file.onchange = (ev) => {
+                if (file.files.length > 0)
+                    if (file.files[0].name.includes(".avm")) {
+                        reader.readAsArrayBuffer(file.files[0]);
+                    }
+            };
+        }
+        createNativeContract(nativeBackGround, select) {
+            var nameText = document.createElement('span');
+            nameText.style.color = "#eeeeee";
+            nameText.textContent = "NAME";
+            nativeBackGround.appendChild(nameText);
+            var name = document.createElement('input');
+            name.value = "InvokeContractTest_NativeNEP5";
+            nativeBackGround.appendChild(name);
+            var symbolText = document.createElement('span');
+            symbolText.style.color = "#eeeeee";
+            symbolText.textContent = "SYMBOL";
+            nativeBackGround.appendChild(symbolText);
+            var symbol = document.createElement('input');
+            symbol.value = "InvokeContractTest";
+            nativeBackGround.appendChild(symbol);
+            var totalSupplyText = document.createElement('span');
+            totalSupplyText.style.color = "#eeeeee";
+            totalSupplyText.textContent = "TotalSupply";
+            nativeBackGround.appendChild(totalSupplyText);
+            var totalSupply = document.createElement('input');
+            totalSupply.value = "2000000000";
+            nativeBackGround.appendChild(totalSupply);
+            var presionText = document.createElement('span');
+            presionText.style.color = "#eeeeee";
+            presionText.textContent = "Presion";
+            nativeBackGround.appendChild(presionText);
+            var presion = document.createElement('input');
+            presion.value = "8";
+            nativeBackGround.appendChild(presion);
+            var btnSend = document.createElement('button');
+            btnSend.textContent = "send";
+            nativeBackGround.appendChild(btnSend);
+            btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
+                WebBrowser.AppChainTool.SendNativeContract(parseInt(presion.value), parseInt(totalSupply.value), symbol.value, name.value, select.childNodes[select.selectedIndex].value, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.prikey);
+            });
+        }
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
     }
     WebBrowser.GUI_Contract = GUI_Contract;
 })(WebBrowser || (WebBrowser = {}));
@@ -5757,7 +6549,10 @@ var WebBrowser;
 /// <reference path="./AppChain.ts"/>
 /// <reference path="./Contract.ts"/>
 /// <reference path="./TxMessage.ts"/>
+<<<<<<< HEAD
 /// <reference path="../tools/CSSTools.ts"/>
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 var WebBrowser;
 /// <reference path="./Base.ts"/>
 /// <reference path="./Asset.ts"/>
@@ -5765,11 +6560,15 @@ var WebBrowser;
 /// <reference path="./AppChain.ts"/>
 /// <reference path="./Contract.ts"/>
 /// <reference path="./TxMessage.ts"/>
+<<<<<<< HEAD
 /// <reference path="../tools/CSSTools.ts"/>
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 (function (WebBrowser) {
     class GUI_Title {
         constructor(div) {
             this.div = div;
+<<<<<<< HEAD
             this.div.style.width = "100%";
             this.div.style.background = '#3D3E4C';
             var navTitle = document.createElement("div");
@@ -5779,6 +6578,11 @@ var WebBrowser;
             this.title = document.createElement('div');
             navTitle.appendChild(this.title);
             WebBrowser.CSSTool.title_set(this.title);
+=======
+            this.title = document.createElement('div');
+            this.title.style.width = "100%";
+            this.div.appendChild(this.title);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             this.mainValueBackGround = document.createElement('div');
             this.mainValueBackGround.style.width = "100%";
             this.div.appendChild(this.mainValueBackGround);
@@ -5805,21 +6609,32 @@ var WebBrowser;
             }
         }
         showTitle(title) {
+<<<<<<< HEAD
             $("#gui-info").width($(window).width());
             $("#removeContainer").removeClass("container");
             var asset = document.createElement("button");
             title.appendChild(asset);
             $(asset).css("background", "#333542");
             WebBrowser.CSSTool.titleBtn_set(asset);
+=======
+            var asset = document.createElement("button");
+            title.appendChild(asset);
+            asset.style.cssFloat = "left";
+            asset.style.width = "10%";
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             asset.textContent = "资产";
             asset.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Asset);
                 this.addSelect();
+<<<<<<< HEAD
                 $(asset).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             };
             asset.click();
             var charge = document.createElement("button");
             title.appendChild(charge);
+<<<<<<< HEAD
             $(charge).css("background", "#3D3E4C");
             WebBrowser.CSSTool.titleBtn_set(charge);
             charge.textContent = "转账";
@@ -5862,6 +6677,44 @@ var WebBrowser;
             WebBrowser.CSSTool.titleBtn_set(message);
             message.onclick = () => {
                 $(message).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
+=======
+            charge.style.cssFloat = "left";
+            charge.style.width = "10%";
+            charge.textContent = "转账";
+            charge.onclick = () => {
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Charge);
+            };
+            var appChain = document.createElement("button");
+            title.appendChild(appChain);
+            appChain.style.cssFloat = "left";
+            appChain.style.width = "10%";
+            appChain.textContent = "应用链";
+            appChain.onclick = () => {
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.AppChain);
+            };
+            var contract = document.createElement("button");
+            title.appendChild(contract);
+            contract.style.cssFloat = "left";
+            contract.style.width = "10%";
+            contract.textContent = "发布合约";
+            contract.onclick = () => {
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Contract);
+            };
+            var transaction = document.createElement("button");
+            title.appendChild(transaction);
+            transaction.style.cssFloat = "left";
+            transaction.style.width = "10%";
+            transaction.textContent = "交易记录";
+            transaction.onclick = () => {
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.TxMessage);
+            };
+            var message = document.createElement("button");
+            title.appendChild(message);
+            message.style.cssFloat = "left";
+            message.style.width = "10%";
+            message.textContent = "信息";
+            message.onclick = () => {
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             };
         }
         addSelect() {
@@ -5871,13 +6724,19 @@ var WebBrowser;
             this.selectAppChain = document.createElement("select");
             this.selectAppChain.style.cssFloat = "right";
             this.selectAppChain.style.width = "15%";
+<<<<<<< HEAD
             WebBrowser.CSSTool.select_set(this.selectAppChain);
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             this.title.appendChild(this.selectAppChain);
             this.height = document.createElement("span");
             this.height.style.color = "#eeeeee";
             this.title.appendChild(this.height);
             this.height.style.cssFloat = "right";
+<<<<<<< HEAD
             this.height.style.lineHeight = "30px";
+=======
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             this.height.style.width = "6%";
             this.height.textContent = "0";
         }
@@ -8039,7 +8898,11 @@ var WebBrowser;
                                 case "cli":
                                     try {
                                         let json = yield response.json();
+<<<<<<< HEAD
                                         if (json["result"][0]["blockcount"]) {
+=======
+                                        if (json["result"][0]["indexx"]) {
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
                                             if (!this.first_host) {
                                                 this.first_host = url_head + host;
                                                 callback(this.first_host, json);

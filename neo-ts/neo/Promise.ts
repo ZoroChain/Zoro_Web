@@ -50,7 +50,11 @@ class NeoPromise<T> implements PromiseLike<T>
         });
     }
 
+<<<<<<< HEAD
     public catch<TResult>(onRejected: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<TResult|any> {
+=======
+    public catch<TResult>(onRejected: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<T|TResult> {
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         return this.then(null, onRejected);
     }
 
@@ -105,19 +109,32 @@ class NeoPromise<T> implements PromiseLike<T>
         return new NeoPromise<T>((resolve, reject) => resolve(value));
     }
 
+<<<<<<< HEAD
     public then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2>{
         this._onFulfilled = onfulfilled;
         this._onRejected = onrejected;
         this._callback_attached = true;
         if (this._state == PromiseState.pending) {
             this._next_promise = new NeoPromise<TResult1|TResult2>(null);
+=======
+    public then<TResult1 = T, TResult2 = never>(onFulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>, onRejected?: (reason: any) => TResult2 | PromiseLike<TResult2>):PromiseLike<TResult1 | TResult2>{
+        this._onFulfilled = onFulfilled;
+        this._onRejected = onRejected;
+        this._callback_attached = true;
+        if (this._state == PromiseState.pending) {
+            this._next_promise = new NeoPromise<TResult1>(null);
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             return this._next_promise;
         }
         else {
             return this.checkState();
         }
     }
+<<<<<<< HEAD
     // public then<TResult>(onFulfilled?: Func<T, TResult | PromiseLike<TResult>>, onRejected?: Func<any, TResult | PromiseLike<TResult>>): NeoPromise<TResult> {
+=======
+    // public then<TResult>(onFulfilled?: Func<T, TResult | NeoPromise<TResult>>, onRejected?: Func<any, TResult | NeoPromise<TResult>>): NeoPromise<TResult> {
+>>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
     //     this._onFulfilled = onFulfilled;
     //     this._onRejected = onRejected;
     //     this._callback_attached = true;
