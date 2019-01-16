@@ -19,6 +19,7 @@ namespace WebBrowser
         }
 
         mainMenu():void{
+
             this.div.removeChild(this.div.firstChild);
 
             var background = document.createElement('div') as HTMLDivElement;

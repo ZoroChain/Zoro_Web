@@ -18,40 +18,69 @@ namespace WebBrowser
         }
 
         mainAppChain(div:HTMLDivElement):void{
-            if (div.firstChild)
-            div.removeChild(div.firstChild);
+                if (div.firstChild)
+                div.removeChild(div.firstChild);
+                div.style.background = '#333542';
+                div.style.position = 'relative';
+                div.style.overflow = 'hidden';
 
-            var appChainBackGround = document.createElement('div') as HTMLDivElement;
-            appChainBackGround.style.width = "100%";
-            appChainBackGround.style.cssFloat = "left";
-            div.appendChild(appChainBackGround);
+                var appChainBackGround = document.createElement('div') as HTMLDivElement;
+                CSSTool.zoroChain_set(appChainBackGround);
+                appChainBackGround.style.position = 'relative';
+                appChainBackGround.style.width = '600px';
+                $(appChainBackGround).css("left",($(window).width() - $(appChainBackGround).width()) / 2);
+                div.appendChild(appChainBackGround);
 
-            var appChainText = document.createElement('span') as HTMLSpanElement;
-            appChainText.style.color = "#eeeeee";
-            appChainText.textContent = "应用链";
-            appChainBackGround.appendChild(appChainText);
+                var appChainText = document.createElement('div') as HTMLSpanElement;
+                CSSTool.assets_setname(appChainText);
+                appChainText.textContent = "应用链";
+                appChainBackGround.appendChild(appChainText);
 
-            var appChainName = document.createElement('span') as HTMLSpanElement;
-            appChainName.style.color = "#eeeeee";
-            appChainName.textContent = "应用链名称";
-            appChainBackGround.appendChild(appChainName);
+                var chain = document.createElement("div");
+                chain.style.textAlign = 'left';
+                chain.style.margin = '20px 0';
+                chain.style.padding = '10px 45px';
+                appChainBackGround.appendChild(chain);
 
-            var name = document.createElement('input') as HTMLInputElement;
-            appChainBackGround.appendChild(name);
+                var appChainName = document.createElement('span') as HTMLSpanElement;
+                appChainName.style.color = "#eeeeee";
+                appChainName.textContent = "应用链名称";
+                chain.appendChild(appChainName);
 
+                var name = document.createElement('input') as HTMLInputElement;
+                name.placeholder = '请输入应用链名称';
+                CSSTool.addr_set(name);
+                name.style.width = '80%';
+                CSSTool.flowRight_set(name);
+                chain.appendChild(name);
+
+                var firstInt = document.createElement("div");
+                firstInt.style.textAlign = 'left';
+                firstInt.style.margin = '20px 0';
+                firstInt.style.padding = '10px 45px';
+                appChainBackGround.appendChild(firstInt);
 
                 var pubkeyList = document.createElement('span') as HTMLSpanElement;
                 pubkeyList.style.color = "#eeeeee";
                 pubkeyList.textContent = "共识节点数量";
-                appChainBackGround.appendChild(pubkeyList);
+                firstInt.appendChild(pubkeyList);
                 
                 var pubkeyListNumber = document.createElement('input') as HTMLInputElement;
                 pubkeyListNumber.type = "number";
-                appChainBackGround.appendChild(pubkeyListNumber);
+                CSSTool.addr_set(pubkeyListNumber);
+                pubkeyListNumber.style.width = '80%';
+                pubkeyListNumber.style.marginLeft = '';
+                pubkeyListNumber.placeholder = '请输入共识节点数量';
+                CSSTool.flowRight_set(pubkeyListNumber);
+                firstInt.appendChild(pubkeyListNumber);
 
                 var pbutton = document.createElement("button") as HTMLButtonElement;
-                appChainBackGround.appendChild(pbutton);
+                firstInt.appendChild(pbutton);
                 pbutton.textContent = "确认";
+                pbutton.style.position = 'absolute';
+                pbutton.style.right = '0';
+                pbutton.style.lineHeight = '30px';
+                CSSTool.break_set(pbutton);
                 pbutton.onkeyup = () => {
                     if (pbutton.value.length == 1){
                         pbutton.value = pbutton.value.replace(/[^1-9]/g,'')
@@ -67,6 +96,7 @@ namespace WebBrowser
                     }
                 }
                 var back = document.createElement("div");
+                $(back).addClass("back");
                 appChainBackGround.appendChild(back);
                 var pubkey = [];
                 pbutton.onclick = () => {
@@ -78,26 +108,50 @@ namespace WebBrowser
                         back.removeChild(back.firstChild);
                     }
                     for (let i = 0; i < parseInt(pubkeyListNumber.value); i++){
-                        var pkey1 = document.createElement('span') as HTMLSpanElement;
+                        var pkey1 = document.createElement('span') as HTMLSpanElement, pkeyDiv = document.createElement("div");
                         pkey1.style.color = "#eeeeee";
                         pkey1.textContent = "选择公钥" + (i+1);
-                        back.appendChild(pkey1);
-            
-                        pubkey.push(AppChainTool.createSelect(back, "pubkey", i + 1));
+                        $(pkeyDiv).css({"margin":"5px 0","text-align":"left","padding":"0 45px"});
+                        pkeyDiv.appendChild(pkey1);
+                        back.appendChild(pkeyDiv);
+                        pubkey.push(AppChainTool.createSelect(pkeyDiv, "pubkey", i + 1));
+                        pubkey.forEach(element => {
+                            element.style.border = '1px solid #CDCEE0';
+                            element.style.background = '#3C3E4B';
+                            element.style.color = 'white';
+                            element.style.width = '150px';
+                            element.style.padding = '5px 15px';      
+                            element.style.marginLeft = '15px';                  
+                        });
                     }
                 }
+
+                var lastInt = document.createElement("div");
+                lastInt.style.textAlign = 'left';
+                lastInt.style.margin = '20px 0';
+                lastInt.style.padding = '10px 45px';
+                appChainBackGround.appendChild(lastInt);        
 
                 var ipList = document.createElement('span') as HTMLSpanElement;
                 ipList.style.color = "#eeeeee";
                 ipList.textContent = "种子节点数量";
-                appChainBackGround.appendChild(ipList);
+                lastInt.appendChild(ipList);
                 
                 var ipListNumber = document.createElement('input') as HTMLInputElement;
                 ipListNumber.type = "number";
-                appChainBackGround.appendChild(ipListNumber);
+                ipListNumber.placeholder = '请输入种子节点数量';
+                CSSTool.addr_set(ipListNumber);
+                ipListNumber.style.width = '80%';
+                ipListNumber.style.marginLeft = '';
+                CSSTool.flowRight_set(ipListNumber);
+                lastInt.appendChild(ipListNumber);
 
                 var ipbutton = document.createElement("button") as HTMLButtonElement;
-                appChainBackGround.appendChild(ipbutton);
+                lastInt.appendChild(ipbutton);
+                ipbutton.style.position = 'absolute';
+                ipbutton.style.right = '0';
+                ipbutton.style.lineHeight = '30px';
+                CSSTool.break_set(ipbutton);
                 ipbutton.textContent = "确认";
                 ipbutton.onkeyup = () => {
                     if (ipbutton.value.length == 1){
@@ -126,22 +180,37 @@ namespace WebBrowser
                         backip.removeChild(backip.firstChild);
                     }
                     for (let i = 0; i < parseInt(ipListNumber.value); i++){
-                        var seed1= document.createElement('span') as HTMLSpanElement;
+                        var seed1= document.createElement('span') as HTMLSpanElement,seedDiv = document.createElement("div");
+                        
                         seed1.style.color = "#eeeeee";
                         seed1.textContent = "选择种子地址" + (i+1);
-                        backip.appendChild(seed1);
-
-                        ip.push(AppChainTool.createSelect(backip, "ip", i + 1));
+                        seedDiv.appendChild(seed1);
+                        $(seedDiv).css({"margin":"5px 0","text-align":"left","padding":"0 45px"});
+                        backip.appendChild(seedDiv);
+                        ip.push(AppChainTool.createSelect(seedDiv, "ip", i + 1));
+                        ip.forEach(element => {
+                            element.style.border = '1px solid #CDCEE0';
+                            element.style.background = '#3C3E4B';
+                            element.style.color = 'white';
+                            element.style.width = '150px';
+                            element.style.padding = '5px 15px';      
+                            element.style.marginLeft = '15px'; 
+                        });
 
                         let port1 = document.createElement('input') as HTMLInputElement;
                         port1.value = "15000";
-                        backip.appendChild(port1);
+                        CSSTool.addr_set(port1);
+                        port1.style.width = '230px';
+                        seedDiv.appendChild(port1);
                         port.push(port1);
                     }
                 }          
 
             var btnCreate = document.createElement('button') as HTMLButtonElement;
             btnCreate.textContent = "创建";
+            CSSTool.btn_set(btnCreate);
+            btnCreate.style.width = '50%';
+            btnCreate.style.margin = '20px 0';
             btnCreate.onclick = () => {
                 var listpubkey = [];
                 for (let i = 0; i < parseInt(pubkeyListNumber.value); i++){

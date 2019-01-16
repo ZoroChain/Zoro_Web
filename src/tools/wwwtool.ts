@@ -2,10 +2,10 @@
 namespace WebBrowser {
 	export class WWW {
 
-		static api: string = "http://115.159.53.39:59908/api/testnet/";
-		static apiaggr: string = "http://115.159.53.39:59999/api/testnet/";
+		static api: string = "http://115.159.68.43:59908/api/testnet/";
+		static apiaggr: string = "http://115.159.68.43:59999/api/testnet/";
 
-		static rpc: string = "http://115.159.53.39:20333/";
+		static rpc: string = "http://47.91.210.16:20333";
 		static neoRpc:string = "http://47.52.192.77:20332";
 		static neoGetUTXO:string = "https://api.nel.group/api/testnet/";
         static rpcName: string = "";

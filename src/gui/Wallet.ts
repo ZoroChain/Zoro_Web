@@ -1,4 +1,5 @@
 /// <reference path="./Base.ts"/>
+/// <reference path="../tools/CSSTools.ts"/>
 namespace WebBrowser
 {
     export class GUI_Wallet implements GUI_Base
@@ -22,30 +23,58 @@ namespace WebBrowser
 
             var loginbackground = document.createElement('div') as HTMLDivElement;
             this.div.appendChild(loginbackground);
+            
 
             var name = document.createElement('h3') as HTMLHeadingElement;
             name.textContent = "创建您的钱包";
             name.style.color = "#ffffff";
             loginbackground.appendChild(name);
+            CSSTool.name_set(name);
+
+            var uploadFiles = document.createElement("div");//外层div
+            loginbackground.appendChild(uploadFiles);
+            CSSTool.uploadFiles_set(uploadFiles);
 
             var walletName = document.createElement("input");
-            loginbackground.appendChild(walletName);
+            uploadFiles.appendChild(walletName);
             walletName.type = "text";
-            walletName.title = "输入钱包名";
+            walletName.placeholder = "输入钱包名";
+            CSSTool.password_set(walletName);
+           
+
+            var moneyTip = document.createElement("p");
+            moneyTip.textContent = '*钱包名不能为空';
+            uploadFiles.appendChild(moneyTip);
+            CSSTool.fileTip_set(moneyTip);
 
             var password = document.createElement("input");
-            loginbackground.appendChild(password);
+            uploadFiles.appendChild(password);
             password.type = "password";
-            password.title = "输入密码";
+            password.placeholder = "输入密码";
+            CSSTool.password_set(password);
+
+             //密码提示的
+             var passwordTip = document.createElement("p");
+             passwordTip.textContent='*请输入密码';
+             uploadFiles.appendChild(passwordTip);
+             CSSTool.fileTip_set(passwordTip);
 
             var repassword = document.createElement("input");
-            loginbackground.appendChild(repassword);
+            uploadFiles.appendChild(repassword);
             repassword.type = "password";
-            repassword.title = "重复密码";
+            repassword.placeholder = "重复密码";
+            CSSTool.password_set(repassword);
+
+             //重复密码
+             var repeatTip = document.createElement("p");
+             repeatTip.textContent='*请输入相同的密码';
+             uploadFiles.appendChild(repeatTip);
+             CSSTool.fileTip_set(repeatTip);
 
             var create = document.createElement('button') as HTMLButtonElement;
-            loginbackground.appendChild(create);
+            uploadFiles.appendChild(create);
             create.textContent = "新建";
+            CSSTool.btn_set(create);
             create.onclick = () => {
                 try
                 {
@@ -85,8 +114,10 @@ namespace WebBrowser
                 
             }
             var returnLogin = document.createElement('a') as HTMLAnchorElement;
-            loginbackground.appendChild(returnLogin);
+            uploadFiles.appendChild(returnLogin);
             returnLogin.textContent = "返回登录>>";
+            returnLogin.style.paddingTop = '5px';
+            returnLogin.style.display = 'block';
             returnLogin.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Login);
             }
@@ -102,20 +133,30 @@ namespace WebBrowser
             name.textContent = "您的钱包文件已创建";
             name.style.color = "#ffffff";
             loginbackground.appendChild(name);
+            CSSTool.name_set(name);
+
+            var uploadFiles = document.createElement("div");//外层div
+            loginbackground.appendChild(uploadFiles);
+            CSSTool.uploadFiles_set(uploadFiles);
 
             var text1 = document.createElement('h5') as HTMLHeadingElement;
             text1.textContent = "点击“下载”来保存您的文件";
             text1.style.color = "#eeeeee";
-            loginbackground.appendChild(text1);
+            text1.style.fontSize = "18px";
+            text1.style.padding = "5px 0";
+            uploadFiles.appendChild(text1);
 
             var text2 = document.createElement('h5') as HTMLHeadingElement;
             text2.textContent = "不要丢失！如果丢失，将无法恢复";
             text2.style.color = "#eeeeee";
-            loginbackground.appendChild(text2);
+            text2.style.fontSize = "18px";
+            text2.style.padding = "5px 0";
+            uploadFiles.appendChild(text2);
 
             var downLoad = document.createElement('button') as HTMLButtonElement;
-            loginbackground.appendChild(downLoad);
-            downLoad.textContent = "下载文件";           
+            uploadFiles.appendChild(downLoad);
+            downLoad.textContent = "下载文件";  
+            CSSTool.btn_set(downLoad);     
 
             var b = true;
             downLoad.onclick = () => {
@@ -131,8 +172,10 @@ namespace WebBrowser
                 GUI_Route.instance.showUI(PageName.MainView);            
             }
             var returnLogin = document.createElement('a') as HTMLAnchorElement;
-            loginbackground.appendChild(returnLogin);
+            uploadFiles.appendChild(returnLogin);
             returnLogin.textContent = "返回登录>>";
+            returnLogin.style.paddingTop = "5px";
+            returnLogin.style.display = "block";
             returnLogin.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Login);
             }

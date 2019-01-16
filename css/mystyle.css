@@ -669,4 +669,42 @@ a{
     width: 80px;
 }
 
+.switch-wrap input[type=checkbox]{
+    height: 0px;
+    width: 0px;
+    visibility: hidden;
+    margin:0;
+    padding:0;
+  }
+  .switch-wrap label{
+    display: inline-block;
+    width: 35px;
+    height: 15px;
+    outline: none;
+    border-radius: 16px;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: border-color .3s,background-color .3s;
+    vertical-align: middle;
+    position: relative;
+  }
+  .switch-wrap label::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    background-color: #fff;
+  }
+  .switch-wrap input:checked + label {
+    background: #1C1E2A;
+  }
+  .switch-wrap input:checked + label:before {
+    transform: translateX(20px);
+  }
 /*footer end*/

@@ -4,6 +4,7 @@
 /// <reference path="./AppChain.ts"/>
 /// <reference path="./Contract.ts"/>
 /// <reference path="./TxMessage.ts"/>
+/// <reference path="../tools/CSSTools.ts"/>
 namespace WebBrowser
 {
     export class GUI_Title implements GUI_Base
@@ -17,11 +18,19 @@ namespace WebBrowser
         selectIndex:number;   
 
         constructor(div:HTMLDivElement){
-            this.div = div;   
+            this.div = div;
+            this.div.style.width = "100%";
+            this.div.style.background = '#3D3E4C';
+            
+            var navTitle = document.createElement("div");
+            navTitle.style.width = "1140px";
+            navTitle.style.margin = '0 auto';
+            this.div.appendChild(navTitle);
 
+             
             this.title = document.createElement('div') as HTMLDivElement;
-            this.title.style.width = "100%";
-            this.div.appendChild(this.title);
+            navTitle.appendChild(this.title);
+            CSSTool.title_set(this.title);
 
             this.mainValueBackGround = document.createElement('div') as HTMLDivElement;
             this.mainValueBackGround.style.width = "100%";
@@ -47,60 +56,68 @@ namespace WebBrowser
         }
 
         showTitle(title):void{                       
+            $("#gui-info").width($(window).width());
+            $("#removeContainer").removeClass("container");
             var asset = document.createElement("button") as HTMLButtonElement;
-            title.appendChild(asset)
-            asset.style.cssFloat = "left";
-            asset.style.width = "10%";
+            title.appendChild(asset);
+            $(asset).css("background","#333542");
+            CSSTool.titleBtn_set(asset);
             asset.textContent = "资产";
             asset.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Asset);
                 this.addSelect();
+                $(asset).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }
             asset.click();
 
             var charge = document.createElement("button") as HTMLButtonElement;
             title.appendChild(charge)
-            charge.style.cssFloat = "left";
-            charge.style.width = "10%";
+            $(charge).css("background","#3D3E4C");
+            CSSTool.titleBtn_set(charge);
             charge.textContent = "转账";
             charge.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Charge);
+                $(charge).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }
 
             var appChain = document.createElement("button") as HTMLButtonElement;
             title.appendChild(appChain)
-            appChain.style.cssFloat = "left";
-            appChain.style.width = "10%";
+            $(appChain).css("background","#3D3E4C");
+            CSSTool.titleBtn_set(appChain);
             appChain.textContent = "应用链";
             appChain.onclick = () => {
                 GUI_Route.instance.showUI(PageName.AppChain);
+                $(appChain).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }
 
             var contract = document.createElement("button") as HTMLButtonElement;
+            CSSTool.titleBtn_set(contract);
             title.appendChild(contract)
-            contract.style.cssFloat = "left";
-            contract.style.width = "10%";
+            $(contract).css("background","#3D3E4C");
             contract.textContent = "发布合约";
+            CSSTool.titleBtn_set(contract);
             contract.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Contract);
+                $(contract).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }
 
             var transaction = document.createElement("button") as HTMLButtonElement;
             title.appendChild(transaction)
-            transaction.style.cssFloat = "left";
-            transaction.style.width = "10%";
+            $(transaction).css("background","#3D3E4C");
             transaction.textContent = "交易记录";
+            CSSTool.titleBtn_set(transaction);
             transaction.onclick = () => {
                 GUI_Route.instance.showUI(PageName.TxMessage);
+                $(transaction).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }
 
             var message = document.createElement("button") as HTMLButtonElement;
             title.appendChild(message)
-            message.style.cssFloat = "left";
-            message.style.width = "10%";
+            $(message).css("background","#3D3E4C");
             message.textContent = "信息";
+            CSSTool.titleBtn_set(message);
             message.onclick = () => {
-                
+                $(message).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }                    
         }
 
@@ -112,12 +129,14 @@ namespace WebBrowser
             this.selectAppChain = document.createElement("select") as HTMLSelectElement;     
             this.selectAppChain.style.cssFloat = "right";
             this.selectAppChain.style.width = "15%";
+            CSSTool.select_set(this.selectAppChain);
             this.title.appendChild(this.selectAppChain);  
 
             this.height = document.createElement("span") as HTMLSpanElement;
             this.height.style.color = "#eeeeee";
             this.title.appendChild(this.height)
             this.height.style.cssFloat = "right";
+            this.height.style.lineHeight = "30px";
             this.height.style.width = "6%";
             this.height.textContent = "0";    
         }

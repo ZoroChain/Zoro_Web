@@ -168,13 +168,13 @@ declare class NeoPromise<T> implements PromiseLike<T> {
     private _tag;
     constructor(executor: PromiseExecutor<T>);
     static all(iterable: NeoPromise<any>[]): NeoPromise<any[]>;
-    catch<TResult>(onRejected: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<TResult>;
+    catch<TResult>(onRejected: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<TResult | any>;
     private checkState;
     private reject;
-    static reject(reason: any): PromiseLike<any>;
+    static reject(reason: any): NeoPromise<any>;
     private resolve;
-    static resolve<T>(value: T | PromiseLike<T>): PromiseLike<T>;
-    then<TResult>(onFulfilled?: Func<T, TResult | PromiseLike<TResult>>, onRejected?: Func<any, TResult | PromiseLike<TResult>>): PromiseLike<TResult>;
+    static resolve<T>(value: T | PromiseLike<T>): NeoPromise<T>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2>;
 }
 declare namespace Neo {
     class Uint160 extends UintVariable {
@@ -726,6 +726,98 @@ declare namespace ThinNeo {
         SerializeUnsigned(writer: Neo.IO.BinaryWriter): void;
         Serialize(writer: Neo.IO.BinaryWriter): void;
         extdata: IExtData;
+        DeserializeUnsigned(ms: Neo.IO.BinaryReader): void;
+        Deserialize(ms: Neo.IO.BinaryReader): void;
+        GetMessage(): Uint8Array;
+        GetRawData(): Uint8Array;
+        AddWitness(signdata: Uint8Array, pubkey: Uint8Array, addrs: string): void;
+        AddWitnessScript(vscript: Uint8Array, iscript: Uint8Array): void;
+        GetHash(): Uint8Array;
+    }
+}
+declare namespace ThinNeo {
+    enum ZoroTransactionType {
+        MinerTransaction = 0,
+        IssueTransaction = 1,
+        ClaimTransaction = 2,
+        EnrollmentTransaction = 32,
+        RegisterTransaction = 64,
+        ContractTransaction = 128,
+        PublishTransaction = 208,
+        InvocationTransaction = 209
+    }
+    enum ZoroTransactionAttributeUsage {
+        ContractHash = 0,
+        ECDH02 = 2,
+        ECDH03 = 3,
+        Script = 32,
+        Vote = 48,
+        DescriptionUrl = 129,
+        Description = 144,
+        Hash1 = 161,
+        Hash2 = 162,
+        Hash3 = 163,
+        Hash4 = 164,
+        Hash5 = 165,
+        Hash6 = 166,
+        Hash7 = 167,
+        Hash8 = 168,
+        Hash9 = 169,
+        Hash10 = 170,
+        Hash11 = 171,
+        Hash12 = 172,
+        Hash13 = 173,
+        Hash14 = 174,
+        Hash15 = 175,
+        Remark = 240,
+        Remark1 = 241,
+        Remark2 = 242,
+        Remark3 = 243,
+        Remark4 = 244,
+        Remark5 = 245,
+        Remark6 = 246,
+        Remark7 = 247,
+        Remark8 = 248,
+        Remark9 = 249,
+        Remark10 = 250,
+        Remark11 = 251,
+        Remark12 = 252,
+        Remark13 = 253,
+        Remark14 = 254,
+        Remark15 = 255
+    }
+    class ZoroAttribute {
+        usage: ZoroTransactionAttributeUsage;
+        data: Uint8Array;
+    }
+    class ZoroWitness {
+        InvocationScript: Uint8Array;
+        VerificationScript: Uint8Array;
+        readonly Address: string;
+    }
+    interface ZoroIExtData {
+        Serialize(trans: ZoroTransaction, writer: Neo.IO.BinaryWriter): void;
+        Deserialize(trans: ZoroTransaction, reader: Neo.IO.BinaryReader): void;
+    }
+    class ZoroInvokeTransData implements ZoroIExtData {
+        script: Uint8Array;
+        gasLimit: Neo.Fixed8;
+        gasPrice: Neo.Fixed8;
+        ScriptHash: Neo.Uint160;
+        Serialize(trans: ZoroTransaction, writer: Neo.IO.BinaryWriter): void;
+        Deserialize(trans: ZoroTransaction, reader: Neo.IO.BinaryReader): void;
+    }
+    class ZoroTransaction {
+        type: ZoroTransactionType;
+        version: number;
+        nonce: number;
+        Account: Neo.Uint160;
+        attributes: ZoroAttribute[];
+        witnesses: ZoroWitness[];
+        SerializeUnsigned(writer: Neo.IO.BinaryWriter): void;
+        Serialize(writer: Neo.IO.BinaryWriter): void;
+        extdata: ZoroIExtData;
+        static GetNonce(): number;
         DeserializeUnsigned(ms: Neo.IO.BinaryReader): void;
         Deserialize(ms: Neo.IO.BinaryReader): void;
         GetMessage(): Uint8Array;

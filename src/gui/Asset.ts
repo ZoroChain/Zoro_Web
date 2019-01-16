@@ -1,4 +1,5 @@
 /// <reference path="./Base.ts"/>
+/// <reference path="../tools/CSSTools.ts"/>
 namespace WebBrowser
 {
     export class GUI_Asset implements GUI_Base
@@ -21,79 +22,113 @@ namespace WebBrowser
             div.removeChild(div.firstChild);
 
             var zoroChainBackGround = document.createElement('div') as HTMLDivElement;
-            zoroChainBackGround.style.width = "100%";
-            zoroChainBackGround.style.cssFloat = "left";
+            zoroChainBackGround.style.width = "1140px";
+            zoroChainBackGround.style.margin = '0 auto';
             div.appendChild(zoroChainBackGround);
             //zoro
             var zoroChain = document.createElement('div') as HTMLDivElement;
-            zoroChain.style.width = "30%";
-            zoroChain.style.cssFloat = "left";
+            CSSTool.zoroChain_set(zoroChain);
             zoroChainBackGround.appendChild(zoroChain);
 
-            var name = document.createElement('span') as HTMLSpanElement;
-            name.style.width = "100%";
-            name.style.cssFloat = "left";
-            name.style.color = "#eeeeee";
+            var name = document.createElement('div') as HTMLSpanElement;
+            CSSTool.assets_setname(name);
             name.textContent = 'ZORO CHAIN';
             zoroChain.appendChild(name);
 
-            var BCP = document.createElement('span') as HTMLSpanElement;
-            BCP.style.width = "100%";
-            BCP.style.cssFloat = "left";
+            var BCP = document.createElement('div') as HTMLSpanElement;
             var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.zoroBCP, GUITool.address, "0000000000000000000000000000000000000000");
-            BCP.style.color = "#eeeeee";
-            BCP.textContent = 'BCP = ' + bcpnum;
+            var BCPTitle = document.createElement('div');
+            var BCPData = document.createElement('div');
+            CSSTool.BCP_set(BCP);
+            CSSTool.flowLeft_set(BCPTitle);
+            BCPTitle.textContent = 'BCP';
+            BCPData.textContent = bcpnum;
+            BCPData.style.color = '#C1A26F';
+            CSSTool.flowRight_set(BCPData);
+            BCP.appendChild(BCPTitle);
+            BCP.appendChild(BCPData);
             zoroChain.appendChild(BCP);
+           
+            
+           
             //neo
             var neoChain = document.createElement('div') as HTMLDivElement;
-            neoChain.style.width = "30%";
-            neoChain.style.cssFloat = "left";
+            CSSTool.zoroChain_set(neoChain);
+            neoChain.style.marginLeft = '60px';
             zoroChainBackGround.appendChild(neoChain);
 
-            var name = document.createElement('span') as HTMLSpanElement;
-            name.style.width = "100%";
-            name.style.cssFloat = "left";
-            name.style.color = "#eeeeee";
+            var name = document.createElement('div') as HTMLSpanElement;
             name.textContent = 'NEO CHAIN';
+            CSSTool.assets_setname(name);
             neoChain.appendChild(name);
 
             var utxo = await WWW.rpc_getUTXO(GUITool.address);
-            var GAS = document.createElement('span') as HTMLSpanElement;
-            GAS.style.width = "100%";
-            GAS.style.cssFloat = "left";
-            GAS.style.color = "#eeeeee";
-            GAS.textContent = 'GAS = ' + AppChainTool.GAS;
+            var GAS = document.createElement('div') as HTMLSpanElement;
+            CSSTool.BCP_set(GAS);
+            var GASTitle = document.createElement("div");
+            var GASData = document.createElement("div");
+            CSSTool.flowLeft_set(GASTitle);
+            CSSTool.flowRight_set(GASData);
+            GASTitle.textContent = 'GAS';
+            GASData.textContent = AppChainTool.GAS.toString();
+            GASData.style.color = '#C1A26F';
+            GAS.appendChild(GASTitle);
+            GAS.appendChild(GASData);
             neoChain.appendChild(GAS);
 
-            var CGAS = document.createElement('span') as HTMLSpanElement;
-            CGAS.style.width = "100%";
-            CGAS.style.cssFloat = "left";
-            CGAS.style.color = "#eeeeee";
+            var CGAS = document.createElement('div') as HTMLSpanElement;
+            CSSTool.BCP_set(CGAS);
+            var CGASTitle = document.createElement('div');
+            var CGASData = document.createElement('div');
+            CGASData.style.color = '#C1A26F';
+            CSSTool.flowLeft_set(CGASTitle);
+            CSSTool.flowRight_set(CGASData);
             var CgasNum = await WWW.rpc_getBalanceOf(AppChainTool.CGAS, GUITool.address);
-            CGAS.textContent = 'CGAS = ' + CgasNum;
+            CGASTitle.textContent = 'CGAS';
+            CGASData.textContent = CgasNum;
+            CGAS.appendChild(CGASTitle);
+            CGAS.appendChild(CGASData);
             neoChain.appendChild(CGAS);
 
-            var NEO = document.createElement('span') as HTMLSpanElement;
-            NEO.style.width = "100%";
-            NEO.style.cssFloat = "left";
-            NEO.style.color = "#eeeeee";            
-            NEO.textContent = 'NEO = ' + AppChainTool.NEO;
+            var NEO = document.createElement('div') as HTMLSpanElement;
+            CSSTool.BCP_set(NEO);
+            var NEOTitle = document.createElement('div');
+            var NEOData = document.createElement('div');
+            NEOData.style.color = '#C1A26F';
+            CSSTool.flowLeft_set(NEOTitle);
+            CSSTool.flowRight_set(NEOData);
+            NEOTitle.textContent = 'NEO';
+            NEOData.textContent = AppChainTool.NEO.toString();
+            NEO.appendChild(NEOTitle);  
+            NEO.appendChild(NEOData);           
             neoChain.appendChild(NEO);
 
-            var CNEO = document.createElement('span') as HTMLSpanElement;
-            CNEO.style.width = "100%";
-            CNEO.style.cssFloat = "left";
-            CNEO.style.color = "#eeeeee";
+            var CNEO = document.createElement('div') as HTMLSpanElement;
             var CneoNum = await WWW.rpc_getBalanceOf(AppChainTool.CNEO, GUITool.address);
-            CNEO.textContent = 'CNEO = ' + CneoNum;
+            CSSTool.BCP_set(CNEO);
+            var CNEOTitle = document.createElement('div');
+            var CNEOData = document.createElement('div');
+            CNEOData.style.color = '#C1A26F';
+            CSSTool.flowLeft_set(CNEOTitle);
+            CSSTool.flowRight_set(CNEOData);
+            CNEOTitle.textContent = 'CNEO';
+            CNEOData.textContent = CneoNum;
+            CNEO.appendChild(CNEOTitle);  
+            CNEO.appendChild(CNEOData);   
             neoChain.appendChild(CNEO);
 
-            var NBCP = document.createElement('span') as HTMLSpanElement;
-            NBCP.style.width = "100%";
-            NBCP.style.cssFloat = "left";
-            NBCP.style.color = "#eeeeee";
+            var NBCP = document.createElement('div') as HTMLSpanElement;
             var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, GUITool.address);
-            NBCP.textContent = 'BCP = ' + bcpnum;
+            CSSTool.BCP_set(NBCP);
+            var NBCPTitle = document.createElement('div');
+            var NBCPData = document.createElement('div');
+            NBCPData.style.color = '#C1A26F';
+            CSSTool.flowLeft_set(NBCPTitle);
+            CSSTool.flowRight_set(NBCPData);
+            NBCPTitle.textContent = 'BCP';
+            NBCPData.textContent = bcpnum;
+            NBCP.appendChild(NBCPTitle);  
+            NBCP.appendChild(NBCPData); 
             neoChain.appendChild(NBCP);
 
             //appchain
