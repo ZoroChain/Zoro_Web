@@ -99,14 +99,13 @@ namespace WebBrowser
             assetModel.appendChild(select);
             AppChainTool.getChain(select);
 
-<<<<<<< HEAD
             var changeModel = document.createElement("div");
             contractBackGround.appendChild(changeModel);
 
             var ContractText = document.createElement('span') as HTMLSpanElement;
             ContractText.style.color = "#eeeeee";
             ContractText.textContent = "合约";
-           // contractBackGround.appendChild(ContractText);
+            contractBackGround.appendChild(ContractText);
 
            var storage_lable = document.createElement("div");
            CSSTool.handle_set(storage_lable);
@@ -273,7 +272,7 @@ namespace WebBrowser
             CSSTool.btn_set(btnSend);
             btnSend.style.width = '50%';
             contractBackGround.appendChild(btnSend);
-=======
+
             var chooseNative = document.createElement("div") as HTMLDivElement;
             contractBackGround.appendChild(chooseNative);
 
@@ -328,13 +327,12 @@ namespace WebBrowser
 
                     var nativeBackGround = document.createElement('div') as HTMLDivElement;
                     chooseNative.appendChild(nativeBackGround);
->>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
 
                     this.createContract(nativeBackGround, select);
                 }
             }
-<<<<<<< HEAD
 
+            var ContractAvm = null;
             var reader = new FileReader();
             reader.onload = (e: Event) =>
             {                
@@ -349,9 +347,7 @@ namespace WebBrowser
                     reader.readAsArrayBuffer(file.files[0]);
                 }
             }      
-=======
             this.createContract(nativeBackGround, select);
->>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
         }
 
         useContract(div:HTMLDivElement, use:boolean){

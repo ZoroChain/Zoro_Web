@@ -55,60 +55,6 @@ namespace WebBrowser
             return this.chainName2Hash;          
         }
 
-        static makeTran(name:string, pubkey:Uint8Array, validators:string[], seedList:string[], out:{} = null): ThinNeo.Transaction
-        {                     
-            var array = [];
-            var sb = new ThinNeo.ScriptBuilder();            
-            for (var i = 0; i < validators.length; i++){
-              sb.EmitPushString(validators[i]);
-            }
-            sb.EmitPushNumber(new Neo.BigInteger(validators.length));
-            for (var i = 0; i < seedList.length; i++){
-              sb.EmitPushString(seedList[i]);
-            }
-            sb.EmitPushNumber(new Neo.BigInteger(seedList.length));
-            
-            {//获取UTC时间
-              var date = new Date();
-              var y = date.getUTCFullYear();
-              var M = date.getUTCMonth();
-              var d = date.getUTCDay();
-              var h = date.getUTCHours();
-              var m = date.getUTCMinutes();
-              var s = date.getUTCSeconds();
-            }
-            var time = Math.floor(Date.UTC(y,M,d,h,m,s) / 1000);
-            sb.EmitPushNumber(new Neo.BigInteger(time));
-            sb.EmitPushBytes(Neo.Cryptography.ECPoint.fromUint8Array(pubkey, Neo.Cryptography.ECCurve.secp256r1).encodePoint(true));
-            sb.EmitPushString(name);
-            
-            var chainHash = new Neo.Uint160(Neo.Cryptography.RIPEMD160.computeHash(Neo.Cryptography.Sha256.computeHash(sb.ToArray()))); 
-            sb.EmitPushBytes(chainHash.toArray());
-            sb.EmitSysCall("Zoro.AppChain.Create");           
-
-            var extdata = new ThinNeo.InvokeTransData();
-            extdata.script = sb.ToArray();
-            extdata.gas = Neo.Fixed8.Zero;
-
-            var tran = new  ThinNeo.Transaction();
-            tran.type = ThinNeo.TransactionType.InvocationTransaction;
-            tran.version = 1;
-            
-            tran.extdata = extdata;
-
-            var scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
-
-            tran.attributes = [];
-            tran.attributes[0] = new ThinNeo.Attribute();
-            tran.attributes[0].usage = ThinNeo.TransactionAttributeUsage.Script;
-            tran.attributes[0].data = scriptHash;
-            tran.inputs = [];
-            tran.outputs = [];
-           
-            return tran;
-        }
-
-
         static pubKey_List:{[id:string]:string} = {};
         static ip_List:{[id:string]:string} = {};
 
@@ -166,7 +112,6 @@ namespace WebBrowser
           extdata.gasPrice = Neo.Fixed8.One;
           var pubkeyScriptHash = Neo.Cryptography.Sha256.computeHash(ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));          
           pubkeyScriptHash = Neo.Cryptography.RIPEMD160.computeHash(pubkeyScriptHash);     
-          extdata.ScriptHash = new Neo.Uint160(pubkeyScriptHash);
 
           var tran = new  ThinNeo.ZoroTransaction();
           tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
@@ -282,97 +227,152 @@ namespace WebBrowser
         }
 
         static async SendContractMethod(chainHash, pubkey, prikey, method, contract){
+            var sb = this.getJointScriptBuilder(method, contract);                     
+
+            if (chainHash == "NEO"){
+              var extdata = new ThinNeo.InvokeTransData();
+              extdata.script = sb.ToArray();
+              extdata.gas = Neo.Fixed8.Zero;
+              var utxo = await WWW.rpc_getUTXO(GUITool.address);
+              let tran = CoinTool.makeTran(CoinTool.getassets(utxo), ThinNeo.Helper.GetAddressFromPublicKey(pubkey), this.id_GAS, Neo.Fixed8.Zero);
+              tran.type = ThinNeo.TransactionType.InvocationTransaction;
+              tran.extdata = extdata;
+              var msg = tran.GetMessage();
+              var signdata = ThinNeo.Helper.Sign(msg, prikey);
+              tran.AddWitness(signdata, pubkey, ThinNeo.Helper.GetAddressFromPublicKey(pubkey));
+              var data = tran.GetRawData();
+              var postResult = await WWW.rpc_postRawTransaction(data);
+              return tran.GetHash().toHexString();
+            }else{
+              var invokeResult = await this.InvokeZoroContract(sb, chainHash);
+              var gasLimit = invokeResult["gas_consumed"];
+              let tran = this.getZoroTransaction(Neo.Fixed8.parse(gasLimit), Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
+              var txid = await this.SendZororawtransaction(tran, prikey, pubkey, chainHash);
+              return tran.GetHash().toHexString();
+            }                                                
+        }
+        //拼接scriptbuilder合约调用
+        static getJointScriptBuilder(method, contract):ThinNeo.ScriptBuilder{
           var sb = new ThinNeo.ScriptBuilder();
-                for (var i = 0; i < method.length; i++) {
-                  var array = [];
-                  for (var j = 0; j < method[i]["params"].length; j++){
-                    var s = method[i]["params"][j];
-                    array.push(s);
-                  }
-                  sb.EmitParamJson(array);
-                  sb.EmitPushString(method[i]["methodName"]);
-                  sb.EmitAppCall(contract.hexToBytes().reverse());
-                }                
-                
-                var scriptPublish = sb.ToArray().toHexString();
-                // var postArray = [];
-                // postArray.push(chainHash);
-                // postArray.push(scriptPublish);
-                // var result = await WWW.rpc_invokeScript(postArray);
-
-                // var consume = result["gas_consumed"];
-                // var gas_consumed = parseInt(consume);
-
-                var extdata = new ThinNeo.InvokeTransData();
-                extdata.script = sb.ToArray();
-                extdata.gas = Neo.Fixed8.Zero;
-
-                if (chainHash == "NEO"){
-                  var utxo = await WWW.rpc_getUTXO(GUITool.address);
-                  var tran = CoinTool.makeTran(CoinTool.getassets(utxo), ThinNeo.Helper.GetAddressFromPublicKey(pubkey), this.id_GAS, Neo.Fixed8.Zero);
-                  tran.type = ThinNeo.TransactionType.InvocationTransaction;
-                }else{
-                  var tran = WWW.makeTran(ThinNeo.Helper.GetAddressFromPublicKey(pubkey));
-                }
-                
-                tran.extdata = extdata;
-
-                var msg = tran.GetMessage();
-                var signdata = ThinNeo.Helper.Sign(msg, prikey);
-                tran.AddWitness(signdata, pubkey, ThinNeo.Helper.GetAddressFromPublicKey(pubkey));
-                var data = tran.GetRawData();
-                var rawdata = data.toHexString();
-
-                var postRawArray = [];
-                postRawArray.push(chainHash);
-                postRawArray.push(rawdata);
-                if (chainHash == "NEO"){
-                  var postResult = await WWW.rpc_postRawTransaction(data);
-                }else{
-                  var postResult1 = await WWW.rpc_sendrawtransaction(postRawArray);
-                }               
-            //     if (postResult1["result"] as boolean == true)
-            // {
-                //alert("txid=" + tran.GetHash().toHexString());
-            // }
-            return tran.GetHash().toHexString();
+          for (var i = 0; i < method.length; i++) {
+            var array = [];
+            for (var j = 0; j < method[i]["params"].length; j++){
+              var s = method[i]["params"][j];
+              array.push(s);
+            }
+            sb.EmitParamJson(array);
+            sb.EmitPushString(method[i]["methodName"]);
+            sb.EmitAppCall(contract.hexToBytes().reverse());
+          }  
+          return sb;            
         }
 
         static async SendCreateAppChain(name:string, pubkey:Uint8Array, validators:string[], seedList:string[], prikey:any, chainHash:any){
-            var tran = this.makeTran(name, pubkey, validators, seedList);
-            var msg = tran.GetMessage();
-            var signdata = ThinNeo.Helper.Sign(msg, prikey);
-            tran.AddWitness(signdata, pubkey, ThinNeo.Helper.GetAddressFromPublicKey(pubkey));
-            var data = tran.GetRawData();
-            var rawdata = data.toHexString();
+            var sb = this.makeAppChainScriptBuilder(pubkey, validators, seedList);
+            var invokeResult = await this.InvokeZoroContract(sb, chainHash);
+            var gasLimit = invokeResult["gas_consumed"];
+            var tran = this.getZoroTransaction(Neo.Fixed8.parse(gasLimit), Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
+            var txid = await this.SendZororawtransaction(tran, prikey, pubkey, chainHash);
+            alert("this is txid = " + txid);
+        }
+        //发送Zoro交易
+        static async SendZororawtransaction(tran:ThinNeo.ZoroTransaction, prikey, pubkey, chainHash:string):Promise<string>{
+          var msg = tran.GetMessage();
+          var signdata = ThinNeo.Helper.Sign(msg, prikey);
+          tran.AddWitness(signdata, pubkey, ThinNeo.Helper.GetAddressFromPublicKey(pubkey));
+          var data = tran.GetRawData();
+          var rawdata = data.toHexString();
 
-            var postRawArray = [];
-            postRawArray.push(chainHash);
-            postRawArray.push(rawdata);
-            var postResult = await WWW.rpc_sendrawtransaction(postRawArray);
-            if (postResult["result"] as boolean == true)
-            {
-                alert("txid=" + tran.GetHash().toHexString());
-                AppChainTool.port++;
-            }            
+          var postRawArray = [];
+          postRawArray.push(chainHash);
+          postRawArray.push(rawdata);
+          var postResult = await WWW.rpc_sendrawtransaction(postRawArray);
+          if (postResult["result"] as boolean == true)
+          {
+            return tran.GetHash().toHexString();
+          }            
+        }
+
+        //zoro invokescript
+        static async InvokeZoroContract(sb:ThinNeo.ScriptBuilder, chainHash:string){
+          var data = sb.ToArray();
+          var scriptPublish = data.toHexString();
+          var array = [];
+          array.push(chainHash);
+          array.push(scriptPublish);
+
+          var postdata = WWW.makeZoroRpcPostBody("invokescript", array);
+          var result = await fetch("http://127.0.0.1:20332/", {"method":"post", "body":JSON.stringify(postdata)});
+          var json = await result.json();
+          return json["result"];
+        }
+        //获取ZoroTransaction
+        private static getZoroTransaction(gasLimit:Neo.Fixed8, gasPrice:Neo.Fixed8, script:Uint8Array, scriptHash:Uint8Array):ThinNeo.ZoroTransaction{
+          var exData = new ThinNeo.ZoroInvokeTransData();
+          exData.gasLimit = gasLimit;
+          exData.gasPrice = gasPrice;
+          exData.script = script;     
+          
+          var tran = new ThinNeo.ZoroTransaction();
+          tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+          tran.version = 0;       
+  
+          tran.nonce = ThinNeo.ZoroTransaction.GetNonce();
+          tran.Account = scriptHash;
+          tran.attributes = [];
+          tran.extdata = exData;
+  
+          return tran;
+        }
+
+        //拼接应用链scriptbuilder
+        static makeAppChainScriptBuilder(pubkey:Uint8Array, validators:string[], seedList:string[]):ThinNeo.ScriptBuilder{
+          var sb = new ThinNeo.ScriptBuilder();            
+          for (var i = 0; i < validators.length; i++){
+            sb.EmitPushString(validators[i]);
+          }
+          sb.EmitPushNumber(new Neo.BigInteger(validators.length));
+          for (var i = 0; i < seedList.length; i++){
+            sb.EmitPushString(seedList[i]);
+          }
+          sb.EmitPushNumber(new Neo.BigInteger(seedList.length));
+          
+          {//获取UTC时间
+            var date = new Date();
+            var y = date.getUTCFullYear();
+            var M = date.getUTCMonth();
+            var d = date.getUTCDay();
+            var h = date.getUTCHours();
+            var m = date.getUTCMinutes();
+            var s = date.getUTCSeconds();
+          }
+          var time = Math.floor(Date.UTC(y,M,d,h,m,s) / 1000);
+          sb.EmitPushNumber(new Neo.BigInteger(time));
+          sb.EmitPushBytes(Neo.Cryptography.ECPoint.fromUint8Array(pubkey, Neo.Cryptography.ECCurve.secp256r1).encodePoint(true));
+          sb.EmitPushString(name);
+          
+          var chainHash = new Neo.Uint160(Neo.Cryptography.RIPEMD160.computeHash(Neo.Cryptography.Sha256.computeHash(sb.ToArray()))); 
+          sb.EmitPushBytes(chainHash.toArray());
+          sb.EmitSysCall("Zoro.AppChain.Create");   
+          return sb; 
         }
 
         static async MakeZoroTransaction(address:string, targetaddress:string, sendCount:any, assetid, contractHash, prikey, pubkey, chainHash){
-            var tran = CoinTool.makeZoroTran(address, targetaddress, sendCount, assetid, contractHash);
-            var msg = tran.GetMessage();
-            var signdata = ThinNeo.Helper.Sign(msg, prikey);
-            tran.AddWitness(signdata, pubkey, address);
-            var data = tran.GetRawData();
-            var rawdata = data.toHexString();
+          var tran = CoinTool.makeZoroTran(address, targetaddress, sendCount, assetid, contractHash);
+          var msg = tran.GetMessage();
+          var signdata = ThinNeo.Helper.Sign(msg, prikey);
+          tran.AddWitness(signdata, pubkey, address);
+          var data = tran.GetRawData();
+          var rawdata = data.toHexString();
 
-            var postRawArray = [];
-            postRawArray.push(chainHash);
-            postRawArray.push(rawdata);
-            var postResult = await WWW.rpc_sendrawtransaction(postRawArray);
-            if (postResult["result"] as boolean == true)
-            {
-                alert("txid=" + tran.GetHash().toHexString());
-            }
+          var postRawArray = [];
+          postRawArray.push(chainHash);
+          postRawArray.push(rawdata);
+          var postResult = await WWW.rpc_sendrawtransaction(postRawArray);
+          if (postResult["result"] as boolean == true)
+          {
+              alert("txid=" + tran.GetHash().toHexString());
+          }
         }
 
         static async MakeInvokeTransaction(utxo, address, targetaddress, assetid, sendCount, prikey, pubkey){

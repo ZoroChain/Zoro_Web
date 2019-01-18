@@ -38,12 +38,13 @@ namespace WebBrowser {
         }
 
         public static async Transfer(){
+
             var bcp = "0000000000000000000000000000000000000001";
             var chainHash = "";
             var wif = "L4ooZWvkj6QM9AjPREmF2SZZFYgEFAxWPzYJY6jdr4XJNx62Smbf";
             var targetwif = "L17Cq1FEbZJ8bc8Y8HcqVCgxsNpWY6LHDoau9DBD98m8vtGcVpuQ";
 
-            var scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
+            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
             var targetScriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(targetwif)));
 
             var sb = new ThinNeo.ScriptBuilder();
@@ -60,7 +61,7 @@ namespace WebBrowser {
             var json = await WWW.rpc_invokeScript(array);
             var decimals = parseInt(json["stack"][0]["value"]);
 
-            var value = 98;
+            var value = 1;
             value = 1 * Math.pow(10, decimals);
 
             sb = new ThinNeo.ScriptBuilder();
@@ -82,26 +83,20 @@ namespace WebBrowser {
         }
 
         static async makeTransaction(script, wif, gas, gasPrice){
-            var chainHash = "";
-
-            
+            var chainHash = "";            
 
             var exData = new ThinNeo.ZoroInvokeTransData();
             exData.gasLimit = gas;
             exData.gasPrice = gasPrice;
             exData.script = script;
-            var scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
-            exData.ScriptHash = new Neo.Uint160(scriptHash);
+            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
             
             var tran = new ThinNeo.ZoroTransaction();
             tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
-            tran.version = 0;
-
-            var r = Math.random() << 32;
-            alert(r);
+            tran.version = 0;       
 
             tran.nonce = ThinNeo.ZoroTransaction.GetNonce();
-            tran.Account = new Neo.Uint160(scriptHash);
+            tran.Account = scriptHash;
             tran.attributes = [];
             tran.extdata = exData;
 

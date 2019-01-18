@@ -58,7 +58,7 @@ namespace WebBrowser
         nep5: Nep5page
         routet: Route
         strat()
-        {
+        {           
             this.langmgr = new LangMgr()
             let language = sessionStorage.getItem("language");  
             if (!language) {

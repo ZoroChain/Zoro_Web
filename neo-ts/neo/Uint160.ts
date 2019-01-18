@@ -12,7 +12,7 @@ namespace Neo
         {
             if (value == null) value = new ArrayBuffer(20);
             if (value.byteLength != 20) throw new RangeError();
-            super(new Uint32Array(value));
+            super(new Uint8Array(value));
         }
 
         public static parse(str: string): Uint160

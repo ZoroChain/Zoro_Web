@@ -14,7 +14,7 @@ namespace WebBrowser
 
         showUI(){
             //Test.ZoroTransfer();
-            Test.Transfer();
+            //Test.Transfer();
             this.login();
         }        
 

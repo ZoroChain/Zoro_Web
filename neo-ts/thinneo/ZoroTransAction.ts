@@ -124,33 +124,19 @@ namespace ThinNeo
         public script: Uint8Array;
         public gasLimit: Neo.Fixed8;
         public gasPrice:Neo.Fixed8;
-        public ScriptHash:Neo.Uint160;
         public Serialize(trans: ZoroTransaction, writer: Neo.IO.BinaryWriter): void
         {
-            writer.writeVarBytes(this.script.buffer);
-            if (trans.version >= 1)
-            {
-                writer.writeUint64(this.gasLimit.getData());
-            }
-            if (trans.version >= 2)
-            {
-                writer.writeUint64(this.gasPrice.getData());
-                writer.writeVarBytes(this.ScriptHash.toArray());
-            }
+            writer.writeVarBytes(this.script);
+            writer.writeUint64(this.gasLimit.getData());
+            writer.writeUint64(this.gasPrice.getData());
+
         }
         public Deserialize(trans: ZoroTransaction, reader: Neo.IO.BinaryReader): void
         {
-            var buf = reader.readVarBytes(10000000);
+            var buf = reader.readVarBytes(65536);
             this.script = new Uint8Array(buf, 0, buf.byteLength);
-            if (trans.version >= 1)
-            {
-                this.gasLimit = new Neo.Fixed8(reader.readUint64());
-            }
-            if (trans.version >= 2)
-            {
-                this.gasPrice = new Neo.Fixed8(reader.readUint64());
-                this.ScriptHash = new Neo.Uint160(reader.readVarBytes());
-            }
+            this.gasLimit = new Neo.Fixed8(reader.readUint64());
+            this.gasPrice = new Neo.Fixed8(reader.readUint64());
         }
 
     }    
@@ -159,38 +145,18 @@ namespace ThinNeo
     {
         public type: ZoroTransactionType;
         public version: number;
-<<<<<<< HEAD
-        public nonce:number;
-        public Account:Neo.Uint160;
-=======
->>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
+        public nonce:string;
+        public Account:Uint8Array;
         public attributes: ZoroAttribute[];
         public witnesses: ZoroWitness[];//见证人
         public SerializeUnsigned(writer: Neo.IO.BinaryWriter): void
         {
-<<<<<<< HEAD
             writer.writeByte(this.type);
-            writer.writeByte(this.version);
-            writer.writeUint64(Neo.Uint64.parse(this.nonce + ""));
-            writer.writeVarString(this.Account.toString());
+            writer.writeByte(this.version);          
+            writer.writeUint64(Neo.Uint64.parse(this.nonce));
+            //Accout的Uint32Array是有问题
+            writer.writeUintVariable(new Neo.Uint160(this.Account));
             this.extdata.Serialize(this, writer);
-
-=======
-            if (this.type == ZoroTransactionType.ContractTransaction ||
-                this.type == ZoroTransactionType.IssueTransaction)//每个交易类型有一些自己独特的处理
-            {
-                //ContractTransaction 就是最常见的转账交易
-                //他没有自己的独特处理
-            }
-            else if (this.type == ZoroTransactionType.InvocationTransaction)
-            {
-                this.extdata.Serialize(this, writer);
-            }
-            else
-            {
-                throw new Error("未编写针对这个交易类型的代码");
-            }
->>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             //#region write attribute
             var countAttributes = this.attributes.length;
             writer.writeVarInt(countAttributes);
@@ -252,44 +218,23 @@ namespace ThinNeo
         }
         public extdata: ZoroIExtData;
 
-<<<<<<< HEAD
-        public static GetNonce():number{
-            var random = Math.random() << 32;
-            var nonce = random | parseInt(Date.UTC.toString());
-            return nonce;
+        public static GetNonce():string{
+            var r = (Math.random() + 1) * Math.pow(10, 19);
+            var str = r.toString().substr(0, 9);
+            r = Math.round(Date.now() / 1000);
+            str = str + r;
+            return str;
         }
 
         public DeserializeUnsigned(ms: Neo.IO.BinaryReader): void
         {
             if (ms.readByte() != this.type) throw "error";
             this.version = ms.readByte();
-            this.nonce = ms.readUint64().toNumber();
-            this.Account = Neo.Uint160.parse(ms.readVarString());
+            this.nonce = ms.readUint64().toString();
+            var buf = ms.readVarBytes(65536);
+            this.Account = new Uint8Array(buf, 0, buf.byteLength);
             this.extdata.Deserialize(this, ms);
 
-=======
-        public DeserializeUnsigned(ms: Neo.IO.BinaryReader): void
-        {
-            if (this.type == ZoroTransactionType.ContractTransaction
-                || this.type == ZoroTransactionType.IssueTransaction)//每个交易类型有一些自己独特的处理
-            {
-                //ContractTransaction 就是最常见的合约交易，
-                //他没有自己的独特处理
-                this.extdata = null;
-            }
-            else if (this.type == ZoroTransactionType.InvocationTransaction)
-            {
-                this.extdata = new ZoroInvokeTransData();
-            }
-            else
-            {
-                throw new Error("未编写针对这个交易类型的代码");
-            }
-            if (this.extdata != null)
-            {
-                this.extdata.Deserialize(this, ms);
-            }
->>>>>>> f50d0b50ded475789a92394f806ffb67f9d1dfa8
             //attributes
             var countAttributes = ms.readVarInt();
             this.attributes = [];//new Attribute[countAttributes];
