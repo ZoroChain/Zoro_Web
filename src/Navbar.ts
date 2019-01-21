@@ -155,21 +155,21 @@ namespace WebBrowser
                 } else {
                     search = search.replace('0x', '');
                     if (search.length == 64) {
-                        if (appchain){
+                        if (appchain && appchain.length == 40){
                             window.open(locationtool.getUrl() + '/transaction/' + appchain + "/" +search);
                         }else{
                             window.open(locationtool.getUrl() + '/transaction/' + search);
                         }
                     }
                     else if (search.length == 40) {
-                        if (appchain){
+                        if (appchain && appchain.length == 40){
                             window.open(locationtool.getUrl() + '/nep5/' + appchain + "/" +search);
                         }else{
                             window.open(locationtool.getUrl() + '/nep5/' + search);
                         }
                     }
                     else if (!isNaN(Number(search))) {
-                        if (appchain){
+                        if (appchain && appchain.length == 40){
                             window.open(locationtool.getUrl() + '/block/' + appchain + "/" +search);
                         }else{
                             window.open(locationtool.getUrl() + '/block/' + search);
@@ -179,7 +179,7 @@ namespace WebBrowser
                         let length = this.searchList.children.length;
                         if (length) {
                             let data = this.searchList.children[this.currentLine-1].getAttribute("data");
-                            if (appchain){
+                            if (appchain && appchain.length == 40){
                                 window.open(locationtool.getUrl() + '/asset/' + appchain + "/" +search);
                             }else{
                                 window.open(locationtool.getUrl() + '/asset/' + data);

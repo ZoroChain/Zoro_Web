@@ -59,7 +59,7 @@ namespace WebBrowser {
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
 			var r = json["result"];
-			var height = parseInt(r[0]["indexx"] as string) - 1;
+			var height = parseInt(r[0]["blockcount"] as string) - 1;
 			return height;
 		}
 

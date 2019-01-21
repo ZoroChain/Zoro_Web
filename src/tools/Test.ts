@@ -14,6 +14,7 @@ namespace WebBrowser {
             var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
             var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
 
+            address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AQXPAKF7uD5rYbBnqikGDVcsP1Ukpkopg5");
             var sb = new ThinNeo.ScriptBuilder();
             var a = [];
             a.push("(hex160)" + bcp);
@@ -31,7 +32,7 @@ namespace WebBrowser {
             array.push(scriptPublish);
 
             var postdata = WWW.makeZoroRpcPostBody("invokescript", array);
-            var result = await fetch("http://127.0.0.1:20332/", {"method":"post", "body":JSON.stringify(postdata)});
+            var result = await fetch(WWW.api, {"method":"post", "body":JSON.stringify(postdata)});
             var json = await result.json();
 
             alert(JSON.stringify(json));

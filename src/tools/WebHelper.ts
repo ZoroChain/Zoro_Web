@@ -48,10 +48,21 @@ namespace WebBrowser
                 break;
             }
             return sb;
-        }       
+        }          
     }
 
     export enum Nep5Type{
         Neo,Zoro,NativeNep5
     }
+
+    
+}
+
+interface Uint8Array{
+    ToScriptHash():ArrayBuffer;
+}
+
+Uint8Array.prototype.ToScriptHash = () => {
+    var scripthash = Neo.Cryptography.Sha256.computeHash(this);          
+    return Neo.Cryptography.RIPEMD160.computeHash(scripthash);   
 }
