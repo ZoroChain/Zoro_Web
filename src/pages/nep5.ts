@@ -13,7 +13,7 @@ namespace WebBrowser
             if (this.langType != this.app.langmgr.type) {
                 let page_lang = [
                     "asset_title",
-                    "asset_id",
+                    // "asset_id",
                     "asset_asset",
                     "asset_type",
                     "asset_ava",

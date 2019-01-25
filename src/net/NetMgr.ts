@@ -15,8 +15,8 @@ namespace WebBrowser {
         type: number; // 当前网络
         private nodes_server: any; // 当前nelnode_server
 
-        //url = "localhost";
-        static url = "115.159.68.43";
+        //static url = "47.244.141.254";
+        static url = "localhost";
 
         constructor(app: App) {
 

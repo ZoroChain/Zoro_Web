@@ -3645,7 +3645,7 @@ var WebBrowser;
                 var result = this.SendZororawtransaction(tran, prikey, pubkey, chainHash);
                 alert(JSON.stringify(result));
                 //NativeNep5 Hash
-                return new Neo.Uint160(scripthash);
+                alert(new Neo.Uint160(scripthash).toString());
             });
         }
         static SendContract(need_storage, need_canCharge, description, email, auther, version, name, ContractAvm, chainHash, pubkey, prikey) {
@@ -6704,11 +6704,11 @@ var WebBrowser;
                     "tran_txid",
                     "tran_type",
                     "tran_sysfee",
+                    "tran_gas_limit",
+                    "tran_gas_price",
                     "tran_size",
                     "tran_height",
                     "tran_time",
-                    "tran_input",
-                    "tran_output",
                     "tran_nep5",
                     "tran_nep5_asset",
                     "tran_nep5_from",
@@ -6757,7 +6757,9 @@ var WebBrowser;
                 $("#blockindex").empty();
                 $("#blockindex").append("<a href='" + WebBrowser.Url.href_block(txInfo.blockindex) + "'>" + txInfo.blockindex + "</a>");
                 $("#txsize").text(txInfo.size + " bytes");
-                $("#sysfee").text(txInfo.gas + " gas");
+                $("#sysfee").text(txInfo.gas + " BCP");
+                $("#gaslimit").text(txInfo.gaslimit);
+                $("#gasprice").text(txInfo.gasprice);
                 let ajax = new WebBrowser.Ajax();
                 let blocks = yield WebBrowser.WWW.getblock(txInfo.blockindex); //let blocks: Block[] = await ajax.post('getblock', [txInfo.blockindex]); 
                 let block = blocks[0];
@@ -6819,7 +6821,7 @@ var WebBrowser;
                 if (txidNep) {
                     $(".txidnep-warp").show();
                     txidNep.forEach((item) => {
-                        this.loadTxidNep5View(item.asset, item.from, item.to, item.value);
+                        this.loadTxidNep5View(item.asset, item.from, item.to, item.value, item.symbol);
                     });
                 }
                 else {
@@ -6827,14 +6829,13 @@ var WebBrowser;
                 }
             });
         }
-        loadTxidNep5View(asset, from, to, value) {
+        loadTxidNep5View(asset, from, to, value, symbol) {
             return __awaiter(this, void 0, void 0, function* () {
                 let href = WebBrowser.Url.href_nep5(asset);
                 //let nep5Name = await WWW.api_getnep5(asset); 
-                var assetid = asset.substr(0, 4) + "..." + asset.substr(asset.length - 3);
                 let html = `
                     <tr>
-                    <td> <a href="` + href + `" target="_self">` + assetid + `</a></td>
+                    <td> <a href="` + href + `" target="_self">` + symbol + `</a></td>
                     <td>` + from + `</td>
                     <td>` + to + `</td>
                     <td>` + value + `</td>
@@ -7052,7 +7053,7 @@ var WebBrowser;
             if (this.langType != this.app.langmgr.type) {
                 let page_lang = [
                     "asset_title",
-                    "asset_id",
+                    // "asset_id",
                     "asset_asset",
                     "asset_type",
                     "asset_ava",
@@ -7870,6 +7871,8 @@ var WebBrowser;
                 tran_type: "类型",
                 tran_netfee: "网络费用",
                 tran_sysfee: "系统费用",
+                tran_gas_limit: "Gas Limit",
+                tran_gas_price: "Gas Price",
                 tran_size: "大小",
                 tran_height: "区块高度",
                 tran_time: "时间",
@@ -8095,6 +8098,8 @@ var WebBrowser;
                 tran_type: "Type",
                 tran_netfee: "Network Fee",
                 tran_sysfee: "System Fee",
+                tran_gas_limit: "Gas Limit",
+                tran_gas_price: "Gas Price",
                 tran_size: "Size",
                 tran_height: "Height",
                 tran_time: "Time",
@@ -8481,8 +8486,8 @@ var WebBrowser;
             return scan;
         }
     }
-    //url = "localhost";
-    NetMgr.url = "115.159.68.43";
+    //static url = "47.244.141.254";
+    NetMgr.url = "localhost";
     WebBrowser.NetMgr = NetMgr;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="../lib/neo-ts.d.ts"/>

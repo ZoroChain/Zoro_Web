@@ -23,8 +23,6 @@ namespace WebBrowser {
 					"tran_size",
 					"tran_height",
 					"tran_time",
-					"tran_input",
-					"tran_output",
 
 					"tran_nep5",
 					"tran_nep5_asset",
@@ -83,8 +81,8 @@ namespace WebBrowser {
 			$("#blockindex").append("<a href='" + Url.href_block(txInfo.blockindex) + "'>" + txInfo.blockindex + "</a>");
 			$("#txsize").text(txInfo.size + " bytes");
 			$("#sysfee").text(txInfo.gas + " BCP");
-			$("#gaslimit").text(txInfo.gaslimit + " GAS");
-			$("#gasprice").text(txInfo.gasprice + " GWEI");
+			$("#gaslimit").text(txInfo.gaslimit);
+			$("#gasprice").text(txInfo.gasprice);
 			let ajax: Ajax = new Ajax();
 			
 			let blocks: Block[] = await WWW.getblock(txInfo.blockindex); //let blocks: Block[] = await ajax.post('getblock', [txInfo.blockindex]); 
@@ -151,20 +149,19 @@ namespace WebBrowser {
 			if (txidNep) {
 				$(".txidnep-warp").show();
 				txidNep.forEach((item) => {
-					this.loadTxidNep5View(item.asset, item.from, item.to, item.value);
+					this.loadTxidNep5View(item.asset, item.from, item.to, item.value, item.symbol);
 				})
 			} else {
 				$(".txidnep-warp").hide();
 			}
 		}
 
-		async loadTxidNep5View(asset: string, from: string, to: string, value: number) {
+		async loadTxidNep5View(asset: string, from: string, to: string, value: number, symbol:string) {
 			let href = Url.href_nep5(asset);
 			//let nep5Name = await WWW.api_getnep5(asset); 
-			var assetid = asset.substr(0, 4) + "..." + asset.substr(asset.length - 3);
 			let html = `
                     <tr>
-                    <td> <a href="`+ href + `" target="_self">` + assetid + `</a></td>
+                    <td> <a href="`+ href + `" target="_self">` + symbol + `</a></td>
                     <td>` + from + `</td>
                     <td>` + to + `</td>
                     <td>` + value + `</td>
