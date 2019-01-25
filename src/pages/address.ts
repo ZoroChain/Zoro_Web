@@ -114,22 +114,22 @@ namespace WebBrowser {
 			$("#balance").empty();
 			if (balances) {
 				balances.forEach((balance: Balance) => {
-					if (balance.name.indexOf("{") >= 0){
-						var json = JSON.parse(balance.name);		
+					if (balance.symbol.indexOf("{") >= 0){
+						var json = JSON.parse(balance.symbol);		
 						for (let i = 0; i < json.length; i++){
 							if (this.langType == "cn" && json[i].lang == "zh-CN"){
-								balance.name = json[i].name;
+								balance.symbol = json[i].name;
 								break;
 							}
 							else if (json[i].lang == this.langType){
-								balance.name = json[i].name;
+								balance.symbol = json[i].name;
 								break;
 							}
 						};												
 					}					
 					
 					let html = `
-                <div class="line" > <div class="title-nel" > <span>` + balance.name + ` </span></div >
+                <div class="line" > <div class="title-nel" > <span>` + balance.symbol + ` </span></div >
                 <div class="content-nel" > <span> ` + balance.balance + ` </span></div > </div>`;
 					$("#balance").append(html);
 				});

@@ -33,17 +33,16 @@ namespace WebBrowser
                     sb.EmitSysCall("Zoro.Contract.Create");
                 break;
                 case Nep5Type.NativeNep5:               
-                    var amount = _params[2] * Math.pow(10, _params[1]);                        
-                    var script = ThinNeo.Helper.GetAddressCheckScriptFromPublicKey(_params[0]);
-                    var scripthash = Neo.Cryptography.Sha256.computeHash(script);
-                    scripthash = Neo.Cryptography.RIPEMD160.computeHash(scripthash);
-                    var ss = new Neo.Uint160(scripthash).toString();
+                    var amount = _params[3] * Math.pow(10, _params[2]);                        
+                    var script = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(_params[1]);
+                    var ss = new Neo.Uint160(script).toString();
+                    sb.EmitPushBytes(_params[0].hexToBytes().reverse());
                     sb.EmitPushString(ss);
-                    sb.EmitPushBytes(_params[0]);                   
-                    sb.EmitPushNumber(new Neo.BigInteger(_params[1]));                   
+                    sb.EmitPushBytes(_params[1]);                   
+                    sb.EmitPushNumber(new Neo.BigInteger(_params[2]));                   
                     sb.EmitPushNumber(new Neo.BigInteger(amount));
-                    sb.EmitPushString(_params[3]);
                     sb.EmitPushString(_params[4]);
+                    sb.EmitPushString(_params[5]);
                     sb.EmitSysCall("Zoro.NativeNEP5.Create");
                 break;
             }
@@ -56,13 +55,4 @@ namespace WebBrowser
     }
 
     
-}
-
-interface Uint8Array{
-    ToScriptHash():ArrayBuffer;
-}
-
-Uint8Array.prototype.ToScriptHash = () => {
-    var scripthash = Neo.Cryptography.Sha256.computeHash(this);          
-    return Neo.Cryptography.RIPEMD160.computeHash(scripthash);   
 }

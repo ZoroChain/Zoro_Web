@@ -114,6 +114,8 @@ namespace WebBrowser
             tran_type: "类型",
             tran_netfee: "网络费用",
             tran_sysfee: "系统费用",
+            tran_gas_limit: "Gas Limit",
+            tran_gas_price: "Gas Price",
             tran_size: "大小",
             tran_height: "区块高度",
             tran_time: "时间",
@@ -200,7 +202,7 @@ namespace WebBrowser
 			nep5assetid: "资产ID",
 			nep5name: "所属",
 			nep5assettotalsupply: "总量",
-			nep5symbol: "应用链资产",
+			nep5symbol: "资产",
             nep5decimals: "小数点后位数", 
             back_chainmessage:"返回",
 

@@ -243,7 +243,7 @@ namespace WebBrowser {
 
 		static async getrawtransaction(txid: string) 
 		{
-			var str = WWW.makeRpcUrl("getrawtransaction", txid);
+			var str = WWW.makeRpcUrl("gettransaction", txid);
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
 			var r = json["result"];
@@ -252,7 +252,7 @@ namespace WebBrowser {
 
 		static async getappchainrawtransaction(ac: string ,txid: string) 
 		{
-			var str = WWW.makeRpcUrl("getacrawtransaction", ac,txid);
+			var str = WWW.makeRpcUrl("getactransaction", ac,txid);
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
 			var r = json["result"];
@@ -525,8 +525,7 @@ namespace WebBrowser {
 				}	
 				if (element["asset"] == AppChainTool.id_NEO){
 					AppChainTool.NEO += parseFloat(element["value"]);
-				}
-				
+				}				
 			});
 			return r;
 		}
@@ -568,7 +567,7 @@ namespace WebBrowser {
                 r = Neo.BigInteger.fromUint8ArrayAutoSign(r);
             }
             return r;
-        }    
+		}    
 
 		static async api_getAllAppChain(){
             var str = WWW.makeZoroRpcUrl(WWW.rpc, "getappchainhashlist");

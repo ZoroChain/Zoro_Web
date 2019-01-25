@@ -1892,7 +1892,7 @@ var WebBrowser;
         }
         static getrawtransaction(txid) {
             return __awaiter(this, void 0, void 0, function* () {
-                var str = WWW.makeRpcUrl("getrawtransaction", txid);
+                var str = WWW.makeRpcUrl("gettransaction", txid);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
                 var r = json["result"];
@@ -1901,7 +1901,7 @@ var WebBrowser;
         }
         static getappchainrawtransaction(ac, txid) {
             return __awaiter(this, void 0, void 0, function* () {
-                var str = WWW.makeRpcUrl("getacrawtransaction", ac, txid);
+                var str = WWW.makeRpcUrl("getactransaction", ac, txid);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
                 var r = json["result"];
@@ -2415,7 +2415,7 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 switch (type) {
                     case "ZOROBCP":
-                        return yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.zoroBCP, address, chainHash);
+                        return yield WebBrowser.AppChainTool.getNativeBalanceOf(chainHash);
                     case "NEOBCP":
                         return yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.neoBCP, address);
                     case "NEO":
@@ -2423,12 +2423,12 @@ var WebBrowser;
                     case "GAS":
                         return WebBrowser.AppChainTool.GAS;
                     default:
-                        let price = 0;
+                        let price = "";
                         if (chainHash == "NEO") {
                             price = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.neoBCP, address);
                         }
                         else {
-                            price = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.zoroBCP, address, chainHash);
+                            price = yield WebBrowser.AppChainTool.getNativeBalanceOf(chainHash);
                         }
                         return price;
                 }
@@ -2681,22 +2681,22 @@ var WebBrowser;
             $("#balance").empty();
             if (balances) {
                 balances.forEach((balance) => {
-                    if (balance.name.indexOf("{") >= 0) {
-                        var json = JSON.parse(balance.name);
+                    if (balance.symbol.indexOf("{") >= 0) {
+                        var json = JSON.parse(balance.symbol);
                         for (let i = 0; i < json.length; i++) {
                             if (this.langType == "cn" && json[i].lang == "zh-CN") {
-                                balance.name = json[i].name;
+                                balance.symbol = json[i].name;
                                 break;
                             }
                             else if (json[i].lang == this.langType) {
-                                balance.name = json[i].name;
+                                balance.symbol = json[i].name;
                                 break;
                             }
                         }
                         ;
                     }
                     let html = `
-                <div class="line" > <div class="title-nel" > <span>` + balance.name + ` </span></div >
+                <div class="line" > <div class="title-nel" > <span>` + balance.symbol + ` </span></div >
                 <div class="content-nel" > <span> ` + balance.balance + ` </span></div > </div>`;
                     $("#balance").append(html);
                 });
@@ -3508,17 +3508,16 @@ var WebBrowser;
                     sb.EmitSysCall("Zoro.Contract.Create");
                     break;
                 case Nep5Type.NativeNep5:
-                    var amount = _params[2] * Math.pow(10, _params[1]);
-                    var script = ThinNeo.Helper.GetAddressCheckScriptFromPublicKey(_params[0]);
-                    var scripthash = Neo.Cryptography.Sha256.computeHash(script);
-                    scripthash = Neo.Cryptography.RIPEMD160.computeHash(scripthash);
-                    var ss = new Neo.Uint160(scripthash).toString();
+                    var amount = _params[3] * Math.pow(10, _params[2]);
+                    var script = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(_params[1]);
+                    var ss = new Neo.Uint160(script).toString();
+                    sb.EmitPushBytes(_params[0].hexToBytes().reverse());
                     sb.EmitPushString(ss);
-                    sb.EmitPushBytes(_params[0]);
-                    sb.EmitPushNumber(new Neo.BigInteger(_params[1]));
+                    sb.EmitPushBytes(_params[1]);
+                    sb.EmitPushNumber(new Neo.BigInteger(_params[2]));
                     sb.EmitPushNumber(new Neo.BigInteger(amount));
-                    sb.EmitPushString(_params[3]);
                     sb.EmitPushString(_params[4]);
+                    sb.EmitPushString(_params[5]);
                     sb.EmitSysCall("Zoro.NativeNEP5.Create");
                     break;
             }
@@ -3533,10 +3532,6 @@ var WebBrowser;
         Nep5Type[Nep5Type["NativeNep5"] = 2] = "NativeNep5";
     })(Nep5Type = WebBrowser.Nep5Type || (WebBrowser.Nep5Type = {}));
 })(WebBrowser || (WebBrowser = {}));
-Uint8Array.prototype.ToScriptHash = () => {
-    var scripthash = Neo.Cryptography.Sha256.computeHash(this);
-    return Neo.Cryptography.RIPEMD160.computeHash(scripthash);
-};
 /// <reference path="../tools/wwwtool.ts"/>
 /// <reference path="../tools/WebHelper.ts"/>
 /// <reference path="../../lib/neo-ts.d.ts"/>
@@ -3607,14 +3602,46 @@ var WebBrowser;
             select.selectedIndex = num - 1;
             return select;
         }
+        static getNativeBalanceOf(chainHash) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var sb = new ThinNeo.ScriptBuilder();
+                var a = [];
+                a.push("(hex160)" + this.zoroBCP);
+                a.push("(addr)" + WebBrowser.GUITool.address);
+                sb.EmitParamJson(a);
+                sb.EmitPushString("BalanceOf");
+                sb.EmitSysCall("Zoro.NativeNEP5.Call");
+                sb.EmitPushBytes(this.zoroBCP.hexToBytes().reverse());
+                sb.EmitPushString("Decimals");
+                sb.EmitSysCall("Zoro.NativeNEP5.Call");
+                var result = yield this.InvokeZoroContract(sb, chainHash);
+                var decimals = Number(result[0]["stack"][1]["value"]);
+                var value = new Neo.BigInteger(result[0]["stack"][0]["value"]).toString();
+                if (value.length < 8) {
+                    let s = "0.";
+                    for (var i = 0; i < 8 - value.length; i++) {
+                        s += "0";
+                    }
+                    value = s + value;
+                }
+                else {
+                    let s = value.substr(0, value.length - 8);
+                    s += ".";
+                    s += value.substr(value.length - 8);
+                    value = s;
+                }
+                return value;
+            });
+        }
         static SendNativeContract(presion, totalsupply, symbol, name, chainHash, pubkey, prikey) {
             return __awaiter(this, void 0, void 0, function* () {
                 var sb = new ThinNeo.ScriptBuilder();
-                sb = WebBrowser.WebHelper.getScriptBuilderCreate(WebBrowser.Nep5Type.NativeNep5, pubkey, presion, totalsupply, symbol, name);
-                var scripthash = sb.ToArray().ToScriptHash();
+                sb = WebBrowser.WebHelper.getScriptBuilderCreate(WebBrowser.Nep5Type.NativeNep5, AppChainTool.zoroBCP, pubkey, presion, totalsupply, symbol, name);
+                var scripthash = Neo.Cryptography.Sha256.computeHash(sb.ToArray());
+                scripthash = Neo.Cryptography.RIPEMD160.computeHash(scripthash);
                 var invokeResult = yield this.InvokeZoroContract(sb, chainHash);
-                var gasLimit = invokeResult["gas_consumed"];
-                var tran = this.getZoroTransaction(gasLimit, Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
+                var gasLimit = invokeResult[0]["gas_consumed"];
+                var tran = this.getZoroTransaction(Neo.Fixed8.parse(gasLimit), Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
                 var result = this.SendZororawtransaction(tran, prikey, pubkey, chainHash);
                 alert(JSON.stringify(result));
                 //NativeNep5 Hash
@@ -3646,7 +3673,7 @@ var WebBrowser;
                 else {
                     var invokeResult = yield this.InvokeZoroContract(sb, chainHash);
                     var gasLimit = invokeResult["gas_consumed"];
-                    let tran = this.getZoroTransaction(gasLimit, Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
+                    let tran = this.getZoroTransaction(Neo.Fixed8.parse(gasLimit), Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
                     let result = this.SendZororawtransaction(tran, prikey, pubkey, chainHash);
                     alert("txid=" + tran.GetHash().toHexString());
                 }
@@ -3821,8 +3848,8 @@ var WebBrowser;
                 sb.EmitPushString("Transfer");
                 sb.EmitSysCall("Zoro.NativeNEP5.Call");
                 var invokeResult = yield this.InvokeZoroContract(sb, chainHash);
-                var gasLimit = invokeResult["gas_consumed"];
-                var tran = this.getZoroTransaction(gasLimit, Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
+                var gasLimit = invokeResult[0]["gas_consumed"];
+                var tran = this.getZoroTransaction(Neo.Fixed8.parse(gasLimit), Neo.Fixed8.One, sb.ToArray(), ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey));
                 var result = this.SendZororawtransaction(tran, prikey, pubkey, chainHash);
                 alert("txid=" + tran.GetHash().toHexString());
             });
@@ -3893,7 +3920,6 @@ var WebBrowser;
     AppChainTool.neoBCP = "04e31cee0443bb916534dad2adf508458920e66d";
     AppChainTool.CNEO = "c074a05e9dcf0141cbe6b4b3475dd67baf4dcb60";
     AppChainTool.CGAS = "74f2dc36a68fdc4682034178eb2220729231db76";
-    AppChainTool.appChainBCP = "054df92125ca222b979c8ae8c546c9d4d1c22dc2";
     AppChainTool.Neotransfer = "0x04e31cee0443bb916534dad2adf508458920e66d";
     AppChainTool.Zorotransfer = "0x67147557c0b6431e9b9297de26b46d9889434e49";
     AppChainTool.RootChain = "0000000000000000000000000000000000000000";
@@ -4245,11 +4271,12 @@ var WebBrowser;
                 var prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
                 var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
                 var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
-                address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AQXPAKF7uD5rYbBnqikGDVcsP1Ukpkopg5");
+                //address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
                 var sb = new ThinNeo.ScriptBuilder();
                 var a = [];
                 a.push("(hex160)" + bcp);
-                a.push("(hex160)" + address.reverse().toHexString());
+                //a.push("(hex160)" + address.reverse().toHexString());
+                a.push("(addr)AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
                 sb.EmitParamJson(a);
                 // sb.EmitPushBytes(address);
                 // sb.EmitPushBytes(this.getUint160(bcp));           
@@ -4287,20 +4314,29 @@ var WebBrowser;
                 var decimals = parseInt(json["stack"][0]["value"]);
                 var value = 1;
                 value = 1 * Math.pow(10, decimals);
+                // sb = new ThinNeo.ScriptBuilder();
+                // sb.EmitPushNumber(new Neo.BigInteger(value));
+                // sb.EmitPushBytes(ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp"));
+                // //sb.EmitPushBytes(targetScriptHash);
+                // sb.EmitPushBytes(scriptHash);           
+                // sb.EmitPushBytes(this.getUint160(bcp));
+                // sb.EmitPushString("Transfer");
+                // sb.EmitSysCall("Zoro.NativeNEP5.Call");
                 sb = new ThinNeo.ScriptBuilder();
-                sb.EmitPushNumber(new Neo.BigInteger(value));
-                sb.EmitPushBytes(targetScriptHash);
-                sb.EmitPushBytes(scriptHash);
-                sb.EmitPushBytes(this.getUint160(bcp));
-                sb.EmitPushString("Transfer");
-                sb.EmitSysCall("Zoro.NativeNEP5.Call");
+                array = [];
+                array.push("(addr)AcQLYjGbQU2bEQ8RKFXUcf8XvromfUQodq");
+                array.push("(addr)AbN2K2trYzgx8WMg2H7U7JHH6RQVzz2fnx");
+                array.push("(bytes)f8c86f9cfaade7d2863403b706497caaba47f633598fd684cf71dc1546a87e02");
+                sb.EmitParamJson(array);
+                sb.EmitPushString("exchange");
+                sb.EmitAppCall("7e465b65c8ba9bd255ba93947732502e30985007".hexToBytes().reverse());
                 scriptPublish = sb.ToArray().toHexString();
                 array = [];
                 array.push(chainHash);
                 array.push(scriptPublish);
                 var gas = yield WebBrowser.WWW.rpc_invokeScript(array);
                 gas = gas["gas_consumed"];
-                this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.parse(gas), Neo.Fixed8.One);
+                this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.parse("8"), Neo.Fixed8.One);
             });
         }
         static makeTransaction(script, wif, gas, gasPrice) {
@@ -4327,11 +4363,11 @@ var WebBrowser;
                 postRawArray.push(chainHash);
                 postRawArray.push(rawdata);
                 var postdata = WebBrowser.WWW.makeZoroRpcPostBody("sendrawtransaction", postRawArray);
-                var result = yield fetch("http://127.0.0.1:20332/", { "method": "post", "body": JSON.stringify(postdata) });
+                var result = yield fetch("http://115.159.68.43:59908/api/testnet", { "method": "post", "body": JSON.stringify(postdata) });
                 var json = yield result.json();
                 var postResult1 = json;
                 {
-                    alert("txid=" + tran.GetHash().toHexString());
+                    alert("txid=" + tran.GetHash().reverse().toHexString());
                 }
             });
         }
@@ -4365,8 +4401,8 @@ var WebBrowser;
             this.div = div;
         }
         showUI() {
-            //Test.ZoroTransfer();
-            //Test.Transfer();
+            // Test.ZoroTransfer();
+            // Test.Transfer();
             this.login();
         }
         hideUI() {
@@ -4653,7 +4689,7 @@ var WebBrowser;
                 name.textContent = 'ZORO CHAIN';
                 zoroChain.appendChild(name);
                 var BCP = document.createElement('div');
-                var bcpnum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.zoroBCP, WebBrowser.GUITool.address, "0000000000000000000000000000000000000000");
+                var bcpnum = yield WebBrowser.AppChainTool.getNativeBalanceOf("0000000000000000000000000000000000000000");
                 var BCPTitle = document.createElement('div');
                 var BCPData = document.createElement('div');
                 WebBrowser.CSSTool.BCP_set(BCP);
@@ -4682,7 +4718,7 @@ var WebBrowser;
                 WebBrowser.CSSTool.flowLeft_set(GASTitle);
                 WebBrowser.CSSTool.flowRight_set(GASData);
                 GASTitle.textContent = 'GAS';
-                GASData.textContent = WebBrowser.AppChainTool.GAS.toString();
+                GASData.textContent = WebBrowser.AppChainTool.GAS.toFixed(8).toString();
                 GASData.style.color = '#C1A26F';
                 GAS.appendChild(GASTitle);
                 GAS.appendChild(GASData);
@@ -4708,7 +4744,7 @@ var WebBrowser;
                 WebBrowser.CSSTool.flowLeft_set(NEOTitle);
                 WebBrowser.CSSTool.flowRight_set(NEOData);
                 NEOTitle.textContent = 'NEO';
-                NEOData.textContent = WebBrowser.AppChainTool.NEO.toString();
+                NEOData.textContent = WebBrowser.AppChainTool.NEO.toFixed(8).toString();
                 NEO.appendChild(NEOTitle);
                 NEO.appendChild(NEOData);
                 neoChain.appendChild(NEO);
@@ -4757,7 +4793,7 @@ var WebBrowser;
                 BCP.style.width = "100%";
                 BCP.style.cssFloat = "left";
                 BCP.style.color = "#eeeeee";
-                var bcpnum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.appChainBCP, WebBrowser.GUITool.address, WebBrowser.GUITool.chainHash);
+                var bcpnum = yield WebBrowser.AppChainTool.getNativeBalanceOf(WebBrowser.GUITool.chainHash);
                 BCP.textContent = 'BCP = ' + bcpnum;
                 appChain.appendChild(BCP);
             });
@@ -4915,7 +4951,7 @@ var WebBrowser;
                             var utxo = yield WebBrowser.WWW.rpc_getUTXO(WebBrowser.GUITool.address);
                             return yield WebBrowser.AppChainTool.MakeInvokeTransaction(WebBrowser.CoinTool.getassets(utxo), WebBrowser.GUITool.address, addr.value, WebBrowser.AppChainTool.neoBCP, parseInt(gold.value), WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey);
                         default:
-                            return yield WebBrowser.AppChainTool.MakeZoroTransaction(WebBrowser.GUITool.address, addr.value, parseInt(gold.value), WebBrowser.AppChainTool.zoroBCP, WebBrowser.AppChainTool.zoroBCP, WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey, select.childNodes[select.selectedIndex].value);
+                            return yield WebBrowser.AppChainTool.MakeZoroTransaction(WebBrowser.GUITool.address, addr.value, Number(gold.value), WebBrowser.AppChainTool.zoroBCP, WebBrowser.AppChainTool.zoroBCP, WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey, select.childNodes[select.selectedIndex].value);
                     }
                 });
             });
@@ -4994,7 +5030,7 @@ var WebBrowser;
                         return;
                     switch (select.childNodes[select.selectedIndex].value) {
                         case "ZOROBCP":
-                            return yield WebBrowser.AppChainTool.MakeZoroTransaction(WebBrowser.GUITool.address, addr.value, parseInt(gold.value), WebBrowser.AppChainTool.zoroBCP, WebBrowser.AppChainTool.zoroBCP, WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.chainHash);
+                            return yield WebBrowser.AppChainTool.MakeZoroTransaction(WebBrowser.GUITool.address, addr.value, Number(gold.value), WebBrowser.AppChainTool.zoroBCP, WebBrowser.AppChainTool.zoroBCP, WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey, WebBrowser.AppChainTool.RootChain);
                         case "NEOBCP":
                             var utxo = yield WebBrowser.WWW.rpc_getUTXO(WebBrowser.GUITool.address);
                             return yield WebBrowser.AppChainTool.MakeInvokeTransaction(WebBrowser.CoinTool.getassets(utxo), WebBrowser.GUITool.address, addr.value, WebBrowser.AppChainTool.neoBCP, parseInt(gold.value), WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey);
@@ -5084,7 +5120,7 @@ var WebBrowser;
                         return;
                     switch (funcSelect.childNodes[funcSelect.selectedIndex].value) {
                         case "ZOROBCP":
-                            return yield WebBrowser.AppChainTool.MakeZoroTransaction(WebBrowser.GUITool.address, "AUB7tMoKTzN33iVVqhz98vnT3KiG4bqx3f", parseInt(gold.value), WebBrowser.AppChainTool.Zorotransfer, WebBrowser.AppChainTool.Zorotransfer, WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.chainHash);
+                            return yield WebBrowser.AppChainTool.MakeZoroTransaction(WebBrowser.GUITool.address, "AUB7tMoKTzN33iVVqhz98vnT3KiG4bqx3f", Number(gold.value), WebBrowser.AppChainTool.Zorotransfer, WebBrowser.AppChainTool.Zorotransfer, WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.chainHash);
                         case "NEOBCP":
                             var utxo = yield WebBrowser.WWW.rpc_getUTXO(WebBrowser.GUITool.address);
                             return yield WebBrowser.AppChainTool.MakeInvokeTransaction(WebBrowser.CoinTool.getassets(utxo), WebBrowser.GUITool.address, "AMjCDmrbfcBxGPitHcdrUYRyPXD7DfC52c", WebBrowser.AppChainTool.Neotransfer, parseInt(gold.value), WebBrowser.GUITool.prikey, WebBrowser.GUITool.pubkey);
@@ -5396,147 +5432,6 @@ var WebBrowser;
             WebBrowser.AppChainTool.getChain(select);
             var changeModel = document.createElement("div");
             contractBackGround.appendChild(changeModel);
-            var ContractText = document.createElement('span');
-            ContractText.style.color = "#eeeeee";
-            ContractText.textContent = "合约";
-            contractBackGround.appendChild(ContractText);
-            var storage_lable = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(storage_lable);
-            $(storage_lable).addClass("switch-wrap");
-            contractBackGround.appendChild(storage_lable);
-            var storageName = document.createElement('span');
-            storageName.style.color = "#eeeeee";
-            storageName.textContent = "storage";
-            storage_lable.appendChild(storageName);
-            var lable_store = document.createElement("span");
-            WebBrowser.CSSTool.flowRight_set(lable_store);
-            lable_store.style.marginRight = '373px';
-            storage_lable.appendChild(lable_store);
-            var need_storage = document.createElement('input');
-            $(need_storage).attr("id", "switch_s");
-            need_storage.type = "checkbox";
-            need_storage.checked = false;
-            lable_store.appendChild(need_storage);
-            var lable_s = document.createElement("label");
-            $(lable_s).attr("for", "switch_s");
-            lable_store.appendChild(lable_s);
-            var can_lable = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(can_lable);
-            $(can_lable).addClass("switch-wrap");
-            contractBackGround.appendChild(can_lable);
-            var canChargeName = document.createElement('span');
-            canChargeName.style.color = "#eeeeee";
-            canChargeName.textContent = "canCharge";
-            can_lable.appendChild(canChargeName);
-            var lable_div = document.createElement("span");
-            WebBrowser.CSSTool.flowRight_set(lable_div);
-            lable_div.style.marginRight = '373px';
-            can_lable.appendChild(lable_div);
-            var need_canCharge = document.createElement('input');
-            $(need_canCharge).attr("id", "switch");
-            need_canCharge.type = "checkbox";
-            need_canCharge.checked = false;
-            lable_div.appendChild(need_canCharge);
-            var lable = document.createElement("label");
-            $(lable).attr("for", "switch");
-            lable_div.appendChild(lable);
-            var nameTextModel = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(nameTextModel);
-            contractBackGround.appendChild(nameTextModel);
-            var nameText = document.createElement('span');
-            nameText.style.color = "#eeeeee";
-            nameText.textContent = "NAME";
-            nameTextModel.appendChild(nameText);
-            var name = document.createElement('input');
-            WebBrowser.CSSTool.addr_set(name);
-            name.placeholder = '请输入NAME';
-            name.style.marginLeft = '0';
-            name.style.width = '80%';
-            WebBrowser.CSSTool.flowRight_set(name);
-            nameTextModel.appendChild(name);
-            var versionTextModel = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(versionTextModel);
-            contractBackGround.appendChild(versionTextModel);
-            var versionText = document.createElement('span');
-            versionText.style.color = "#eeeeee";
-            versionText.textContent = "VERSION";
-            versionTextModel.appendChild(versionText);
-            var version = document.createElement('input');
-            version.value = "1.0";
-            WebBrowser.CSSTool.addr_set(version);
-            version.placeholder = '请输入VERSION';
-            version.style.marginLeft = '0';
-            version.style.width = '80%';
-            WebBrowser.CSSTool.flowRight_set(version);
-            versionTextModel.appendChild(version);
-            var autherTextModel = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(autherTextModel);
-            contractBackGround.appendChild(autherTextModel);
-            var autherText = document.createElement('span');
-            autherText.style.color = "#eeeeee";
-            autherText.textContent = "AUTHOR";
-            autherTextModel.appendChild(autherText);
-            var auther = document.createElement('input');
-            auther.value = "auther";
-            WebBrowser.CSSTool.addr_set(auther);
-            auther.placeholder = '请输入AUTHOR';
-            auther.style.marginLeft = '0';
-            auther.style.width = '80%';
-            WebBrowser.CSSTool.flowRight_set(auther);
-            autherTextModel.appendChild(auther);
-            var emailTextModel = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(emailTextModel);
-            contractBackGround.appendChild(emailTextModel);
-            var emailText = document.createElement('span');
-            emailText.style.color = "#eeeeee";
-            emailText.textContent = "EMAIL";
-            emailTextModel.appendChild(emailText);
-            var email = document.createElement('input');
-            email.value = "email";
-            WebBrowser.CSSTool.addr_set(email);
-            email.placeholder = '请输入EMAIL';
-            email.style.marginLeft = '0';
-            email.style.width = '80%';
-            WebBrowser.CSSTool.flowRight_set(email);
-            emailTextModel.appendChild(email);
-            var descriptionTextModel = document.createElement("div");
-            WebBrowser.CSSTool.handle_set(descriptionTextModel);
-            contractBackGround.appendChild(descriptionTextModel);
-            var descriptionText = document.createElement('span');
-            descriptionText.style.color = "#eeeeee";
-            descriptionText.textContent = "DESCRIPTION";
-            descriptionTextModel.appendChild(descriptionText);
-            var description = document.createElement('input');
-            description.value = "description";
-            WebBrowser.CSSTool.addr_set(description);
-            description.placeholder = '请输入DESCRIPTION';
-            description.style.marginLeft = '0';
-            description.style.width = '80%';
-            WebBrowser.CSSTool.flowRight_set(description);
-            descriptionTextModel.appendChild(description);
-            var uploadFiles = document.createElement("div"); //外层div
-            contractBackGround.appendChild(uploadFiles);
-            WebBrowser.CSSTool.uploadFiles_set(uploadFiles);
-            //feile  外层
-            var firstFile = document.createElement("div");
-            var putIn = document.createElement("div");
-            putIn.textContent = "请选择文件";
-            firstFile.appendChild(putIn);
-            var fileIcon = document.createElement("i");
-            $(fileIcon).addClass("glyphicon glyphicon-file").css("padding-left", "5px").appendTo(putIn);
-            uploadFiles.appendChild(firstFile);
-            WebBrowser.CSSTool.firstFile_set(firstFile);
-            //将file添加到feile  外层里
-            var file = document.createElement("input");
-            firstFile.appendChild(file);
-            file.type = "file";
-            WebBrowser.CSSTool.file_set(file);
-            firstFile.appendChild(file);
-            var btnSend = document.createElement('button');
-            btnSend.textContent = "send";
-            WebBrowser.CSSTool.btn_set(btnSend);
-            btnSend.style.width = '50%';
-            contractBackGround.appendChild(btnSend);
             var chooseNative = document.createElement("div");
             contractBackGround.appendChild(chooseNative);
             var nativeBackGround = document.createElement('div');
@@ -5548,14 +5443,34 @@ var WebBrowser;
                         chooseNative.removeChild(chooseNative.firstChild);
                     var nativeBackGround = document.createElement('div');
                     chooseNative.appendChild(nativeBackGround);
-                    var nativeName = document.createElement('span');
-                    nativeBackGround.appendChild(nativeName);
-                    nativeName.style.color = "#eeeeee";
-                    nativeName.textContent = "选择是否NativeNep5类型";
-                    BoolNativeNep5 = document.createElement('input');
+                    var nativeNep5_lable = document.createElement("div");
+                    WebBrowser.CSSTool.handle_set(nativeNep5_lable);
+                    $(nativeNep5_lable).addClass("switch-wrap");
+                    nativeBackGround.appendChild(nativeNep5_lable);
+                    var NativeNep5 = document.createElement('span');
+                    NativeNep5.style.color = "#eeeeee";
+                    NativeNep5.textContent = "NativeNep5";
+                    nativeNep5_lable.appendChild(NativeNep5);
+                    var lable_nativeNep5 = document.createElement("span");
+                    WebBrowser.CSSTool.flowRight_set(lable_nativeNep5);
+                    lable_nativeNep5.style.marginRight = '373px';
+                    nativeNep5_lable.appendChild(lable_nativeNep5);
+                    var BoolNativeNep5 = document.createElement('input');
+                    $(BoolNativeNep5).attr("id", "switch_nativeNep5");
                     BoolNativeNep5.type = "checkbox";
                     BoolNativeNep5.checked = false;
-                    nativeBackGround.appendChild(BoolNativeNep5);
+                    lable_nativeNep5.appendChild(BoolNativeNep5);
+                    var lable_s = document.createElement("label");
+                    $(lable_s).attr("for", "switch_nativeNep5");
+                    lable_nativeNep5.appendChild(lable_s);
+                    // var nativeName = document.createElement('span') as HTMLSpanElement;
+                    // nativeBackGround.appendChild(nativeName);
+                    // nativeName.style.color = "#eeeeee";
+                    // nativeName.textContent = "选择是否NativeNep5类型";
+                    // BoolNativeNep5 = document.createElement('input') as HTMLInputElement;
+                    // BoolNativeNep5.type = "checkbox";
+                    // BoolNativeNep5.checked = false;
+                    // nativeBackGround.appendChild(BoolNativeNep5);  
                     var nativeBackGround2 = document.createElement('div');
                     nativeBackGround.appendChild(nativeBackGround2);
                     BoolNativeNep5.onchange = () => {
@@ -5583,18 +5498,6 @@ var WebBrowser;
                     chooseNative.appendChild(nativeBackGround);
                     this.createContract(nativeBackGround, select);
                 }
-            };
-            var ContractAvm = null;
-            var reader = new FileReader();
-            reader.onload = (e) => {
-                ContractAvm = reader.result;
-            };
-            file.onchange = (ev) => {
-                if (file.files.length > 0)
-                    if (file.files[0].name.includes(".avm")) {
-                        $(putIn).text(file.files[0].name);
-                        reader.readAsArrayBuffer(file.files[0]);
-                    }
             };
             this.createContract(nativeBackGround, select);
         }
@@ -5815,72 +5718,148 @@ var WebBrowser;
                 txText.textContent = (use ? "txid = " : "invokeMessage = ") + txMessage;
             });
         }
-        createContract(nativeBackGround, select) {
+        createContract(contractBackGround, select) {
             var ContractText = document.createElement('span');
             ContractText.style.color = "#eeeeee";
             ContractText.textContent = "合约";
-            nativeBackGround.appendChild(ContractText);
+            contractBackGround.appendChild(ContractText);
+            var storage_lable = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(storage_lable);
+            $(storage_lable).addClass("switch-wrap");
+            contractBackGround.appendChild(storage_lable);
             var storageName = document.createElement('span');
             storageName.style.color = "#eeeeee";
             storageName.textContent = "storage";
-            nativeBackGround.appendChild(storageName);
+            storage_lable.appendChild(storageName);
+            var lable_store = document.createElement("span");
+            WebBrowser.CSSTool.flowRight_set(lable_store);
+            lable_store.style.marginRight = '373px';
+            storage_lable.appendChild(lable_store);
             var need_storage = document.createElement('input');
+            $(need_storage).attr("id", "switch_s");
             need_storage.type = "checkbox";
             need_storage.checked = false;
-            nativeBackGround.appendChild(need_storage);
+            lable_store.appendChild(need_storage);
+            var lable_s = document.createElement("label");
+            $(lable_s).attr("for", "switch_s");
+            lable_store.appendChild(lable_s);
+            var can_lable = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(can_lable);
+            $(can_lable).addClass("switch-wrap");
+            contractBackGround.appendChild(can_lable);
             var canChargeName = document.createElement('span');
             canChargeName.style.color = "#eeeeee";
             canChargeName.textContent = "canCharge";
-            nativeBackGround.appendChild(canChargeName);
+            can_lable.appendChild(canChargeName);
+            var lable_div = document.createElement("span");
+            WebBrowser.CSSTool.flowRight_set(lable_div);
+            lable_div.style.marginRight = '373px';
+            can_lable.appendChild(lable_div);
             var need_canCharge = document.createElement('input');
+            $(need_canCharge).attr("id", "switch");
             need_canCharge.type = "checkbox";
             need_canCharge.checked = false;
-            nativeBackGround.appendChild(need_canCharge);
+            lable_div.appendChild(need_canCharge);
+            var lable = document.createElement("label");
+            $(lable).attr("for", "switch");
+            lable_div.appendChild(lable);
+            var nameTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(nameTextModel);
+            contractBackGround.appendChild(nameTextModel);
             var nameText = document.createElement('span');
             nameText.style.color = "#eeeeee";
             nameText.textContent = "NAME";
-            nativeBackGround.appendChild(nameText);
+            nameTextModel.appendChild(nameText);
             var name = document.createElement('input');
-            name.value = "name";
-            nativeBackGround.appendChild(name);
+            WebBrowser.CSSTool.addr_set(name);
+            name.placeholder = '请输入NAME';
+            name.style.marginLeft = '0';
+            name.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(name);
+            nameTextModel.appendChild(name);
+            var versionTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(versionTextModel);
+            contractBackGround.appendChild(versionTextModel);
             var versionText = document.createElement('span');
             versionText.style.color = "#eeeeee";
             versionText.textContent = "VERSION";
-            nativeBackGround.appendChild(versionText);
+            versionTextModel.appendChild(versionText);
             var version = document.createElement('input');
             version.value = "1.0";
-            nativeBackGround.appendChild(version);
+            WebBrowser.CSSTool.addr_set(version);
+            version.placeholder = '请输入VERSION';
+            version.style.marginLeft = '0';
+            version.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(version);
+            versionTextModel.appendChild(version);
+            var autherTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(autherTextModel);
+            contractBackGround.appendChild(autherTextModel);
             var autherText = document.createElement('span');
             autherText.style.color = "#eeeeee";
             autherText.textContent = "AUTHOR";
-            nativeBackGround.appendChild(autherText);
+            autherTextModel.appendChild(autherText);
             var auther = document.createElement('input');
             auther.value = "auther";
-            nativeBackGround.appendChild(auther);
+            WebBrowser.CSSTool.addr_set(auther);
+            auther.placeholder = '请输入AUTHOR';
+            auther.style.marginLeft = '0';
+            auther.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(auther);
+            autherTextModel.appendChild(auther);
+            var emailTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(emailTextModel);
+            contractBackGround.appendChild(emailTextModel);
             var emailText = document.createElement('span');
             emailText.style.color = "#eeeeee";
             emailText.textContent = "EMAIL";
-            nativeBackGround.appendChild(emailText);
+            emailTextModel.appendChild(emailText);
             var email = document.createElement('input');
             email.value = "email";
-            nativeBackGround.appendChild(email);
+            WebBrowser.CSSTool.addr_set(email);
+            email.placeholder = '请输入EMAIL';
+            email.style.marginLeft = '0';
+            email.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(email);
+            emailTextModel.appendChild(email);
+            var descriptionTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(descriptionTextModel);
+            contractBackGround.appendChild(descriptionTextModel);
             var descriptionText = document.createElement('span');
             descriptionText.style.color = "#eeeeee";
             descriptionText.textContent = "DESCRIPTION";
-            nativeBackGround.appendChild(descriptionText);
+            descriptionTextModel.appendChild(descriptionText);
             var description = document.createElement('input');
             description.value = "description";
-            nativeBackGround.appendChild(description);
-            var fileText = document.createElement('span');
-            fileText.style.color = "#eeeeee";
-            fileText.textContent = "FILE";
-            nativeBackGround.appendChild(fileText);
-            var file = document.createElement('input');
+            WebBrowser.CSSTool.addr_set(description);
+            description.placeholder = '请输入DESCRIPTION';
+            description.style.marginLeft = '0';
+            description.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(description);
+            descriptionTextModel.appendChild(description);
+            var uploadFiles = document.createElement("div"); //外层div
+            contractBackGround.appendChild(uploadFiles);
+            WebBrowser.CSSTool.uploadFiles_set(uploadFiles);
+            //feile  外层
+            var firstFile = document.createElement("div");
+            var putIn = document.createElement("div");
+            putIn.textContent = "请选择文件";
+            firstFile.appendChild(putIn);
+            var fileIcon = document.createElement("i");
+            $(fileIcon).addClass("glyphicon glyphicon-file").css("padding-left", "5px").appendTo(putIn);
+            uploadFiles.appendChild(firstFile);
+            WebBrowser.CSSTool.firstFile_set(firstFile);
+            //将file添加到feile  外层里
+            var file = document.createElement("input");
+            firstFile.appendChild(file);
             file.type = "file";
-            nativeBackGround.appendChild(file);
+            WebBrowser.CSSTool.file_set(file);
+            firstFile.appendChild(file);
             var btnSend = document.createElement('button');
             btnSend.textContent = "send";
-            nativeBackGround.appendChild(btnSend);
+            WebBrowser.CSSTool.btn_set(btnSend);
+            btnSend.style.width = '50%';
+            contractBackGround.appendChild(btnSend);
             var ContractAvm = null;
             btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
                 if (!ContractAvm) {
@@ -5900,40 +5879,73 @@ var WebBrowser;
                     }
             };
         }
-        createNativeContract(nativeBackGround, select) {
+        createNativeContract(contractBackGround, select) {
+            var nameTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(nameTextModel);
+            contractBackGround.appendChild(nameTextModel);
             var nameText = document.createElement('span');
             nameText.style.color = "#eeeeee";
             nameText.textContent = "NAME";
-            nativeBackGround.appendChild(nameText);
+            nameTextModel.appendChild(nameText);
             var name = document.createElement('input');
-            name.value = "InvokeContractTest_NativeNEP5";
-            nativeBackGround.appendChild(name);
+            WebBrowser.CSSTool.addr_set(name);
+            name.placeholder = '请输入NAME';
+            name.style.marginLeft = '0';
+            name.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(name);
+            nameTextModel.appendChild(name);
+            var symbolTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(symbolTextModel);
+            contractBackGround.appendChild(symbolTextModel);
             var symbolText = document.createElement('span');
             symbolText.style.color = "#eeeeee";
             symbolText.textContent = "SYMBOL";
-            nativeBackGround.appendChild(symbolText);
+            symbolTextModel.appendChild(symbolText);
             var symbol = document.createElement('input');
-            symbol.value = "InvokeContractTest";
-            nativeBackGround.appendChild(symbol);
+            symbol.value = "SYMBOL";
+            WebBrowser.CSSTool.addr_set(symbol);
+            symbol.placeholder = '请输入SYMBOL';
+            symbol.style.marginLeft = '0';
+            symbol.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(symbol);
+            symbolTextModel.appendChild(symbol);
+            var totalSupplyTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(totalSupplyTextModel);
+            contractBackGround.appendChild(totalSupplyTextModel);
             var totalSupplyText = document.createElement('span');
             totalSupplyText.style.color = "#eeeeee";
-            totalSupplyText.textContent = "TotalSupply";
-            nativeBackGround.appendChild(totalSupplyText);
+            totalSupplyText.textContent = "TOTALSUPPLY";
+            totalSupplyTextModel.appendChild(totalSupplyText);
             var totalSupply = document.createElement('input');
-            totalSupply.value = "2000000000";
-            nativeBackGround.appendChild(totalSupply);
+            totalSupply.value = "200000000000000000";
+            WebBrowser.CSSTool.addr_set(totalSupply);
+            totalSupply.placeholder = '请输入TOTALSUPPLY';
+            totalSupply.style.marginLeft = '0';
+            totalSupply.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(totalSupply);
+            totalSupplyTextModel.appendChild(totalSupply);
+            var presionTextModel = document.createElement("div");
+            WebBrowser.CSSTool.handle_set(presionTextModel);
+            contractBackGround.appendChild(presionTextModel);
             var presionText = document.createElement('span');
             presionText.style.color = "#eeeeee";
-            presionText.textContent = "Presion";
-            nativeBackGround.appendChild(presionText);
+            presionText.textContent = "PRESION";
+            presionTextModel.appendChild(presionText);
             var presion = document.createElement('input');
             presion.value = "8";
-            nativeBackGround.appendChild(presion);
+            WebBrowser.CSSTool.addr_set(presion);
+            presion.placeholder = '请输入PRESION';
+            presion.style.marginLeft = '0';
+            presion.style.width = '80%';
+            WebBrowser.CSSTool.flowRight_set(presion);
+            presionTextModel.appendChild(presion);
             var btnSend = document.createElement('button');
             btnSend.textContent = "send";
-            nativeBackGround.appendChild(btnSend);
+            WebBrowser.CSSTool.btn_set(btnSend);
+            btnSend.style.width = '50%';
+            contractBackGround.appendChild(btnSend);
             btnSend.onclick = () => __awaiter(this, void 0, void 0, function* () {
-                WebBrowser.AppChainTool.SendNativeContract(parseInt(presion.value), parseInt(totalSupply.value), symbol.value, name.value, select.childNodes[select.selectedIndex].value, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.prikey);
+                WebBrowser.AppChainTool.SendNativeContract(Number(presion.value), totalSupply.value, symbol.value, name.value, select.childNodes[select.selectedIndex].value, WebBrowser.GUITool.pubkey, WebBrowser.GUITool.prikey);
             });
         }
     }
@@ -6080,14 +6092,18 @@ var WebBrowser;
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.TxMessage);
                 $(transaction).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
             };
-            var message = document.createElement("button");
-            title.appendChild(message);
-            $(message).css("background", "#3D3E4C");
-            message.textContent = "信息";
-            WebBrowser.CSSTool.titleBtn_set(message);
-            message.onclick = () => {
-                $(message).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
-            };
+            // var message = document.createElement("button") as HTMLButtonElement;
+            // title.appendChild(message)
+            // $(message).css("background","#3D3E4C");
+            // message.textContent = "信息";
+            // CSSTool.titleBtn_set(message);
+            // message.onclick = () => {
+            //     $(message).css("background","#333542").siblings("button").css("background","#3D3E4C");
+            // }        
+            var address = document.createElement('span');
+            title.appendChild(address);
+            address.textContent = "地址：" + WebBrowser.GUITool.address;
+            WebBrowser.CSSTool.titleBtn_set(address);
         }
         addSelect() {
             this.hideUI();
@@ -6687,7 +6703,6 @@ var WebBrowser;
                     "tran_title_1",
                     "tran_txid",
                     "tran_type",
-                    "tran_netfee",
                     "tran_sysfee",
                     "tran_size",
                     "tran_height",
@@ -6742,8 +6757,7 @@ var WebBrowser;
                 $("#blockindex").empty();
                 $("#blockindex").append("<a href='" + WebBrowser.Url.href_block(txInfo.blockindex) + "'>" + txInfo.blockindex + "</a>");
                 $("#txsize").text(txInfo.size + " bytes");
-                $("#sysfee").text(txInfo["sys_fee"] + " gas");
-                $("#netfee").text(txInfo["net_fee"] + " gas");
+                $("#sysfee").text(txInfo.gas + " gas");
                 let ajax = new WebBrowser.Ajax();
                 let blocks = yield WebBrowser.WWW.getblock(txInfo.blockindex); //let blocks: Block[] = await ajax.post('getblock', [txInfo.blockindex]); 
                 let block = blocks[0];
@@ -6817,9 +6831,10 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 let href = WebBrowser.Url.href_nep5(asset);
                 //let nep5Name = await WWW.api_getnep5(asset); 
+                var assetid = asset.substr(0, 4) + "..." + asset.substr(asset.length - 3);
                 let html = `
                     <tr>
-                    <td> <a href="` + href + `" target="_self">` + asset + `</a></td>
+                    <td> <a href="` + href + `" target="_self">` + assetid + `</a></td>
                     <td>` + from + `</td>
                     <td>` + to + `</td>
                     <td>` + value + `</td>
@@ -7305,12 +7320,13 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 this.getLangs();
                 var nep5assetid = WebBrowser.locationtool.getParam3();
-                var appchain = WebBrowser.locationtool.getParam2();
-                if (appchain && appchain.length == 40) {
+                if (nep5assetid) {
+                    var appchain = WebBrowser.locationtool.getParam2();
                     var href = WebBrowser.locationtool.getUrl() + "/asset/" + appchain;
                 }
                 else {
                     var href = WebBrowser.locationtool.getUrl();
+                    var nep5assetid = WebBrowser.locationtool.getParam2();
                 }
                 let html = '<a href="' + href + '" target="_self">&lt&lt&lt' + this.app.langmgr.get("back_chainmessage") + '</a>';
                 $("#nep5asset").empty();
@@ -7384,13 +7400,14 @@ var WebBrowser;
         }
         loadAssetInfoView(nep5assetid) {
             return __awaiter(this, void 0, void 0, function* () {
-                var appchain = WebBrowser.locationtool.getParam2();
-                if (appchain && appchain.length == 40) {
+                if (WebBrowser.locationtool.getParam3()) {
+                    var appchain = WebBrowser.locationtool.getParam2();
                     var asset = yield WebBrowser.WWW.api_getappchainnep5(appchain, nep5assetid);
                 }
                 else {
                     var asset = yield WebBrowser.WWW.api_getnep5(nep5assetid);
                 }
+                asset = asset[0];
                 if (asset.symbol.indexOf("{") >= 0) {
                     var json = JSON.parse(asset.symbol);
                     for (var i = 0; i < json.length; i++) {
@@ -7920,7 +7937,7 @@ var WebBrowser;
                 nep5assetid: "资产ID",
                 nep5name: "所属",
                 nep5assettotalsupply: "总量",
-                nep5symbol: "应用链资产",
+                nep5symbol: "资产",
                 nep5decimals: "小数点后位数",
                 back_chainmessage: "返回",
                 // appchain

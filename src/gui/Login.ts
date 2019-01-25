@@ -13,8 +13,8 @@ namespace WebBrowser
         }
 
         showUI(){
-            //Test.ZoroTransfer();
-            //Test.Transfer();
+            // Test.ZoroTransfer();
+            // Test.Transfer();
             this.login();
         }        
 

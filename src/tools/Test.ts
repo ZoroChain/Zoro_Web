@@ -14,11 +14,12 @@ namespace WebBrowser {
             var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
             var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
 
-            address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AQXPAKF7uD5rYbBnqikGDVcsP1Ukpkopg5");
+            //address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
             var sb = new ThinNeo.ScriptBuilder();
             var a = [];
             a.push("(hex160)" + bcp);
-            a.push("(hex160)" + address.reverse().toHexString());
+            //a.push("(hex160)" + address.reverse().toHexString());
+            a.push("(addr)AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
             sb.EmitParamJson(a);
             // sb.EmitPushBytes(address);
             // sb.EmitPushBytes(this.getUint160(bcp));           
@@ -65,14 +66,24 @@ namespace WebBrowser {
             var value = 1;
             value = 1 * Math.pow(10, decimals);
 
-            sb = new ThinNeo.ScriptBuilder();
-            sb.EmitPushNumber(new Neo.BigInteger(value));
-            sb.EmitPushBytes(targetScriptHash);
-            sb.EmitPushBytes(scriptHash);           
-            sb.EmitPushBytes(this.getUint160(bcp));
-            sb.EmitPushString("Transfer");
-            sb.EmitSysCall("Zoro.NativeNEP5.Call");
+            // sb = new ThinNeo.ScriptBuilder();
+            // sb.EmitPushNumber(new Neo.BigInteger(value));
+            // sb.EmitPushBytes(ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp"));
+            // //sb.EmitPushBytes(targetScriptHash);
+            // sb.EmitPushBytes(scriptHash);           
+            // sb.EmitPushBytes(this.getUint160(bcp));
+            // sb.EmitPushString("Transfer");
+            // sb.EmitSysCall("Zoro.NativeNEP5.Call");
         
+            sb = new ThinNeo.ScriptBuilder();
+            array = [];
+            array.push("(addr)AcQLYjGbQU2bEQ8RKFXUcf8XvromfUQodq");
+            array.push("(addr)AbN2K2trYzgx8WMg2H7U7JHH6RQVzz2fnx");
+            array.push("(bytes)f8c86f9cfaade7d2863403b706497caaba47f633598fd684cf71dc1546a87e02");
+            sb.EmitParamJson(array);
+            sb.EmitPushString("exchange");
+            sb.EmitAppCall("7e465b65c8ba9bd255ba93947732502e30985007".hexToBytes().reverse());
+
             scriptPublish = sb.ToArray().toHexString();
             array = [];
             array.push(chainHash);
@@ -80,7 +91,7 @@ namespace WebBrowser {
             var gas = await WWW.rpc_invokeScript(array);
             gas = gas["gas_consumed"];
            
-            this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.parse(gas), Neo.Fixed8.One);
+            this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.parse("8"), Neo.Fixed8.One);
         }
 
         static async makeTransaction(script, wif, gas, gasPrice){
@@ -113,12 +124,12 @@ namespace WebBrowser {
             postRawArray.push(rawdata);
 
             var postdata = WWW.makeZoroRpcPostBody("sendrawtransaction",postRawArray);
-            var result = await fetch("http://127.0.0.1:20332/", {"method":"post", "body":JSON.stringify(postdata)});
+            var result = await fetch("http://115.159.68.43:59908/api/testnet", {"method":"post", "body":JSON.stringify(postdata)});
             var json = await result.json();
             var postResult1 = json;
 
             {
-                alert("txid=" + tran.GetHash().toHexString());
+                alert("txid=" + tran.GetHash().reverse().toHexString());
             }
         }
 

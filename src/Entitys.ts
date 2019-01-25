@@ -86,6 +86,8 @@ namespace WebBrowser
         version: number;
         blockindex: number;
         gas: string;
+        gaslimit: string;
+        gasprice: string;
     }
 
     export class Url
@@ -243,7 +245,7 @@ namespace WebBrowser
 
     export interface Balance
     {
-        name: string;
+        symbol: string;
         balance: string;
     }
     export interface AddressMsg {

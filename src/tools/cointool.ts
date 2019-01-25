@@ -90,7 +90,7 @@ namespace WebBrowser
         static async getGold(type:string, address:string, chainHash = "gold"){
             switch(type){
                 case "ZOROBCP":
-                return await WWW.rpc_getBalanceOf(AppChainTool.zoroBCP, address, chainHash);
+                return await AppChainTool.getNativeBalanceOf(chainHash);
                 case "NEOBCP":
                 return await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, address);
                 case "NEO":
@@ -98,11 +98,11 @@ namespace WebBrowser
                 case "GAS":
                 return AppChainTool.GAS;
                 default:
-                    let price = 0;
+                    let price = "";
                     if (chainHash == "NEO"){
                         price = await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, address);
                     }else{
-                        price = await WWW.rpc_getBalanceOf(AppChainTool.zoroBCP, address, chainHash);
+                        price = await AppChainTool.getNativeBalanceOf(chainHash);
                     }
                 return price
             }

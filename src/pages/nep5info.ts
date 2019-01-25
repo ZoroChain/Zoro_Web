@@ -40,14 +40,16 @@
         async start()
         {
             this.getLangs();
-            
+               
             var nep5assetid = locationtool.getParam3();
-            var appchain = locationtool.getParam2();
-            if (appchain && appchain.length == 40){
+            if (nep5assetid) {
+                var appchain = locationtool.getParam2();
                 var href = locationtool.getUrl() + "/asset/" + appchain;
             }else{
                 var href = locationtool.getUrl();
-            }
+                var nep5assetid = locationtool.getParam2();
+            }               
+
             let html = '<a href="' + href + '" target="_self">&lt&lt&lt' + this.app.langmgr.get("back_chainmessage") + '</a>';
             $("#nep5asset").empty();
             $("#nep5asset").append(html);
@@ -121,13 +123,14 @@
             this.footer.hidden = true;
         }
         async loadAssetInfoView(nep5assetid: string)
-        {            
-            var appchain = locationtool.getParam2();
-            if (appchain && appchain.length == 40){
+        {                       
+            if (locationtool.getParam3()){
+                var appchain = locationtool.getParam2();
                 var asset = await WWW.api_getappchainnep5(appchain, nep5assetid);
             }else{
                 var asset = await WWW.api_getnep5(nep5assetid)
             }   
+            asset = asset[0];
             if (asset.symbol.indexOf("{") >= 0){
                 var json = JSON.parse(asset.symbol);
                 for (var i = 0; i < json.length; i++){

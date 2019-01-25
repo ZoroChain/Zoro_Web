@@ -173,7 +173,7 @@ namespace WebBrowser
                     var utxo = await WWW.rpc_getUTXO(GUITool.address);
                     return await AppChainTool.MakeInvokeTransaction(CoinTool.getassets(utxo),GUITool.address, addr.value, AppChainTool.neoBCP, parseInt(gold.value), GUITool.prikey, GUITool.pubkey);
                     default:
-                    return await AppChainTool.MakeZoroTransaction(GUITool.address,addr.value, parseInt(gold.value), 
+                    return await AppChainTool.MakeZoroTransaction(GUITool.address,addr.value, Number(gold.value), 
                     AppChainTool.zoroBCP, AppChainTool.zoroBCP, GUITool.prikey, GUITool.pubkey, (select.childNodes[select.selectedIndex] as HTMLOptionElement).value);
                 }
             }
@@ -265,8 +265,8 @@ namespace WebBrowser
                 if (coinNum.textContent == "0") return;
                 switch((select.childNodes[select.selectedIndex] as HTMLOptionElement).value){
                     case "ZOROBCP":
-                    return await AppChainTool.MakeZoroTransaction(GUITool.address,addr.value, parseInt(gold.value), 
-                    AppChainTool.zoroBCP, AppChainTool.zoroBCP, GUITool.prikey, GUITool.pubkey, GUITool.chainHash);
+                    return await AppChainTool.MakeZoroTransaction(GUITool.address,addr.value, Number(gold.value), 
+                    AppChainTool.zoroBCP, AppChainTool.zoroBCP, GUITool.prikey, GUITool.pubkey, AppChainTool.RootChain);
                     case "NEOBCP":
                     var utxo = await WWW.rpc_getUTXO(GUITool.address);
                     return await AppChainTool.MakeInvokeTransaction(CoinTool.getassets(utxo),GUITool.address, addr.value, AppChainTool.neoBCP, parseInt(gold.value), GUITool.prikey, GUITool.pubkey);
@@ -367,7 +367,7 @@ namespace WebBrowser
                 if (coinNum.textContent == "0") return;
                 switch((funcSelect.childNodes[funcSelect.selectedIndex] as HTMLOptionElement).value){
                     case "ZOROBCP":
-                    return await AppChainTool.MakeZoroTransaction(GUITool.address, "AUB7tMoKTzN33iVVqhz98vnT3KiG4bqx3f", parseInt(gold.value), 
+                    return await AppChainTool.MakeZoroTransaction(GUITool.address, "AUB7tMoKTzN33iVVqhz98vnT3KiG4bqx3f", Number(gold.value), 
                     AppChainTool.Zorotransfer, AppChainTool.Zorotransfer, GUITool.prikey, GUITool.pubkey, GUITool.chainHash);
                     case "NEOBCP":
                     var utxo = await WWW.rpc_getUTXO(GUITool.address);

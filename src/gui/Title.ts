@@ -111,14 +111,19 @@ namespace WebBrowser
                 $(transaction).css("background","#333542").siblings("button").css("background","#3D3E4C");
             }
 
-            var message = document.createElement("button") as HTMLButtonElement;
-            title.appendChild(message)
-            $(message).css("background","#3D3E4C");
-            message.textContent = "信息";
-            CSSTool.titleBtn_set(message);
-            message.onclick = () => {
-                $(message).css("background","#333542").siblings("button").css("background","#3D3E4C");
-            }                    
+            // var message = document.createElement("button") as HTMLButtonElement;
+            // title.appendChild(message)
+            // $(message).css("background","#3D3E4C");
+            // message.textContent = "信息";
+            // CSSTool.titleBtn_set(message);
+            // message.onclick = () => {
+            //     $(message).css("background","#333542").siblings("button").css("background","#3D3E4C");
+            // }        
+            
+            var address = document.createElement('span') as HTMLSpanElement;
+            title.appendChild(address);
+            address.textContent = "地址：" + GUITool.address;
+            CSSTool.titleBtn_set(address);
         }
 
         addSelect(){

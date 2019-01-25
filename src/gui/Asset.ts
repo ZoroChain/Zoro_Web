@@ -36,7 +36,7 @@ namespace WebBrowser
             zoroChain.appendChild(name);
 
             var BCP = document.createElement('div') as HTMLSpanElement;
-            var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.zoroBCP, GUITool.address, "0000000000000000000000000000000000000000");
+            var bcpnum = await AppChainTool.getNativeBalanceOf("0000000000000000000000000000000000000000");
             var BCPTitle = document.createElement('div');
             var BCPData = document.createElement('div');
             CSSTool.BCP_set(BCP);
@@ -70,7 +70,7 @@ namespace WebBrowser
             CSSTool.flowLeft_set(GASTitle);
             CSSTool.flowRight_set(GASData);
             GASTitle.textContent = 'GAS';
-            GASData.textContent = AppChainTool.GAS.toString();
+            GASData.textContent = AppChainTool.GAS.toFixed(8).toString();
             GASData.style.color = '#C1A26F';
             GAS.appendChild(GASTitle);
             GAS.appendChild(GASData);
@@ -98,7 +98,7 @@ namespace WebBrowser
             CSSTool.flowLeft_set(NEOTitle);
             CSSTool.flowRight_set(NEOData);
             NEOTitle.textContent = 'NEO';
-            NEOData.textContent = AppChainTool.NEO.toString();
+            NEOData.textContent = AppChainTool.NEO.toFixed(8).toString();
             NEO.appendChild(NEOTitle);  
             NEO.appendChild(NEOData);           
             neoChain.appendChild(NEO);
@@ -118,7 +118,7 @@ namespace WebBrowser
             neoChain.appendChild(CNEO);
 
             var NBCP = document.createElement('div') as HTMLSpanElement;
-            var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, GUITool.address);
+            var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, GUITool.address) as string;
             CSSTool.BCP_set(NBCP);
             var NBCPTitle = document.createElement('div');
             var NBCPData = document.createElement('div');
@@ -152,10 +152,9 @@ namespace WebBrowser
             BCP.style.width = "100%";
             BCP.style.cssFloat = "left";
             BCP.style.color = "#eeeeee";
-            var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.appChainBCP, GUITool.address, GUITool.chainHash);
+            var bcpnum = await AppChainTool.getNativeBalanceOf(GUITool.chainHash);
             BCP.textContent = 'BCP = ' + bcpnum;
             appChain.appendChild(BCP);
         }
-
     }
 }

@@ -112,6 +112,8 @@ namespace WebBrowser
             tran_type: "Type",
             tran_netfee: "Network Fee",
             tran_sysfee: "System Fee",
+            tran_gas_limit: "Gas Limit",
+            tran_gas_price: "Gas Price",
             tran_size: "Size",
             tran_height: "Height",
             tran_time: "Time",
