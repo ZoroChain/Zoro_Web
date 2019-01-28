@@ -126,9 +126,10 @@ namespace WebBrowser
 
         //区块列表
         async blocksPage()
-        {
+        {           
             //查询区块数量
-            let blockCount = await this.ajax.post('getblockcount', [2]);
+            let blockCount = await WWW.api_getHeight();
+            //let blockCount = await this.ajax.post('getblockcount', [2]);
             //分页查询区块数据
             let pageUtil: PageUtil = new PageUtil(blockCount[0]['indexx'], 15); 
             let block: Blocks = new Blocks(this);

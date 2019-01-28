@@ -9,9 +9,9 @@ namespace WebBrowser
             switch (netType) {
                 case "testnet":
 
-					return "http://"+NetMgr.url+":59908/api/testnet/"
+					return "http://47.52.146.36/api/mainnet/"
                 case "mainnet":
-					return "http://"+NetMgr.url+":59908/api/testnet/"
+					return "http://47.244.141.254/api/testnet/"
 
             }
         }
@@ -29,7 +29,7 @@ namespace WebBrowser
                 $.ajax({
                     type: 'POST',
 
-					url: "http://"+NetMgr.url+":59908/api/testnet/"+ arr[0],
+					url: this.getUrlBase(NetMgr) + arr[0],
 
                     data: JSON.stringify({
                         "jsonrpc": "2.0",
@@ -80,7 +80,7 @@ namespace WebBrowser
                 $.ajax({
                     type: 'GET',
 
-					url: "http://"+NetMgr.url+":59908/api/testnet/" + arr[0] + "?jsonrpc=2.0&method=getblock&params=%5b1000%5d&id=1001",
+					url: "http://:59908/api/testnet/" + arr[0] + "?jsonrpc=2.0&method=getblock&params=%5b1000%5d&id=1001",
 
 
                     success: (data, status) =>

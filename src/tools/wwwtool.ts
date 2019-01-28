@@ -53,7 +53,7 @@ namespace WebBrowser {
 			return body;
 		}
 		//获得高度
-		static async  api_getHeight()    // covered ; gets the id of lastblockheight
+		static async api_getHeight()    // covered ; gets the id of lastblockheight
 		{
 			var str = WWW.makeRpcUrl("getblockcount");
 			var result = await fetch(str, { "method": "get" });
@@ -191,7 +191,7 @@ namespace WebBrowser {
 		//查询交易列表
 		static async getrawtransactions(size: number, page: number, txtype: string) {
 
-			var str = WWW.makeRpcUrl("getrawtransactions", size, page, txtype);
+			var str = WWW.makeRpcUrl("getrawtransactions", size, page - 1, txtype);
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
 			var r = json["result"];
@@ -200,7 +200,7 @@ namespace WebBrowser {
 
 		static async getappchainrawtransactions(appchain:string , size: number, page: number) {
 
-			var str = WWW.makeRpcUrl("getappchainrawtransactions", appchain,size, page);
+			var str = WWW.makeRpcUrl("getappchainrawtransactions", appchain, size, page - 1);
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
 			var r = json["result"];
@@ -544,7 +544,7 @@ namespace WebBrowser {
 				return 0;
 			}
 			if (chainHash == null) {
-				var str = this.makeUrl("invokescript", WWW.neoRpc, scripthash);
+				var str = this.makeUrl("invokescript", WWW.neoGetUTXO, scripthash);
 			}else{
 				var str = this.makeZoroRpcUrl(WWW.rpc, "invokescript", chainHash, scripthash);
 			}           
@@ -552,7 +552,7 @@ namespace WebBrowser {
 			var json = await result.json();
 			var r;
 			if (chainHash == null) {
-				r = json["result"]["stack"][0]["value"];
+				r = json["result"][0]["stack"][0]["value"];
 			}else{
 				if (json["result"]["stack"].length == 0){
 					r = 0;
@@ -588,10 +588,10 @@ namespace WebBrowser {
 		//获得高度
 		static async  api_getNEOHeight()    // covered ; gets the id of lastblockheight
 		{
-			var str = WWW.makeUrl("getblockcount", WWW.neoRpc);
+			var str = WWW.makeUrl("getblockcount", WWW.neoGetUTXO);
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
-			var r = json["result"];
+			var r = json["result"][0]["blockcount"];
 			var height = parseInt(r as string) - 1;
 			return height;
 		}
@@ -640,9 +640,9 @@ namespace WebBrowser {
 		static async rpc_postRawTransaction(data: Uint8Array): Promise<boolean>
         {
             var postdata = WWW.makeRpcPostBody("sendrawtransaction", data.toHexString());
-            var result = await fetch(WWW.neoRpc, { "method": "post", "body": JSON.stringify(postdata) });
+            var result = await fetch(WWW.neoGetUTXO, { "method": "post", "body": JSON.stringify(postdata) });
             var json = await result.json();
-            var r = json["result"];
+            var r = json["result"][0];
             return r;
         }
 	}

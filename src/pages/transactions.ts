@@ -73,10 +73,10 @@ namespace WebBrowser {
 			//分页查询交易记录
 			var appchain = locationtool.getParam2();
             if (appchain && appchain.length == 40){
-				var txs: Tx[] = await WWW.getappchainrawtransactions(appchain, pageUtil.pageSize, pageUtil.currentPage);
+				var txs: Tx[] = await WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
 				var txCount = await WWW.getappchaintxcount(appchain);
 			}else{
-				var txs: Tx[] = await WWW.getrawtransactions(pageUtil.pageSize, pageUtil.currentPage, txType);
+				var txs: Tx[] = await WWW.getrawtransactionsdesc(pageUtil.pageSize, pageUtil.currentPage - 1, txType);
 				var txCount = await WWW.gettxcount(txType);
 			}
 			

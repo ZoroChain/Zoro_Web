@@ -15,9 +15,6 @@ namespace WebBrowser {
         type: number; // 当前网络
         private nodes_server: any; // 当前nelnode_server
 
-        //static url = "47.244.141.254";
-        static url = "localhost";
-
         constructor(app: App) {
 
             this.app = app
@@ -28,7 +25,7 @@ namespace WebBrowser {
             this.nodes[1] = [
                 // 主网nelnode
 
-				["CN", "http://"+NetMgr.url+":59908/api/mainnet", "_1", "http://"+NetMgr.url+":59908/api/mainnet"],
+				["CN", "https://47.52.146.36/api/mainnet", "_1", "https://47.52.146.36/api/mainnet"],
 
                 // ["CN", "https://nelnode01.9191wyx.com/api/mainnet", "_2"],
 
@@ -37,7 +34,7 @@ namespace WebBrowser {
             this.nodes[2] = [
                 // 测试网nelnode
 
-				["CN", "http://"+NetMgr.url+":59908/api/testnet", "_1", "http://"+NetMgr.url+":59908/api/testnet"],
+				["CN", "https://testnet_znode_hk_01.blacat.org/api/testnet", "_1", "https://testnet_znode_hk_01.blacat.org/api/testnet"],
 
                 // ["CN", "https://nelnode03.9191wyx.com/api/testnet", "_2", "https://apiscan03.9191wyx.com/api/testnet"],
 

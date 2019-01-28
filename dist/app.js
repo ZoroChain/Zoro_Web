@@ -672,9 +672,9 @@ var WebBrowser;
         getUrlBase(netType) {
             switch (netType) {
                 case "testnet":
-                    return "http://" + WebBrowser.NetMgr.url + ":59908/api/testnet/";
+                    return "http://47.52.146.36/api/mainnet/";
                 case "mainnet":
-                    return "http://" + WebBrowser.NetMgr.url + ":59908/api/testnet/";
+                    return "http://47.244.141.254/api/testnet/";
             }
         }
         /**
@@ -687,7 +687,7 @@ var WebBrowser;
                 let promise = new Promise((resolve, reject) => {
                     $.ajax({
                         type: 'POST',
-                        url: "http://" + WebBrowser.NetMgr.url + ":59908/api/testnet/" + arr[0],
+                        url: this.getUrlBase(WebBrowser.NetMgr) + arr[0],
                         data: JSON.stringify({
                             "jsonrpc": "2.0",
                             "method": method,
@@ -729,7 +729,7 @@ var WebBrowser;
                 let promise = new Promise((resolve, reject) => {
                     $.ajax({
                         type: 'GET',
-                        url: "http://" + WebBrowser.NetMgr.url + ":59908/api/testnet/" + arr[0] + "?jsonrpc=2.0&method=getblock&params=%5b1000%5d&id=1001",
+                        url: "http://:59908/api/testnet/" + arr[0] + "?jsonrpc=2.0&method=getblock&params=%5b1000%5d&id=1001",
                         success: (data, status) => {
                             resolve(data['result']);
                         },
@@ -1604,10 +1604,10 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
-                    var blocks = yield WebBrowser.WWW.getappchainblocks(appchain, pageUtil.pageSize, pageUtil.currentPage - 1); //limit this to the 15 by 15 splitting
+                    var blocks = yield WebBrowser.WWW.getappchainblocksdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1); //limit this to the 15 by 15 splitting
                 }
                 else {
-                    var blocks = yield WebBrowser.WWW.getblocks(pageUtil.pageSize, pageUtil.currentPage - 1); //limit this to the 15 by 15 splitting
+                    var blocks = yield WebBrowser.WWW.getblocksdesc(pageUtil.pageSize, pageUtil.currentPage - 1); //limit this to the 15 by 15 splitting
                 }
                 $("#blocks-page").children("table").children("tbody").empty();
                 if (pageUtil.totalPage - pageUtil.currentPage) {
@@ -1837,7 +1837,7 @@ var WebBrowser;
         //查询交易列表
         static getrawtransactions(size, page, txtype) {
             return __awaiter(this, void 0, void 0, function* () {
-                var str = WWW.makeRpcUrl("getrawtransactions", size, page, txtype);
+                var str = WWW.makeRpcUrl("getrawtransactions", size, page - 1, txtype);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
                 var r = json["result"];
@@ -1846,7 +1846,7 @@ var WebBrowser;
         }
         static getappchainrawtransactions(appchain, size, page) {
             return __awaiter(this, void 0, void 0, function* () {
-                var str = WWW.makeRpcUrl("getappchainrawtransactions", appchain, size, page);
+                var str = WWW.makeRpcUrl("getappchainrawtransactions", appchain, size, page - 1);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
                 var r = json["result"];
@@ -2230,7 +2230,7 @@ var WebBrowser;
                     return 0;
                 }
                 if (chainHash == null) {
-                    var str = this.makeUrl("invokescript", WWW.neoRpc, scripthash);
+                    var str = this.makeUrl("invokescript", WWW.neoGetUTXO, scripthash);
                 }
                 else {
                     var str = this.makeZoroRpcUrl(WWW.rpc, "invokescript", chainHash, scripthash);
@@ -2239,7 +2239,7 @@ var WebBrowser;
                 var json = yield result.json();
                 var r;
                 if (chainHash == null) {
-                    r = json["result"]["stack"][0]["value"];
+                    r = json["result"][0]["stack"][0]["value"];
                 }
                 else {
                     if (json["result"]["stack"].length == 0) {
@@ -2280,10 +2280,10 @@ var WebBrowser;
         //获得高度
         static api_getNEOHeight() {
             return __awaiter(this, void 0, void 0, function* () {
-                var str = WWW.makeUrl("getblockcount", WWW.neoRpc);
+                var str = WWW.makeUrl("getblockcount", WWW.neoGetUTXO);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
-                var r = json["result"];
+                var r = json["result"][0]["blockcount"];
                 var height = parseInt(r) - 1;
                 return height;
             });
@@ -2330,9 +2330,9 @@ var WebBrowser;
         static rpc_postRawTransaction(data) {
             return __awaiter(this, void 0, void 0, function* () {
                 var postdata = WWW.makeRpcPostBody("sendrawtransaction", data.toHexString());
-                var result = yield fetch(WWW.neoRpc, { "method": "post", "body": JSON.stringify(postdata) });
+                var result = yield fetch(WWW.neoGetUTXO, { "method": "post", "body": JSON.stringify(postdata) });
                 var json = yield result.json();
-                var r = json["result"];
+                var r = json["result"][0];
                 return r;
             });
         }
@@ -6519,11 +6519,11 @@ var WebBrowser;
                 //分页查询交易记录
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
-                    var txs = yield WebBrowser.WWW.getappchainrawtransactions(appchain, pageUtil.pageSize, pageUtil.currentPage);
+                    var txs = yield WebBrowser.WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
                     var txCount = yield WebBrowser.WWW.getappchaintxcount(appchain);
                 }
                 else {
-                    var txs = yield WebBrowser.WWW.getrawtransactions(pageUtil.pageSize, pageUtil.currentPage, txType);
+                    var txs = yield WebBrowser.WWW.getrawtransactionsdesc(pageUtil.pageSize, pageUtil.currentPage - 1, txType);
                     var txCount = yield WebBrowser.WWW.gettxcount(txType);
                 }
                 pageUtil.totalCount = txCount;
@@ -8356,11 +8356,11 @@ var WebBrowser;
             this.nodes = {};
             this.nodes[1] = [
                 // 主网nelnode
-                ["CN", "http://" + NetMgr.url + ":59908/api/mainnet", "_1", "http://" + NetMgr.url + ":59908/api/mainnet"],
+                ["CN", "https://47.52.146.36/api/mainnet", "_1", "https://47.52.146.36/api/mainnet"],
             ];
             this.nodes[2] = [
                 // 测试网nelnode
-                ["CN", "http://" + NetMgr.url + ":59908/api/testnet", "_1", "http://" + NetMgr.url + ":59908/api/testnet"],
+                ["CN", "https://testnet_znode_hk_01.blacat.org/api/testnet", "_1", "https://testnet_znode_hk_01.blacat.org/api/testnet"],
             ];
             this.nodes_server = {};
             this.default_type = 1;
@@ -8486,8 +8486,6 @@ var WebBrowser;
             return scan;
         }
     }
-    //static url = "47.244.141.254";
-    NetMgr.url = "localhost";
     WebBrowser.NetMgr = NetMgr;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="../lib/neo-ts.d.ts"/>
@@ -8603,7 +8601,8 @@ var WebBrowser;
         blocksPage() {
             return __awaiter(this, void 0, void 0, function* () {
                 //查询区块数量
-                let blockCount = yield this.ajax.post('getblockcount', [2]);
+                let blockCount = yield WebBrowser.WWW.api_getHeight();
+                //let blockCount = await this.ajax.post('getblockcount', [2]);
                 //分页查询区块数据
                 let pageUtil = new WebBrowser.PageUtil(blockCount[0]['indexx'], 15);
                 let block = new WebBrowser.Blocks(this);
