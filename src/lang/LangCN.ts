@@ -122,11 +122,16 @@ namespace WebBrowser
             tran_input: "输入",
             tran_output: "输出",
 
+            tran_method:"Contract Method",
+            tran_method_calltype:"调用方式",
+            tran_method_method:"调用方法",
+            tran_method_contract:"调用地址",
+
             tran_nep5: "Nep5",
             tran_nep5_asset: "资产",
             tran_nep5_from: "转出",
             tran_nep5_to: "转入",
-            tran_nep5_value: "交易数",
+            tran_nep5_value: "交易金额",
 
 			tran_goalltran: "返回",
 

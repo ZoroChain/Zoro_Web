@@ -24,6 +24,11 @@ namespace WebBrowser {
 					"tran_height",
 					"tran_time",
 
+					"tran_method",
+					"tran_method_calltype",
+					"tran_method_method",
+					"tran_method_contract",
+
 					"tran_nep5",
 					"tran_nep5_asset",
 					"tran_nep5_from",
@@ -90,53 +95,23 @@ namespace WebBrowser {
 			let time = DateTool.getTime(block.time); 
 
 			$("#transaction-time").text(time);
-			//txInfo.vin = JSON.parse(txInfo.vin.toString());
-			//let allAsset: Asset[] = await WWW.api_getAllAssets();
 
-			let arr = new Array<any>();
-			// for (let index = 0; index < txInfo.vin.length; index++) {
-			// 	const vin = txInfo.vin[index];
-			// 	try {
-			// 		let txInfo: Tx = await WWW.getrawtransaction(vin.txid);
-			// 		let vout = txInfo.vout[vin.vout]
-			// 		let address: string = vout.address;
-			// 		let value: string = vout.value;
-			// 		let name = CoinTool.assetID2name[vout.asset];
-			// 		arr.push({ vin: vin.txid, vout: vin.vout, addr: address, name: name, amount: value }); //  fro
-			// 	} catch (error) {
-
-			// 	}
-			// }
-			$("#from").empty();
-			let array = Transaction.groupByaddr(arr);
-			for (let index = 0; index < array.length; index++) {
-				const item = array[index];
-				let html = "";
-
-				html += '<div class="line" > <div class="title-nel" > <span>Address </span></div >';
-				html += '<div class="content-nel" > <span id="size" >' + item.addr + ' </span></div > </div>';
-				for (let i = 0; i < item.data.length; i++) {
-					const element = item.data[i];
-					html += '<div class="line" > <div class="title-nel" > <span>' + element.name + ' </span></div >';
-					html += '<div class="content-nel" > <span id="size" >' + element.amount + ' </span></div > </div>';
-				}
-				$("#from").append(html);
+			$("#txidscriptmethod").empty();
+			var appchain = locationtool.getParam2();
+            if (appchain && appchain.length == 40){
+				var txidMethod = await WWW.api_getScriptMethod(txid, appchain);
+			}else{
+				var txidMethod = await WWW.api_getScriptMethod(txid);
 			}
-			$("#to").empty();
-			// txInfo.vout = JSON.parse(txInfo.vout.toString());
-			// txInfo.vout.forEach(vout => {
-			// 	let name = CoinTool.assetID2name[vout.asset];
-			// 	let sign: string = "";
-			// 	if (array.find(item => item.addr == vout.address)) {
-			// 		sign = "(change)"
-			// 	}
-			// 	let html = "";
-			// 	html += '<div class="line" > <div class="title-nel" > <span>Address </span></div >';
-			// 	html += '<div class="content-nel" > <span id="size" >' + vout.address + ' </span></div > </div>';
-			// 	html += '<div class="line" > <div class="title-nel" > <span>' + name + ' </span></div >';
-			// 	html += '<div class="content-nel" > <span id="size" >' + vout.value + sign + ' </span></div > </div>';
-			// 	$("#to").append(html);
-			// });
+			//console.log(txidNep);
+			if (txidMethod) {
+				$(".txidmethod-warp").show();
+				txidMethod.forEach((item) => {
+					this.loadTxidMethodView(item.calltype, item.method, item.contract);
+				})
+			} else {
+				$(".txidmethod-warp").hide();
+			}
 
 			$("#txidnep5").empty();
 			var appchain = locationtool.getParam2();
@@ -154,6 +129,16 @@ namespace WebBrowser {
 			} else {
 				$(".txidnep-warp").hide();
 			}
+		}
+
+		async loadTxidMethodView(calltype: string, method: string, contract: string) {
+			let html = `
+                    <tr>
+                    <td>` + calltype + `</td>
+                    <td>` + method + `</td>
+                    <td>` + contract + `</td>
+                    </tr>`
+			$("#txidscriptmethod").append(html);
 		}
 
 		async loadTxidNep5View(asset: string, from: string, to: string, value: number, symbol:string) {

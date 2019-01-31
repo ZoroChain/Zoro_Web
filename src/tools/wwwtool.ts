@@ -324,6 +324,15 @@ namespace WebBrowser {
 			var r = json["result"];
 			return r;
 		}
+
+		static async api_getScriptMethod(txid:string, chainHash:string = ""){
+			var str = WWW.makeRpcUrl("getscriptmethod", chainHash, txid);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r;
+		}
+
 		static async api_getappchainUTXOCount(ac:string, address: string) {
 			var str = WWW.makeRpcUrl("getappchainutxo", ac, address);
 			var result = await fetch(str, { "method": "get" });

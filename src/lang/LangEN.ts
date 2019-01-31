@@ -120,6 +120,11 @@ namespace WebBrowser
             tran_input: "Input",
             tran_output: "Output",
 
+            tran_method:"Contract Method",
+            tran_method_calltype:"CallType",
+            tran_method_method:"Method",
+            tran_method_contract:"Contract",
+
             tran_nep5: "Nep5",
             tran_nep5_asset: "Asset",
             tran_nep5_from: "From",

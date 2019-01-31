@@ -1980,6 +1980,15 @@ var WebBrowser;
                 return r;
             });
         }
+        static api_getScriptMethod(txid, chainHash = "") {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getscriptmethod", chainHash, txid);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r;
+            });
+        }
         static api_getappchainUTXOCount(ac, address) {
             return __awaiter(this, void 0, void 0, function* () {
                 var str = WWW.makeRpcUrl("getappchainutxo", ac, address);
@@ -6709,6 +6718,10 @@ var WebBrowser;
                     "tran_size",
                     "tran_height",
                     "tran_time",
+                    "tran_method",
+                    "tran_method_calltype",
+                    "tran_method_method",
+                    "tran_method_contract",
                     "tran_nep5",
                     "tran_nep5_asset",
                     "tran_nep5_from",
@@ -6765,50 +6778,24 @@ var WebBrowser;
                 let block = blocks[0];
                 let time = WebBrowser.DateTool.getTime(block.time);
                 $("#transaction-time").text(time);
-                //txInfo.vin = JSON.parse(txInfo.vin.toString());
-                //let allAsset: Asset[] = await WWW.api_getAllAssets();
-                let arr = new Array();
-                // for (let index = 0; index < txInfo.vin.length; index++) {
-                // 	const vin = txInfo.vin[index];
-                // 	try {
-                // 		let txInfo: Tx = await WWW.getrawtransaction(vin.txid);
-                // 		let vout = txInfo.vout[vin.vout]
-                // 		let address: string = vout.address;
-                // 		let value: string = vout.value;
-                // 		let name = CoinTool.assetID2name[vout.asset];
-                // 		arr.push({ vin: vin.txid, vout: vin.vout, addr: address, name: name, amount: value }); //  fro
-                // 	} catch (error) {
-                // 	}
-                // }
-                $("#from").empty();
-                let array = Transaction.groupByaddr(arr);
-                for (let index = 0; index < array.length; index++) {
-                    const item = array[index];
-                    let html = "";
-                    html += '<div class="line" > <div class="title-nel" > <span>Address </span></div >';
-                    html += '<div class="content-nel" > <span id="size" >' + item.addr + ' </span></div > </div>';
-                    for (let i = 0; i < item.data.length; i++) {
-                        const element = item.data[i];
-                        html += '<div class="line" > <div class="title-nel" > <span>' + element.name + ' </span></div >';
-                        html += '<div class="content-nel" > <span id="size" >' + element.amount + ' </span></div > </div>';
-                    }
-                    $("#from").append(html);
+                $("#txidscriptmethod").empty();
+                var appchain = WebBrowser.locationtool.getParam2();
+                if (appchain && appchain.length == 40) {
+                    var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txid, appchain);
                 }
-                $("#to").empty();
-                // txInfo.vout = JSON.parse(txInfo.vout.toString());
-                // txInfo.vout.forEach(vout => {
-                // 	let name = CoinTool.assetID2name[vout.asset];
-                // 	let sign: string = "";
-                // 	if (array.find(item => item.addr == vout.address)) {
-                // 		sign = "(change)"
-                // 	}
-                // 	let html = "";
-                // 	html += '<div class="line" > <div class="title-nel" > <span>Address </span></div >';
-                // 	html += '<div class="content-nel" > <span id="size" >' + vout.address + ' </span></div > </div>';
-                // 	html += '<div class="line" > <div class="title-nel" > <span>' + name + ' </span></div >';
-                // 	html += '<div class="content-nel" > <span id="size" >' + vout.value + sign + ' </span></div > </div>';
-                // 	$("#to").append(html);
-                // });
+                else {
+                    var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txid);
+                }
+                //console.log(txidNep);
+                if (txidMethod) {
+                    $(".txidmethod-warp").show();
+                    txidMethod.forEach((item) => {
+                        this.loadTxidMethodView(item.calltype, item.method, item.contract);
+                    });
+                }
+                else {
+                    $(".txidmethod-warp").hide();
+                }
                 $("#txidnep5").empty();
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
@@ -6827,6 +6814,17 @@ var WebBrowser;
                 else {
                     $(".txidnep-warp").hide();
                 }
+            });
+        }
+        loadTxidMethodView(calltype, method, contract) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let html = `
+                    <tr>
+                    <td>` + calltype + `</td>
+                    <td>` + method + `</td>
+                    <td>` + contract + `</td>
+                    </tr>`;
+                $("#txidscriptmethod").append(html);
             });
         }
         loadTxidNep5View(asset, from, to, value, symbol) {
@@ -7878,11 +7876,15 @@ var WebBrowser;
                 tran_time: "时间",
                 tran_input: "输入",
                 tran_output: "输出",
+                tran_method: "Contract Method",
+                tran_method_calltype: "调用方式",
+                tran_method_method: "调用方法",
+                tran_method_contract: "调用地址",
                 tran_nep5: "Nep5",
                 tran_nep5_asset: "资产",
                 tran_nep5_from: "转出",
                 tran_nep5_to: "转入",
-                tran_nep5_value: "交易数",
+                tran_nep5_value: "交易金额",
                 tran_goalltran: "返回",
                 // appchain transaction
                 actran_title: "应用链交易列表",
@@ -8105,6 +8107,10 @@ var WebBrowser;
                 tran_time: "Time",
                 tran_input: "Input",
                 tran_output: "Output",
+                tran_method: "Contract Method",
+                tran_method_calltype: "CallType",
+                tran_method_method: "Method",
+                tran_method_contract: "Contract",
                 tran_nep5: "Nep5",
                 tran_nep5_asset: "Asset",
                 tran_nep5_from: "From",
@@ -8356,7 +8362,7 @@ var WebBrowser;
             this.nodes = {};
             this.nodes[1] = [
                 // 主网nelnode
-                ["CN", "https://47.52.146.36/api/mainnet", "_1", "https://47.52.146.36/api/mainnet"],
+                ["CN", "https://mainnet_znode_hk_01.blacat.org/api/mainnet", "_1", "https://mainnet_znode_hk_01.blacat.org/api/mainnet"],
             ];
             this.nodes[2] = [
                 // 测试网nelnode
