@@ -1,7 +1,4 @@
 
-/// <reference path="./shape/rectElement.ts"/>
-/// <reference path="./event/EventManager.ts"/>
-/// <reference path="./event/Event.ts"/>
 /// <reference path="../tools/wwwtool.ts"/>
 namespace RectElement
 {
@@ -16,14 +13,11 @@ namespace RectElement
 
         rectInterval:RectMessage[] = null;
         chart:Chart = null;
-        data:any = {};
-
+        data = null;
         constructor(){
             this.rectCanvas = document.getElementById("rectCanvas") as HTMLCanvasElement;
             this.rectCanvas.width = window.outerWidth;
-            this.rectCanvas.style.width = "100%";
             this.rectCanvas.height = 150;
-            this.rectCanvas.style.height = "150px";
             this.g = this.rectCanvas.getContext("2d");      
                
             this.getBlockInterval();                       
@@ -33,7 +27,8 @@ namespace RectElement
             this.chart = new Chart(this.g, {
                 type: 'bar',
                 data: this.data,
-                options: {                    
+                options: {      
+                    responsive: true,         
                     title:{
                         display:false
                     }, 
@@ -41,23 +36,17 @@ namespace RectElement
                         display:false
                     },              
                     scales: {
-                        xAxes:[{                                                      
-                            scaleLabel:{
-                                display:false
-                            },
+                        xAxes:[{                                                 
                             ticks: {
                                 display:false,
-                                beginAtZero:true                                
+                                beginAtZero:true                                              
                             },
                             gridLines:{
                                 display:false,
                                 drawBorder:false
                             }
                         }],
-                        yAxes: [{
-                            scaleLabel:{
-                                display:false
-                            },
+                        yAxes: [{                                                 
                             ticks: {
                                 display:false,
                                 beginAtZero:true
@@ -106,7 +95,7 @@ namespace RectElement
         newBlockIndex:number = -1;
         async getBlockIntervalNext(){
             var rectmessage:RectMessage = await WebBrowser.WWW.api_getBlockInterval("");
-            if (rectmessage[0].blockindex != this.newBlockIndex){
+            if (this.data && rectmessage[0].blockindex != this.newBlockIndex){
                 this.newBlockIndex = rectmessage[0].blockindex;
                 this.data.datasets[0].data.splice(0, 1);
                 this.data.datasets[0].data.push(rectmessage[0].blockinterval);
@@ -115,7 +104,6 @@ namespace RectElement
 
                 this.chart.data = this.data;
                 this.chart.update();
-                this.chart.render();
             }
         }
 

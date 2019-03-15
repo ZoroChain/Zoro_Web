@@ -6353,356 +6353,8 @@ var WebBrowser;
     }
     WebBrowser.GUI = GUI;
 })(WebBrowser || (WebBrowser = {}));
-var RectElement;
-(function (RectElement) {
-    class messageBox {
-        constructor(blockindex, blockinterval) {
-            this.blockindex = blockindex;
-            this.blockinterval = blockinterval;
-        }
-        drawRect(g, x, y) {
-            var ax = x - 15;
-            var ay = y - 14;
-            var yh = ay - 40;
-            g.fillStyle = "#00000088";
-            g.fillRect(x, yh, 100, 40);
-            g.beginPath();
-            g.moveTo(ax, ay);
-            g.lineTo(ax + 7, ay + 7);
-            g.lineTo(ax + 14, ay);
-            g.closePath();
-            g.fill();
-            g.fillStyle = "#ffffff";
-            g.fillText(this.blockindex.toString(), x + 5, yh + 15);
-            g.fillRect(x + 5, yh + 20, 10, 10);
-            g.fillText("BlockInterval:" + this.blockinterval, x + 20, yh + 30);
-        }
-    }
-    RectElement.messageBox = messageBox;
-})(RectElement || (RectElement = {}));
-/// <reference path="./shape/DisplayObject.ts"/>
-var RectElement;
-/// <reference path="./shape/DisplayObject.ts"/>
-(function (RectElement) {
-    class SortArray {
-        constructor() {
-            this._data = [];
-            this.selectedElements = [];
-            this.unSelectedElements = [];
-        }
-        add(ele) {
-            if (ele == null)
-                return;
-            var i, data, index, result;
-            for (i = 0, index = 0; i < this._data.length; i++) {
-                data = this._data[i];
-                result = ele.compareTo(data);
-                if (result == null)
-                    return;
-                if (result > 0)
-                    index++;
-                else
-                    break;
-            }
-            for (i = this._data.length; i > index; i--) {
-                this._data[i] = this._data[i - 1];
-            }
-            this._data[index] = ele;
-        }
-        contains(ele) {
-            if (ele == null)
-                return false;
-            var low, mid, high;
-            low = 0;
-            high = this._data.length - 1;
-            while (low <= high) {
-                mid = parseInt(((low + high) / 2).toString());
-                if (this._data[mid] == ele)
-                    return true;
-                if (this._data[mid].compareTo(ele) < 0)
-                    low = mid + 1;
-                else
-                    high = mid - 1;
-            }
-            return false;
-        }
-        search(point) {
-            var d;
-            this.selectedElements.length = 0;
-            this.unSelectedElements.length = 0;
-            for (var i = 0; i < this._data.length; i++) {
-                d = this._data[i];
-                if (d.comparePointX(point) > 0)
-                    break;
-                if (d.hasPoint(point))
-                    this.selectedElements.push(d);
-                else
-                    this.unSelectedElements.push(d);
-            }
-            for (; i < this._data.length; i++) {
-                d = this._data[i];
-                this.unSelectedElements.push(d);
-            }
-        }
-        print() {
-            this._data.forEach(data => {
-                console.log(data);
-            });
-        }
-        delete(ele) {
-            var index = -1;
-            for (var i = 0; i < this._data.length; i++) {
-                if (ele == this._data[i]) {
-                    index = i;
-                    break;
-                }
-            }
-            this._data.splice(index, 1);
-        }
-        reset() {
-            this._data.length = 0;
-            this.selectedElements.length = 0;
-            this.unSelectedElements.length = 0;
-        }
-    }
-    RectElement.SortArray = SortArray;
-})(RectElement || (RectElement = {}));
-/// <reference path="../shape/rectElement.ts"/>
-/// <reference path="../SortArray.ts"/>
-var RectElement;
-/// <reference path="../shape/rectElement.ts"/>
-/// <reference path="../SortArray.ts"/>
-(function (RectElement) {
-    class EventManager {
-        constructor() {
-        }
-        static getTargets(type) {
-            if (type == null)
-                return;
-            type = this._getPrefix(type);
-            return this._targets[type];
-        }
-        static addTarget(type, target) {
-            if (type == null)
-                return;
-            type = this._getPrefix(type);
-            if (!this._targets.hasOwnProperty(type)) {
-                this._targets[type] = new RectElement.SortArray();
-            }
-            var array = this._targets[type];
-            if (!array.contains(target)) {
-                array.add(target);
-            }
-        }
-        static removeTarget(type, target) {
-            if (type == null)
-                return;
-            type = this._getPrefix(type);
-            if (!this._targets.hasOwnProperty(type)) {
-                return;
-            }
-            var array = this._targets[type];
-            array.delete(target);
-        }
-        static _getPrefix(type) {
-            if (type.indexOf("mouse") != -1) {
-                return "mouse";
-            }
-            if (type.indexOf("click") != -1) {
-                return "click";
-            }
-        }
-    }
-    EventManager._targets = {};
-    RectElement.EventManager = EventManager;
-})(RectElement || (RectElement = {}));
-/// <reference path="./EventManager.ts"/>
-var RectElement;
-/// <reference path="./EventManager.ts"/>
-(function (RectElement) {
-    class EventTarget {
-        constructor() {
-            this._listeners = {};
-            this.inBounds = false;
-        }
-        //type表示绑定的方法名
-        hasListener(type) {
-            if (this._listeners.hasOwnProperty(type)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        addListener(type, listener) {
-            if (!this._listeners.hasOwnProperty(type)) {
-                this._listeners[type] = [];
-            }
-            this._listeners[type].push(listener);
-            RectElement.EventManager.addTarget(type, this);
-        }
-        fire(type, event) {
-            if (event == null || event.type == null) {
-                return;
-            }
-            if (this._listeners[event.type] instanceof Array) {
-                var listeners = this._listeners[event.type];
-                for (var i = 0, len = listeners.length; i < len; i++) {
-                    listeners[i].call(this, event);
-                }
-            }
-        }
-        removeListener(type, listener) {
-            if (listener == null) {
-                if (this._listeners.hasOwnProperty(type)) {
-                    this._listeners[type] = [];
-                    RectElement.EventManager.removeTarget(type, this);
-                }
-            }
-            if (this._listeners[type] instanceof Array) {
-                var listeners = this._listeners[type];
-                for (var i = 0, len = listeners.length; i < len; i++) {
-                    if (listeners[i] === listener) {
-                        listeners.splice(i, 1);
-                        if (listeners.length == 0) {
-                            RectElement.EventManager.removeTarget(type, this);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    RectElement.EventTarget = EventTarget;
-})(RectElement || (RectElement = {}));
-/// <reference path="../event/EventTarget.ts"/>
-var RectElement;
-/// <reference path="../event/EventTarget.ts"/>
-(function (RectElement) {
-    class DisplayObject extends RectElement.EventTarget {
-        constructor() {
-            super();
-            this.canvas = null;
-            this.context = null;
-        }
-        compareTo(target) {
-            return null;
-        }
-        comparePointX(point) {
-            return null;
-        }
-        hasPoint(point) {
-            return false;
-        }
-    }
-    RectElement.DisplayObject = DisplayObject;
-})(RectElement || (RectElement = {}));
-/// <reference path="../messageBox.ts"/>
-/// <reference path="../shape/DisplayObject.ts"/>
-var RectElement;
-/// <reference path="../messageBox.ts"/>
-/// <reference path="../shape/DisplayObject.ts"/>
-(function (RectElement) {
-    class Rect extends RectElement.DisplayObject {
-        constructor(blockindex, blockinterval, x, height) {
-            super();
-            this._downY = 140;
-            this._rectWidth = 30;
-            this.x = 0;
-            this.y = 0;
-            this.width = 0;
-            this.height = 0;
-            this.minX = 0;
-            this.on = false;
-            this.messageBox = new RectElement.messageBox(blockindex, blockinterval);
-            this.x = x;
-            this.y = this._downY - height;
-            this.width = this._rectWidth;
-            this.height = height;
-            this.minX = this.x;
-        }
-        create(o) {
-        }
-        setCanvas(canvas, context) {
-            this.canvas = canvas;
-            this.context = context;
-            this._rectWidth = this.canvas.width / 54 - 5;
-            this.width = this._rectWidth;
-        }
-        setX(x) {
-            this.x = x;
-            this.minX = this.x;
-        }
-        draw() {
-            if (this.on) {
-                this.context.fillStyle = "#ffffff";
-                this.context.fillRect(this.x, this.y, this.width, this.height);
-                this.messageBox.drawRect(this.context, this.x - 15, this.height);
-            }
-            else {
-                this.context.fillStyle = "#ffffff66";
-                this.context.fillRect(this.x, this.y, this.width, this.height);
-            }
-        }
-        compareTo(target) {
-            if (target.minX == null)
-                return null;
-            if (this.minX < target.minX)
-                return -1;
-            if (this.minX == target.minX)
-                return 0;
-            if (this.minX > target.minX)
-                return 1;
-            return null;
-        }
-        comparePointX(point) {
-            if (point.x == null)
-                return null;
-            if (this.minX < point.x)
-                return -1;
-            if (this.minX == point.x)
-                return 0;
-            if (this.minX > point.x)
-                return 1;
-            return null;
-        }
-        hasPoint(point) {
-            if (point.x == null || point.y == null)
-                return false;
-            if (this.x + this.width >= point.x && this.y <= point.y && this.y + this.height >= point.y)
-                return true;
-            else
-                return false;
-        }
-        MoveOn() {
-            this.on = true;
-        }
-        MoveOut() {
-            this.on = false;
-        }
-    }
-    RectElement.Rect = Rect;
-})(RectElement || (RectElement = {}));
-var RectElement;
-(function (RectElement) {
-    class Event {
-        constructor(x, y, type, rect) {
-            this.x = x;
-            this.y = y;
-            this.type = type;
-            this.rect = rect;
-        }
-    }
-    RectElement.Event = Event;
-})(RectElement || (RectElement = {}));
-/// <reference path="./shape/rectElement.ts"/>
-/// <reference path="./event/EventManager.ts"/>
-/// <reference path="./event/Event.ts"/>
 /// <reference path="../tools/wwwtool.ts"/>
 var RectElement;
-/// <reference path="./shape/rectElement.ts"/>
-/// <reference path="./event/EventManager.ts"/>
-/// <reference path="./event/Event.ts"/>
 /// <reference path="../tools/wwwtool.ts"/>
 (function (RectElement) {
     class rectCanvas {
@@ -6712,13 +6364,11 @@ var RectElement;
             this.blockHeight = 3;
             this.rectInterval = null;
             this.chart = null;
-            this.data = {};
+            this.data = null;
             this.newBlockIndex = -1;
             this.rectCanvas = document.getElementById("rectCanvas");
             this.rectCanvas.width = window.outerWidth;
-            this.rectCanvas.style.width = "100%";
             this.rectCanvas.height = 150;
-            this.rectCanvas.style.height = "150px";
             this.g = this.rectCanvas.getContext("2d");
             this.getBlockInterval();
         }
@@ -6727,6 +6377,7 @@ var RectElement;
                 type: 'bar',
                 data: this.data,
                 options: {
+                    responsive: true,
                     title: {
                         display: false
                     },
@@ -6735,9 +6386,6 @@ var RectElement;
                     },
                     scales: {
                         xAxes: [{
-                                scaleLabel: {
-                                    display: false
-                                },
                                 ticks: {
                                     display: false,
                                     beginAtZero: true
@@ -6748,9 +6396,6 @@ var RectElement;
                                 }
                             }],
                         yAxes: [{
-                                scaleLabel: {
-                                    display: false
-                                },
                                 ticks: {
                                     display: false,
                                     beginAtZero: true
@@ -6799,7 +6444,7 @@ var RectElement;
         getBlockIntervalNext() {
             return __awaiter(this, void 0, void 0, function* () {
                 var rectmessage = yield WebBrowser.WWW.api_getBlockInterval("");
-                if (rectmessage[0].blockindex != this.newBlockIndex) {
+                if (this.data && rectmessage[0].blockindex != this.newBlockIndex) {
                     this.newBlockIndex = rectmessage[0].blockindex;
                     this.data.datasets[0].data.splice(0, 1);
                     this.data.datasets[0].data.push(rectmessage[0].blockinterval);
@@ -6807,7 +6452,6 @@ var RectElement;
                     this.data.labels.push(rectmessage[0].blockindex);
                     this.chart.data = this.data;
                     this.chart.update();
-                    this.chart.render();
                 }
             });
         }

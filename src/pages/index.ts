@@ -1,6 +1,5 @@
 ﻿/// <reference path="../app.ts"/>
 /// <reference path="../element/rectCanvas.ts"/>
-
 namespace WebBrowser
 {
     export class Index implements Page
