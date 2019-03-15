@@ -2297,6 +2297,22 @@ var WebBrowser;
                 return height;
             });
         }
+        static api_getBlockIntervals(chainHash, num) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getblockinterval", chainHash, num);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                return json["result"];
+            });
+        }
+        static api_getBlockInterval(chainHash) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getblockintervalnext", chainHash);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                return json["result"];
+            });
+        }
         static api_getZoroHeight(chainHash) {
             return __awaiter(this, void 0, void 0, function* () {
                 var str = WWW.makeZoroRpcUrl(WWW.rpc, "getblockcount", chainHash);
@@ -2310,6 +2326,14 @@ var WebBrowser;
         static rpc_invokeScript(params) {
             return __awaiter(this, void 0, void 0, function* () {
                 var postdata = WWW.makeZoroRpcPostBody("invokescript", params);
+                var result = yield fetch(WWW.rpc, { "method": "post", "body": JSON.stringify(postdata) });
+                var json = yield result.json();
+                return json["result"];
+            });
+        }
+        static rpc_estimategas(params) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var postdata = WWW.makeZoroRpcPostBody("estimategas", params);
                 var result = yield fetch(WWW.rpc, { "method": "post", "body": JSON.stringify(postdata) });
                 var json = yield result.json();
                 return json["result"];
@@ -2590,6 +2614,17 @@ var WebBrowser;
             // } else {
             return this.dateFtt("yyyy/MM/dd hh:mm:ss", new Date(time));
             // }
+        }
+        static getTimeSecond(data) {
+            var now = parseInt(Date.now() / 1000 + "");
+            var time = now - data;
+            var m = parseInt(time / 60 + "");
+            if (m > 0) {
+                return m + "min";
+            }
+            else {
+                return time + "sec";
+            }
         }
     }
     WebBrowser.DateTool = DateTool;
@@ -4271,6 +4306,15 @@ var WebBrowser;
 /// <reference path="../../lib/neo-ts.d.ts"/>
 (function (WebBrowser) {
     class Test {
+        static getTransaction(s) {
+            var tran = new ThinNeo.ZoroTransaction();
+            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+            tran.extdata = new ThinNeo.ZoroInvokeTransData();
+            var steam = new Neo.IO.MemoryStream(s.hexToBytes());
+            var buffer = new Neo.IO.BinaryReader(steam);
+            tran.Deserialize(buffer);
+            console.log(tran.GetHash().reverse().toHexString());
+        }
         static ZoroTransfer() {
             return __awaiter(this, void 0, void 0, function* () {
                 var bcp = "0000000000000000000000000000000000000001";
@@ -4279,7 +4323,8 @@ var WebBrowser;
                 var targetwif = "L17Cq1FEbZJ8bc8Y8HcqVCgxsNpWY6LHDoau9DBD98m8vtGcVpuQ";
                 var prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
                 var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
-                var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
+                // var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
+                // var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
                 //address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
                 var sb = new ThinNeo.ScriptBuilder();
                 var a = [];
@@ -4343,42 +4388,55 @@ var WebBrowser;
                 array = [];
                 array.push(chainHash);
                 array.push(scriptPublish);
-                var gas = yield WebBrowser.WWW.rpc_invokeScript(array);
-                gas = gas["gas_consumed"];
-                this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.parse("8"), Neo.Fixed8.One);
+                this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.One);
             });
         }
-        static makeTransaction(script, wif, gas, gasPrice) {
+        static makeTransaction(script, wif, gasPrice) {
             return __awaiter(this, void 0, void 0, function* () {
                 var chainHash = "";
-                var exData = new ThinNeo.ZoroInvokeTransData();
-                exData.gasLimit = gas;
-                exData.gasPrice = gasPrice;
-                exData.script = script;
-                let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
-                var tran = new ThinNeo.ZoroTransaction();
-                tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
-                tran.version = 0;
-                tran.nonce = ThinNeo.ZoroTransaction.GetNonce();
-                tran.Account = scriptHash;
-                tran.attributes = [];
-                tran.extdata = exData;
-                var msg = tran.GetMessage();
-                var signdata = ThinNeo.Helper.Sign(msg, ThinNeo.Helper.GetPrivateKeyFromWIF(wif));
-                tran.AddWitness(signdata, ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)), ThinNeo.Helper.GetAddressFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif))));
-                var data = tran.GetRawData();
-                var rawdata = data.toHexString();
+                var rawdata = this.getTransactionString(script, wif, Neo.Fixed8.Zero, Neo.Fixed8.One);
+                this.getTransaction(rawdata);
+                return;
+                var postRawArray = [];
+                postRawArray.push(chainHash);
+                postRawArray.push(rawdata);
+                var gaspostdata = WebBrowser.WWW.makeZoroRpcPostBody("estimategas", postRawArray);
+                var result = yield fetch("http://localhost:59908/api/testnet", { "method": "post", "body": JSON.stringify(gaspostdata) });
+                var json = yield result.json();
+                var estimategas = json["result"][0]["gas"];
+                estimategas = Neo.Fixed8.parse(estimategas + "");
+                var rawdata = this.getTransactionString(script, wif, estimategas, Neo.Fixed8.One);
                 var postRawArray = [];
                 postRawArray.push(chainHash);
                 postRawArray.push(rawdata);
                 var postdata = WebBrowser.WWW.makeZoroRpcPostBody("sendrawtransaction", postRawArray);
-                var result = yield fetch("http://115.159.68.43:59908/api/testnet", { "method": "post", "body": JSON.stringify(postdata) });
+                var result = yield fetch("http://localhost:59908/api/testnet", { "method": "post", "body": JSON.stringify(postdata) });
                 var json = yield result.json();
                 var postResult1 = json;
-                {
-                    alert("txid=" + tran.GetHash().reverse().toHexString());
-                }
             });
+        }
+        static getTransactionString(script, wif, gasLimit, gasPrice) {
+            var exData = new ThinNeo.ZoroInvokeTransData();
+            exData.gasLimit = gasLimit;
+            exData.gasPrice = gasPrice;
+            exData.script = script;
+            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
+            var tran = new ThinNeo.ZoroTransaction();
+            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+            tran.version = 0;
+            tran.nonce = ThinNeo.ZoroTransaction.GetNonce();
+            tran.Account = scriptHash;
+            tran.attributes = [];
+            tran.extdata = exData;
+            console.log("gasLimit = " + gasLimit);
+            console.log("gasPrice = " + gasPrice);
+            console.log("scriptHash = " + scriptHash);
+            var msg = tran.GetMessage();
+            var signdata = ThinNeo.Helper.Sign(msg, ThinNeo.Helper.GetPrivateKeyFromWIF(wif));
+            tran.AddWitness(signdata, ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)), ThinNeo.Helper.GetAddressFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif))));
+            var data = tran.GetRawData();
+            alert("txid=" + tran.GetHash().reverse().toHexString());
+            return data.toHexString();
         }
         static getUint160(value) {
             if (value == null) {
@@ -4410,8 +4468,8 @@ var WebBrowser;
             this.div = div;
         }
         showUI() {
-            // Test.ZoroTransfer();
-            // Test.Transfer();
+            //Test.ZoroTransfer();
+            WebBrowser.Test.Transfer();
             this.login();
         }
         hideUI() {
@@ -6295,9 +6353,481 @@ var WebBrowser;
     }
     WebBrowser.GUI = GUI;
 })(WebBrowser || (WebBrowser = {}));
+var RectElement;
+(function (RectElement) {
+    class messageBox {
+        constructor(blockindex, blockinterval) {
+            this.blockindex = blockindex;
+            this.blockinterval = blockinterval;
+        }
+        drawRect(g, x, y) {
+            var ax = x - 15;
+            var ay = y - 14;
+            var yh = ay - 40;
+            g.fillStyle = "#00000088";
+            g.fillRect(x, yh, 100, 40);
+            g.beginPath();
+            g.moveTo(ax, ay);
+            g.lineTo(ax + 7, ay + 7);
+            g.lineTo(ax + 14, ay);
+            g.closePath();
+            g.fill();
+            g.fillStyle = "#ffffff";
+            g.fillText(this.blockindex.toString(), x + 5, yh + 15);
+            g.fillRect(x + 5, yh + 20, 10, 10);
+            g.fillText("BlockInterval:" + this.blockinterval, x + 20, yh + 30);
+        }
+    }
+    RectElement.messageBox = messageBox;
+})(RectElement || (RectElement = {}));
+/// <reference path="./shape/DisplayObject.ts"/>
+var RectElement;
+/// <reference path="./shape/DisplayObject.ts"/>
+(function (RectElement) {
+    class SortArray {
+        constructor() {
+            this._data = [];
+            this.selectedElements = [];
+            this.unSelectedElements = [];
+        }
+        add(ele) {
+            if (ele == null)
+                return;
+            var i, data, index, result;
+            for (i = 0, index = 0; i < this._data.length; i++) {
+                data = this._data[i];
+                result = ele.compareTo(data);
+                if (result == null)
+                    return;
+                if (result > 0)
+                    index++;
+                else
+                    break;
+            }
+            for (i = this._data.length; i > index; i--) {
+                this._data[i] = this._data[i - 1];
+            }
+            this._data[index] = ele;
+        }
+        contains(ele) {
+            if (ele == null)
+                return false;
+            var low, mid, high;
+            low = 0;
+            high = this._data.length - 1;
+            while (low <= high) {
+                mid = parseInt(((low + high) / 2).toString());
+                if (this._data[mid] == ele)
+                    return true;
+                if (this._data[mid].compareTo(ele) < 0)
+                    low = mid + 1;
+                else
+                    high = mid - 1;
+            }
+            return false;
+        }
+        search(point) {
+            var d;
+            this.selectedElements.length = 0;
+            this.unSelectedElements.length = 0;
+            for (var i = 0; i < this._data.length; i++) {
+                d = this._data[i];
+                if (d.comparePointX(point) > 0)
+                    break;
+                if (d.hasPoint(point))
+                    this.selectedElements.push(d);
+                else
+                    this.unSelectedElements.push(d);
+            }
+            for (; i < this._data.length; i++) {
+                d = this._data[i];
+                this.unSelectedElements.push(d);
+            }
+        }
+        print() {
+            this._data.forEach(data => {
+                console.log(data);
+            });
+        }
+        delete(ele) {
+            var index = -1;
+            for (var i = 0; i < this._data.length; i++) {
+                if (ele == this._data[i]) {
+                    index = i;
+                    break;
+                }
+            }
+            this._data.splice(index, 1);
+        }
+        reset() {
+            this._data.length = 0;
+            this.selectedElements.length = 0;
+            this.unSelectedElements.length = 0;
+        }
+    }
+    RectElement.SortArray = SortArray;
+})(RectElement || (RectElement = {}));
+/// <reference path="../shape/rectElement.ts"/>
+/// <reference path="../SortArray.ts"/>
+var RectElement;
+/// <reference path="../shape/rectElement.ts"/>
+/// <reference path="../SortArray.ts"/>
+(function (RectElement) {
+    class EventManager {
+        constructor() {
+        }
+        static getTargets(type) {
+            if (type == null)
+                return;
+            type = this._getPrefix(type);
+            return this._targets[type];
+        }
+        static addTarget(type, target) {
+            if (type == null)
+                return;
+            type = this._getPrefix(type);
+            if (!this._targets.hasOwnProperty(type)) {
+                this._targets[type] = new RectElement.SortArray();
+            }
+            var array = this._targets[type];
+            if (!array.contains(target)) {
+                array.add(target);
+            }
+        }
+        static removeTarget(type, target) {
+            if (type == null)
+                return;
+            type = this._getPrefix(type);
+            if (!this._targets.hasOwnProperty(type)) {
+                return;
+            }
+            var array = this._targets[type];
+            array.delete(target);
+        }
+        static _getPrefix(type) {
+            if (type.indexOf("mouse") != -1) {
+                return "mouse";
+            }
+            if (type.indexOf("click") != -1) {
+                return "click";
+            }
+        }
+    }
+    EventManager._targets = {};
+    RectElement.EventManager = EventManager;
+})(RectElement || (RectElement = {}));
+/// <reference path="./EventManager.ts"/>
+var RectElement;
+/// <reference path="./EventManager.ts"/>
+(function (RectElement) {
+    class EventTarget {
+        constructor() {
+            this._listeners = {};
+            this.inBounds = false;
+        }
+        //type表示绑定的方法名
+        hasListener(type) {
+            if (this._listeners.hasOwnProperty(type)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        addListener(type, listener) {
+            if (!this._listeners.hasOwnProperty(type)) {
+                this._listeners[type] = [];
+            }
+            this._listeners[type].push(listener);
+            RectElement.EventManager.addTarget(type, this);
+        }
+        fire(type, event) {
+            if (event == null || event.type == null) {
+                return;
+            }
+            if (this._listeners[event.type] instanceof Array) {
+                var listeners = this._listeners[event.type];
+                for (var i = 0, len = listeners.length; i < len; i++) {
+                    listeners[i].call(this, event);
+                }
+            }
+        }
+        removeListener(type, listener) {
+            if (listener == null) {
+                if (this._listeners.hasOwnProperty(type)) {
+                    this._listeners[type] = [];
+                    RectElement.EventManager.removeTarget(type, this);
+                }
+            }
+            if (this._listeners[type] instanceof Array) {
+                var listeners = this._listeners[type];
+                for (var i = 0, len = listeners.length; i < len; i++) {
+                    if (listeners[i] === listener) {
+                        listeners.splice(i, 1);
+                        if (listeners.length == 0) {
+                            RectElement.EventManager.removeTarget(type, this);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    RectElement.EventTarget = EventTarget;
+})(RectElement || (RectElement = {}));
+/// <reference path="../event/EventTarget.ts"/>
+var RectElement;
+/// <reference path="../event/EventTarget.ts"/>
+(function (RectElement) {
+    class DisplayObject extends RectElement.EventTarget {
+        constructor() {
+            super();
+            this.canvas = null;
+            this.context = null;
+        }
+        compareTo(target) {
+            return null;
+        }
+        comparePointX(point) {
+            return null;
+        }
+        hasPoint(point) {
+            return false;
+        }
+    }
+    RectElement.DisplayObject = DisplayObject;
+})(RectElement || (RectElement = {}));
+/// <reference path="../messageBox.ts"/>
+/// <reference path="../shape/DisplayObject.ts"/>
+var RectElement;
+/// <reference path="../messageBox.ts"/>
+/// <reference path="../shape/DisplayObject.ts"/>
+(function (RectElement) {
+    class Rect extends RectElement.DisplayObject {
+        constructor(blockindex, blockinterval, x, height) {
+            super();
+            this._downY = 140;
+            this._rectWidth = 30;
+            this.x = 0;
+            this.y = 0;
+            this.width = 0;
+            this.height = 0;
+            this.minX = 0;
+            this.on = false;
+            this.messageBox = new RectElement.messageBox(blockindex, blockinterval);
+            this.x = x;
+            this.y = this._downY - height;
+            this.width = this._rectWidth;
+            this.height = height;
+            this.minX = this.x;
+        }
+        create(o) {
+        }
+        setCanvas(canvas, context) {
+            this.canvas = canvas;
+            this.context = context;
+            this._rectWidth = this.canvas.width / 54 - 5;
+            this.width = this._rectWidth;
+        }
+        setX(x) {
+            this.x = x;
+            this.minX = this.x;
+        }
+        draw() {
+            if (this.on) {
+                this.context.fillStyle = "#ffffff";
+                this.context.fillRect(this.x, this.y, this.width, this.height);
+                this.messageBox.drawRect(this.context, this.x - 15, this.height);
+            }
+            else {
+                this.context.fillStyle = "#ffffff66";
+                this.context.fillRect(this.x, this.y, this.width, this.height);
+            }
+        }
+        compareTo(target) {
+            if (target.minX == null)
+                return null;
+            if (this.minX < target.minX)
+                return -1;
+            if (this.minX == target.minX)
+                return 0;
+            if (this.minX > target.minX)
+                return 1;
+            return null;
+        }
+        comparePointX(point) {
+            if (point.x == null)
+                return null;
+            if (this.minX < point.x)
+                return -1;
+            if (this.minX == point.x)
+                return 0;
+            if (this.minX > point.x)
+                return 1;
+            return null;
+        }
+        hasPoint(point) {
+            if (point.x == null || point.y == null)
+                return false;
+            if (this.x + this.width >= point.x && this.y <= point.y && this.y + this.height >= point.y)
+                return true;
+            else
+                return false;
+        }
+        MoveOn() {
+            this.on = true;
+        }
+        MoveOut() {
+            this.on = false;
+        }
+    }
+    RectElement.Rect = Rect;
+})(RectElement || (RectElement = {}));
+var RectElement;
+(function (RectElement) {
+    class Event {
+        constructor(x, y, type, rect) {
+            this.x = x;
+            this.y = y;
+            this.type = type;
+            this.rect = rect;
+        }
+    }
+    RectElement.Event = Event;
+})(RectElement || (RectElement = {}));
+/// <reference path="./shape/rectElement.ts"/>
+/// <reference path="./event/EventManager.ts"/>
+/// <reference path="./event/Event.ts"/>
+/// <reference path="../tools/wwwtool.ts"/>
+var RectElement;
+/// <reference path="./shape/rectElement.ts"/>
+/// <reference path="./event/EventManager.ts"/>
+/// <reference path="./event/Event.ts"/>
+/// <reference path="../tools/wwwtool.ts"/>
+(function (RectElement) {
+    class rectCanvas {
+        constructor() {
+            this.Max = 60;
+            this.blockWidth = 5;
+            this.blockHeight = 3;
+            this.rectInterval = null;
+            this.chart = null;
+            this.data = {};
+            this.newBlockIndex = -1;
+            this.rectCanvas = document.getElementById("rectCanvas");
+            this.rectCanvas.width = window.outerWidth;
+            this.rectCanvas.style.width = "100%";
+            this.rectCanvas.height = 150;
+            this.rectCanvas.style.height = "150px";
+            this.g = this.rectCanvas.getContext("2d");
+            this.getBlockInterval();
+        }
+        createChart() {
+            this.chart = new Chart(this.g, {
+                type: 'bar',
+                data: this.data,
+                options: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        xAxes: [{
+                                scaleLabel: {
+                                    display: false
+                                },
+                                ticks: {
+                                    display: false,
+                                    beginAtZero: true
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false
+                                }
+                            }],
+                        yAxes: [{
+                                scaleLabel: {
+                                    display: false
+                                },
+                                ticks: {
+                                    display: false,
+                                    beginAtZero: true
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false
+                                }
+                            }]
+                    }
+                }
+            });
+        }
+        getBlockInterval() {
+            return __awaiter(this, void 0, void 0, function* () {
+                this.rectInterval = yield WebBrowser.WWW.api_getBlockIntervals("", this.Max);
+                this.newBlockIndex = this.rectInterval[0].blockindex;
+                var labels = [];
+                var data = [];
+                var colors = [];
+                var hovercolors = [];
+                for (var i = this.rectInterval.length - 1; i > -1; i--) {
+                    labels.push(this.rectInterval[i].blockindex);
+                    data.push(this.rectInterval[i].blockinterval);
+                    if (i == 0) {
+                        colors.push('rgba(255, 255, 255, 0.5)');
+                        hovercolors.push('rgba(255, 255, 255, 1.0)');
+                    }
+                    else {
+                        colors.push('rgba(222, 222, 222, 0.2)');
+                        hovercolors.push('rgba(222, 222, 222, 0.8)');
+                    }
+                }
+                this.data = {
+                    labels: labels,
+                    datasets: [{
+                            label: "BlockInterval",
+                            data: data,
+                            backgroundColor: colors,
+                            hoverBackgroundColor: hovercolors
+                        }]
+                };
+                this.createChart();
+            });
+        }
+        getBlockIntervalNext() {
+            return __awaiter(this, void 0, void 0, function* () {
+                var rectmessage = yield WebBrowser.WWW.api_getBlockInterval("");
+                if (rectmessage[0].blockindex != this.newBlockIndex) {
+                    this.newBlockIndex = rectmessage[0].blockindex;
+                    this.data.datasets[0].data.splice(0, 1);
+                    this.data.datasets[0].data.push(rectmessage[0].blockinterval);
+                    this.data.labels.splice(0, 1);
+                    this.data.labels.push(rectmessage[0].blockindex);
+                    this.chart.data = this.data;
+                    this.chart.update();
+                    this.chart.render();
+                }
+            });
+        }
+        update() {
+            this.getBlockIntervalNext();
+        }
+        draw() {
+            //this.chart.render();
+        }
+    }
+    RectElement.rectCanvas = rectCanvas;
+    class RectMessage {
+    }
+    RectElement.RectMessage = RectMessage;
+})(RectElement || (RectElement = {}));
 /// <reference path="../app.ts"/>
+/// <reference path="../element/rectCanvas.ts"/>
 var WebBrowser;
 /// <reference path="../app.ts"/>
+/// <reference path="../element/rectCanvas.ts"/>
 (function (WebBrowser) {
     class Index {
         constructor(app) {
@@ -6346,15 +6876,9 @@ var WebBrowser;
                 this.langType = this.app.langmgr.type;
             }
         }
-        refreshLangs() {
-            var page = this.app.routet.render();
-            page.getLangs();
-            this.app.navbar.getLangs();
-            this.app.netWork.getLangs();
-        }
-        start() {
+        update() {
             return __awaiter(this, void 0, void 0, function* () {
-                this.getLangs();
+                this.canvas.update();
                 this.viewtxlist.href = WebBrowser.Url.href_transactions();
                 this.viewblocks.href = WebBrowser.Url.href_blocks();
                 this.alladdress.href = WebBrowser.Url.href_addresses();
@@ -6379,9 +6903,7 @@ var WebBrowser;
                 let html_blocks = ``;
                 let html_txs = ``;
                 blocks.forEach((item, index, input) => {
-                    //var newDate = new Date();
-                    //newDate.setTime(item.time * 1000);
-                    let time = WebBrowser.DateTool.getTime(item.time);
+                    let time = WebBrowser.DateTool.getTimeSecond(item.time);
                     var id = item.hash;
                     id.replace('0x', '');
                     id = id.substring(0, 4) + '...' + id.substring(id.length - 4);
@@ -6415,6 +6937,22 @@ var WebBrowser;
                 });
                 $("#index-page").find("#blocks").children("tbody").append(html_blocks);
                 $("#index-page").find("#transactions").children("tbody").append(html_txs);
+            });
+        }
+        refreshLangs() {
+            var page = this.app.routet.render();
+            page.getLangs();
+            this.app.navbar.getLangs();
+            this.app.netWork.getLangs();
+        }
+        start() {
+            return __awaiter(this, void 0, void 0, function* () {
+                this.getLangs();
+                this.canvas = new RectElement.rectCanvas();
+                this.update();
+                this.interval = setInterval(() => {
+                    this.update();
+                }, 1000);
                 this.nep5s = yield WebBrowser.WWW.getallnep5asset();
                 this.loadNep5View(this.nep5s);
                 this.footer.hidden = false;
@@ -6781,10 +7319,10 @@ var WebBrowser;
                 $("#txidscriptmethod").empty();
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
-                    var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txid, appchain);
+                    var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txInfo.txid, appchain);
                 }
                 else {
-                    var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txid);
+                    var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txInfo.txid);
                 }
                 //console.log(txidNep);
                 if (txidMethod) {
@@ -6799,10 +7337,10 @@ var WebBrowser;
                 $("#txidnep5").empty();
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
-                    var txidNep = yield WebBrowser.WWW.api_getappchainnep5transferbytxid(appchain, txid);
+                    var txidNep = yield WebBrowser.WWW.api_getappchainnep5transferbytxid(appchain, txInfo.txid);
                 }
                 else {
-                    var txidNep = yield WebBrowser.WWW.api_getnep5transferbytxid(txid);
+                    var txidNep = yield WebBrowser.WWW.api_getnep5transferbytxid(txInfo.txid);
                 }
                 //console.log(txidNep);
                 if (txidNep) {
@@ -8362,7 +8900,7 @@ var WebBrowser;
             this.nodes = {};
             this.nodes[1] = [
                 // 主网nelnode
-                ["CN", "https://mainnet_znode_hk_01.blacat.org/api/mainnet", "_1", "https://mainnet_znode_hk_01.blacat.org/api/mainnet"],
+                ["CN", "http://47.52.146.36/api/mainnet", "_1", "http://47.52.146.36/api/mainnet"],
             ];
             this.nodes[2] = [
                 // 测试网nelnode
@@ -8497,6 +9035,7 @@ var WebBrowser;
 /// <reference path="../lib/neo-ts.d.ts"/>
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
+/// <reference types="chart.js" />
 /// <reference path="./pages/block.ts" />
 /// <reference path="./pages/appchainblock.ts" />
 /// <reference path="./pages/blocks.ts" />
@@ -8525,6 +9064,7 @@ var WebBrowser;
 /// <reference path="../lib/neo-ts.d.ts"/>
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
+/// <reference types="chart.js" />
 /// <reference path="./pages/block.ts" />
 /// <reference path="./pages/appchainblock.ts" />
 /// <reference path="./pages/blocks.ts" />

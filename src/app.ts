@@ -1,6 +1,7 @@
 /// <reference path="../lib/neo-ts.d.ts"/>
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
+/// <reference types="chart.js" />
 /// <reference path="./pages/block.ts" />
 /// <reference path="./pages/appchainblock.ts" />
 /// <reference path="./pages/blocks.ts" />
@@ -118,11 +119,8 @@ namespace WebBrowser
             $("#searchText").focusout(() =>
             {
                 $("#nel-search").removeClass("nel-input");
-            });
-
-            
-            
-        }        
+            });           
+        }         
 
         //区块列表
         async blocksPage()

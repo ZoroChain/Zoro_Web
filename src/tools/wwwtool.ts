@@ -73,7 +73,7 @@ namespace WebBrowser {
 			return height;
 		}
 		//获得交易总数
-		static async gettxcount(type: string) // covered ; gets the total number of txs in address_tx
+		static async gettxcount(type:string) // covered ; gets the total number of txs in address_tx
 		{
 			var str = WWW.makeRpcUrl("gettxcount", type);
 			var result = await fetch(str, { "method": "get" });
@@ -605,6 +605,22 @@ namespace WebBrowser {
 			return height;
 		}
 
+		static async  api_getBlockIntervals(chainHash:any, num:number)    // covered ; gets the id of lastblockheight
+		{
+			var str = WWW.makeRpcUrl("getblockinterval", chainHash, num);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			return json["result"];
+		}
+
+		static async  api_getBlockInterval(chainHash:any)    // covered ; gets the id of lastblockheight
+		{
+			var str = WWW.makeRpcUrl("getblockintervalnext", chainHash);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			return json["result"];
+		}
+
 		static async api_getZoroHeight(chainHash:any)
         {
             var str = WWW.makeZoroRpcUrl(WWW.rpc, "getblockcount", chainHash);
@@ -617,6 +633,13 @@ namespace WebBrowser {
 		
 		static async rpc_invokeScript(params:any){
             var postdata = WWW.makeZoroRpcPostBody("invokescript", params);
+            var result = await fetch(WWW.rpc, {"method":"post", "body":JSON.stringify(postdata)});
+            var json = await result.json();
+            return json["result"];
+		}
+
+		static async rpc_estimategas(params:any){
+            var postdata = WWW.makeZoroRpcPostBody("estimategas", params);
             var result = await fetch(WWW.rpc, {"method":"post", "body":JSON.stringify(postdata)});
             var json = await result.json();
             return json["result"];
@@ -644,7 +667,7 @@ namespace WebBrowser {
             var result = await fetch(WWW.rpc, {"method":"post", "body":JSON.stringify(postdata)});
             var json = await result.json();
             return json;
-		}
+		}		
 		
 		static async rpc_postRawTransaction(data: Uint8Array): Promise<boolean>
         {

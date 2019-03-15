@@ -4,6 +4,16 @@
 namespace WebBrowser {
     export class Test {
 
+        public static getTransaction(s:string){
+            var tran = new ThinNeo.ZoroTransaction();
+            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+            tran.extdata = new ThinNeo.ZoroInvokeTransData();
+            var steam = new Neo.IO.MemoryStream(s.hexToBytes());
+            var buffer = new Neo.IO.BinaryReader(steam);
+            tran.Deserialize(buffer);
+            console.log(tran.GetHash().reverse().toHexString());
+        }
+
         public static async ZoroTransfer() {
             var bcp = "0000000000000000000000000000000000000001";
             var chainHash = "";
@@ -12,8 +22,8 @@ namespace WebBrowser {
 
             var prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
             var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
-            var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
-
+            // var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
+            // var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
             //address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
             var sb = new ThinNeo.ScriptBuilder();
             var a = [];
@@ -88,21 +98,46 @@ namespace WebBrowser {
             array = [];
             array.push(chainHash);
             array.push(scriptPublish);
-            var gas = await WWW.rpc_invokeScript(array);
-            gas = gas["gas_consumed"];
            
-            this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.parse("8"), Neo.Fixed8.One);
+            this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.One);
         }
 
-        static async makeTransaction(script, wif, gas, gasPrice){
+        static async makeTransaction(script, wif, gasPrice){
             var chainHash = "";            
 
+            var rawdata = this.getTransactionString(script, wif, Neo.Fixed8.Zero, Neo.Fixed8.One);
+            this.getTransaction(rawdata);
+            return;
+
+            var postRawArray = [];
+            postRawArray.push(chainHash);
+            postRawArray.push(rawdata);
+
+            var gaspostdata = WWW.makeZoroRpcPostBody("estimategas",postRawArray);
+            var result = await fetch("http://localhost:59908/api/testnet", {"method":"post", "body":JSON.stringify(gaspostdata)});
+            var json = await result.json();
+            var estimategas = json["result"][0]["gas"];
+            estimategas = Neo.Fixed8.parse(estimategas + "");
+
+            var rawdata = this.getTransactionString(script, wif, estimategas, Neo.Fixed8.One);
+            
+            var postRawArray = [];
+            postRawArray.push(chainHash);
+            postRawArray.push(rawdata);
+
+            var postdata = WWW.makeZoroRpcPostBody("sendrawtransaction",postRawArray);
+            var result = await fetch("http://localhost:59908/api/testnet", {"method":"post", "body":JSON.stringify(postdata)});
+            var json = await result.json();
+            var postResult1 = json;           
+        }
+
+        public static getTransactionString(script,wif,gasLimit,gasPrice){
             var exData = new ThinNeo.ZoroInvokeTransData();
-            exData.gasLimit = gas;
+            exData.gasLimit = gasLimit;
             exData.gasPrice = gasPrice;
             exData.script = script;
-            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
-            
+            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));           
+
             var tran = new ThinNeo.ZoroTransaction();
             tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
             tran.version = 0;       
@@ -112,25 +147,18 @@ namespace WebBrowser {
             tran.attributes = [];
             tran.extdata = exData;
 
+            console.log("gasLimit = " + gasLimit);
+            console.log("gasPrice = " + gasPrice);
+            console.log("scriptHash = " + scriptHash);
+
             var msg = tran.GetMessage();
             var signdata = ThinNeo.Helper.Sign(msg, ThinNeo.Helper.GetPrivateKeyFromWIF(wif));
             tran.AddWitness(signdata, ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)), 
             ThinNeo.Helper.GetAddressFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif))));
             var data = tran.GetRawData();
-            var rawdata = data.toHexString();
 
-            var postRawArray = [];
-            postRawArray.push(chainHash);
-            postRawArray.push(rawdata);
-
-            var postdata = WWW.makeZoroRpcPostBody("sendrawtransaction",postRawArray);
-            var result = await fetch("http://115.159.68.43:59908/api/testnet", {"method":"post", "body":JSON.stringify(postdata)});
-            var json = await result.json();
-            var postResult1 = json;
-
-            {
-                alert("txid=" + tran.GetHash().reverse().toHexString());
-            }
+            alert("txid=" + tran.GetHash().reverse().toHexString());
+            return data.toHexString();
         }
 
         static getUint160(value: string): Uint8Array {

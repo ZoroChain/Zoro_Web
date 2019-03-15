@@ -31,5 +31,16 @@ namespace WebBrowser
                 return this.dateFtt("yyyy/MM/dd hh:mm:ss", new Date(time));
             // }
         }
+
+        static getTimeSecond(data:number){
+            var now = parseInt(Date.now() / 1000 + "");
+            var time = now - data;
+            var m = parseInt(time / 60 + "");
+            if (m > 0) {
+                return m + "min";
+            }else{
+                return time + "sec";
+            }
+        }
     }
 }

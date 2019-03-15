@@ -25,7 +25,7 @@ namespace WebBrowser {
             this.nodes[1] = [
                 // 主网nelnode
 
-				["CN", "https://mainnet_znode_hk_01.blacat.org/api/mainnet", "_1", "https://mainnet_znode_hk_01.blacat.org/api/mainnet"],
+				["CN", "http://47.52.146.36/api/mainnet", "_1", "http://47.52.146.36/api/mainnet"],
 
                 // ["CN", "https://nelnode01.9191wyx.com/api/mainnet", "_2"],
 
@@ -34,7 +34,8 @@ namespace WebBrowser {
             this.nodes[2] = [
                 // 测试网nelnode
 
-				["CN", "https://testnet_znode_hk_01.blacat.org/api/testnet", "_1", "https://testnet_znode_hk_01.blacat.org/api/testnet"],
+                ["CN", "https://testnet_znode_hk_01.blacat.org/api/testnet", "_1", "https://testnet_znode_hk_01.blacat.org/api/testnet"],
+                //["CN", "http://localhost:59908/api/testnet", "_1", "http://localhost:59908/api/testnet"],
 
                 // ["CN", "https://nelnode03.9191wyx.com/api/testnet", "_2", "https://apiscan03.9191wyx.com/api/testnet"],
 

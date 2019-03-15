@@ -38,7 +38,6 @@ namespace WebBrowser
         start(): void
         {
             this.getLangs();
-
             GUI_Route.instance.showUI(PageName.Login);     
 
             this.div.hidden = false;

@@ -1,10 +1,14 @@
 ﻿/// <reference path="../app.ts"/>
+/// <reference path="../element/rectCanvas.ts"/>
+
 namespace WebBrowser
 {
     export class Index implements Page
     {
         app: App
         langType: string;
+        canvas:RectElement.rectCanvas;
+        interval:number;
 
         close(): void
         {
@@ -49,7 +53,7 @@ namespace WebBrowser
 
         constructor(app: App) {
 
-            this.app = app
+            this.app = app          
 
             this.cnbtn.onclick = () => {
                 
@@ -66,24 +70,11 @@ namespace WebBrowser
                 //window.location.reload()
                 
                 this.refreshLangs()
-            }
+            }           
         }
 
-        private refreshLangs() {
-            
-            var page = this.app.routet.render();
-            page.getLangs();
-
-            this.app.navbar.getLangs()
-            this.app.netWork.getLangs()
-
-            
-        }
-
-        async start()
-        {
-            this.getLangs()
-
+        private async update(){    
+            this.canvas.update();      
             this.viewtxlist.href = Url.href_transactions();
 			this.viewblocks.href = Url.href_blocks();
 			this.alladdress.href = Url.href_addresses();
@@ -115,9 +106,7 @@ namespace WebBrowser
 
             blocks.forEach( ( item, index, input ) =>
             {
-                //var newDate = new Date();
-                //newDate.setTime(item.time * 1000);
-				let time = DateTool.getTime(item.time);
+				let time = DateTool.getTimeSecond(item.time);
 				var id = item.hash
 				id.replace('0x', '');
 				id = id.substring(0, 4) + '...' + id.substring(id.length - 4);
@@ -158,10 +147,30 @@ namespace WebBrowser
             $( "#index-page" ).find( "#blocks" ).children("tbody" ).append( html_blocks );
             $("#index-page").find("#transactions").children("tbody" ).append(html_txs);
 
+        }
+
+        private refreshLangs() {           
+            var page = this.app.routet.render();
+            page.getLangs();
+
+            this.app.navbar.getLangs()
+            this.app.netWork.getLangs()            
+        }
+
+        async start()
+        {
+            this.getLangs()
+            
+            this.canvas = new RectElement.rectCanvas();
+            this.update();
+            this.interval = setInterval(()=>{
+                this.update();
+            }, 1000);
+
             this.nep5s = await WWW.getallnep5asset();
             this.loadNep5View(this.nep5s);
 
-            this.footer.hidden = false;
+            this.footer.hidden = false;         
         }
 
         

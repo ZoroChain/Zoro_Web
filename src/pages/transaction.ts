@@ -99,9 +99,9 @@ namespace WebBrowser {
 			$("#txidscriptmethod").empty();
 			var appchain = locationtool.getParam2();
             if (appchain && appchain.length == 40){
-				var txidMethod = await WWW.api_getScriptMethod(txid, appchain);
+				var txidMethod = await WWW.api_getScriptMethod(txInfo.txid, appchain);
 			}else{
-				var txidMethod = await WWW.api_getScriptMethod(txid);
+				var txidMethod = await WWW.api_getScriptMethod(txInfo.txid);
 			}
 			//console.log(txidNep);
 			if (txidMethod) {
@@ -116,9 +116,9 @@ namespace WebBrowser {
 			$("#txidnep5").empty();
 			var appchain = locationtool.getParam2();
             if (appchain && appchain.length == 40){
-				var txidNep = await WWW.api_getappchainnep5transferbytxid(appchain, txid);
+				var txidNep = await WWW.api_getappchainnep5transferbytxid(appchain, txInfo.txid);
 			}else{
-				var txidNep = await WWW.api_getnep5transferbytxid(txid);
+				var txidNep = await WWW.api_getnep5transferbytxid(txInfo.txid);
 			}
 			//console.log(txidNep);
 			if (txidNep) {

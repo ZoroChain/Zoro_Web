@@ -231,8 +231,7 @@ namespace ThinNeo
             if (ms.readByte() != this.type) throw "error";
             this.version = ms.readByte();
             this.nonce = ms.readUint64().toString();
-            var buf = ms.readVarBytes(65536);
-            this.Account = new Uint8Array(buf, 0, buf.byteLength);
+            this.Account = ms.readUint160().toArray().reverse();
             this.extdata.Deserialize(this, ms);
 
             //attributes
