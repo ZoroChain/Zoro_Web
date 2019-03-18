@@ -1634,7 +1634,7 @@ var WebBrowser;
                 blocks.forEach((item, index, input) => {
                     //newDate.setTime(item.time * 1000);
                     let time = WebBrowser.DateTool.getTime(item.time);
-                    let txcounts = item.tx.length;
+                    let txcounts = item.txcount;
                     var id = item.hash;
                     id = id.replace('0x', '');
                     id = id.substring(0, 4) + '...' + id.substring(id.length - 4);
@@ -6371,6 +6371,7 @@ var RectElement;
             this.rectCanvas.height = 150;
             this.g = this.rectCanvas.getContext("2d");
             this.getBlockInterval();
+            this.createChart();
         }
         createChart() {
             this.chart = new Chart(this.g, {
@@ -6438,20 +6439,31 @@ var RectElement;
                             hoverBackgroundColor: hovercolors
                         }]
                 };
-                this.createChart();
             });
+        }
+        close() {
+            this.data = {
+                labels: [],
+                datasets: []
+            };
+            this.chart.data = this.data;
         }
         getBlockIntervalNext() {
             return __awaiter(this, void 0, void 0, function* () {
-                var rectmessage = yield WebBrowser.WWW.api_getBlockInterval("");
-                if (this.data && rectmessage[0].blockindex != this.newBlockIndex) {
-                    this.newBlockIndex = rectmessage[0].blockindex;
-                    this.data.datasets[0].data.splice(0, 1);
-                    this.data.datasets[0].data.push(rectmessage[0].blockinterval);
-                    this.data.labels.splice(0, 1);
-                    this.data.labels.push(rectmessage[0].blockindex);
-                    this.chart.data = this.data;
-                    this.chart.update();
+                if (this.data && this.data.labels.length == 0) {
+                    this.getBlockInterval();
+                }
+                if (this.data && this.data.labels.length > 0) {
+                    var rectmessage = yield WebBrowser.WWW.api_getBlockInterval("");
+                    if (this.data && rectmessage[0].blockindex != this.newBlockIndex) {
+                        this.newBlockIndex = rectmessage[0].blockindex;
+                        this.data.datasets[0].data.splice(0, 1);
+                        this.data.datasets[0].data.push(rectmessage[0].blockinterval);
+                        this.data.labels.splice(0, 1);
+                        this.data.labels.push(rectmessage[0].blockindex);
+                        this.chart.data = this.data;
+                        this.chart.update();
+                    }
                 }
             });
         }
@@ -6475,6 +6487,7 @@ var WebBrowser;
 (function (WebBrowser) {
     class Index {
         constructor(app) {
+            this.interval = -1;
             this.div = document.getElementById('index-page');
             this.footer = document.getElementById('footer-box');
             this.viewtxlist = document.getElementById("i_viewtxlist");
@@ -6500,6 +6513,10 @@ var WebBrowser;
             };
         }
         close() {
+            if (this.interval != -1)
+                clearInterval(this.interval);
+            if (this.canvas)
+                this.canvas.close();
             this.div.hidden = true;
         }
         getLangs() {
@@ -6528,7 +6545,6 @@ var WebBrowser;
                 this.alladdress.href = WebBrowser.Url.href_addresses();
                 this.allblock.href = WebBrowser.Url.href_blocks();
                 this.alltxlist.href = WebBrowser.Url.href_transactions();
-                this.div.hidden = false;
                 //查询区块高度(区块数量-1)
                 let blockHeight = yield WebBrowser.WWW.api_getHeight();
                 //查询交易数量
@@ -6559,7 +6575,7 @@ var WebBrowser;
                 <td>` + time + `</td>
                 <td><a class="code" target="_self" href ='` + WebBrowser.Url.href_block(item.index) + `' > 
                 ` + item.index + `</a></td>
-                <td>` + item.tx.length + `</td></tr>`;
+                <td>` + item.txcount + `</td></tr>`;
                 });
                 txs.forEach((tx) => {
                     let txid = tx.txid;
@@ -6597,6 +6613,7 @@ var WebBrowser;
                 this.interval = setInterval(() => {
                     this.update();
                 }, 1000);
+                this.div.hidden = false;
                 this.nep5s = yield WebBrowser.WWW.getallnep5asset();
                 this.loadNep5View(this.nep5s);
                 this.footer.hidden = false;

@@ -7,10 +7,14 @@ namespace WebBrowser
         app: App
         langType: string;
         canvas:RectElement.rectCanvas;
-        interval:number;
+        interval:number = -1;
 
         close(): void
         {
+            if (this.interval != -1)
+            clearInterval(this.interval);
+            if (this.canvas)
+            this.canvas.close();
             this.div.hidden = true;
         }
         div: HTMLDivElement = document.getElementById('index-page') as HTMLDivElement;
@@ -79,7 +83,7 @@ namespace WebBrowser
 			this.alladdress.href = Url.href_addresses();
 			this.allblock.href = Url.href_blocks();
             this.alltxlist.href = Url.href_transactions();
-            this.div.hidden = false;
+            
             //查询区块高度(区块数量-1)
             let blockHeight = await WWW.api_getHeight();
             //查询交易数量
@@ -109,9 +113,7 @@ namespace WebBrowser
 				var id = item.hash
 				id.replace('0x', '');
 				id = id.substring(0, 4) + '...' + id.substring(id.length - 4);
-
 				
-
                 html_blocks += `
                 <tr><td>
                 <a class="code" target="_self" href ='`+ Url.href_blockh(item.hash) + `' > 
@@ -120,7 +122,7 @@ namespace WebBrowser
                 <td>` + time + `</td>
                 <td><a class="code" target="_self" href ='`+ Url.href_block(item.index) + `' > 
                 `+ item.index + `</a></td>
-                <td>` + item.tx.length + `</td></tr>`;
+                <td>` + item.txcount + `</td></tr>`;
             } );
 
             txs.forEach( ( tx ) =>
@@ -166,6 +168,7 @@ namespace WebBrowser
                 this.update();
             }, 1000);
 
+            this.div.hidden = false;
             this.nep5s = await WWW.getallnep5asset();
             this.loadNep5View(this.nep5s);
 

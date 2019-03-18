@@ -100,7 +100,7 @@ namespace WebBrowser
             blocks.forEach((item, index, input) => {
                 //newDate.setTime(item.time * 1000);
                 let time = DateTool.getTime(item.time);
-				let txcounts = item.tx.length
+				let txcounts = item.txcount
 				var id = item.hash
 				id = id.replace('0x', '');
 				id = id.substring(0, 4) + '...' + id.substring(id.length - 4);

@@ -20,7 +20,8 @@ namespace RectElement
             this.rectCanvas.height = 150;
             this.g = this.rectCanvas.getContext("2d");      
                
-            this.getBlockInterval();                       
+            this.getBlockInterval();   
+            this.createChart();                     
         }           
 
         createChart(){
@@ -89,22 +90,35 @@ namespace RectElement
                     hoverBackgroundColor:hovercolors
                 }]
             }; 
-            this.createChart();    
+            
+        }
+
+        close(){
+            this.data = {
+                labels: [],
+                datasets: []
+            };
+            this.chart.data = this.data;
         }
 
         newBlockIndex:number = -1;
         async getBlockIntervalNext(){
-            var rectmessage:RectMessage = await WebBrowser.WWW.api_getBlockInterval("");
-            if (this.data && rectmessage[0].blockindex != this.newBlockIndex){
-                this.newBlockIndex = rectmessage[0].blockindex;
-                this.data.datasets[0].data.splice(0, 1);
-                this.data.datasets[0].data.push(rectmessage[0].blockinterval);
-                this.data.labels.splice(0,1);
-                this.data.labels.push(rectmessage[0].blockindex);
-
-                this.chart.data = this.data;
-                this.chart.update();
+            if (this.data && this.data.labels.length == 0) {
+                this.getBlockInterval();
             }
+            if (this.data && this.data.labels.length > 0){
+                var rectmessage:RectMessage = await WebBrowser.WWW.api_getBlockInterval("");
+                if (this.data && rectmessage[0].blockindex != this.newBlockIndex){
+                    this.newBlockIndex = rectmessage[0].blockindex;
+                    this.data.datasets[0].data.splice(0, 1);
+                    this.data.datasets[0].data.push(rectmessage[0].blockinterval);
+                    this.data.labels.splice(0,1);
+                    this.data.labels.push(rectmessage[0].blockindex);
+    
+                    this.chart.data = this.data;
+                    this.chart.update();
+                }
+            }           
         }
 
         update(){

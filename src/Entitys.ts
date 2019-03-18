@@ -230,6 +230,7 @@ namespace WebBrowser
             verification: string;
         };
         tx: Tx[];
+        txcount:number;
     }
 
     export interface Utxo
