@@ -91,10 +91,10 @@ namespace WebBrowser
             //查询地址总数
             let addrCount: number = await WWW.getaddrcount();
             //分页查询区块数据
-            let blocks: Block[] = await WWW.getblocksdesc( 10, 0 );
+            let blocks: Block[] = await WWW.getblocksdesccache( 10, 0 );
             //分页查询交易记录
          
-			let txs: Tx[] = await WWW.getrawtransactionsdesc(10, 0, '');
+			let txs: Tx[] = await WWW.getrawtransactionsdesccache(10, 0, '');
             $( "#blockHeight" ).text( NumberTool.toThousands( blockHeight ) );//显示在页面
 
             $( "#txcount" ).text( NumberTool.toThousands( txCount ) );//显示在页面

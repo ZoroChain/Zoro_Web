@@ -153,6 +153,24 @@ namespace WebBrowser {
 			return r as Block[];
 		}
 
+		static async getblocksdesccache(size: number, page: number)      
+		{
+			var str = WWW.makeRpcUrl("getblocksdesccache", size, page);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r as Block[];
+		}
+
+		static async getappchainblocksdesccache(appchain:string ,size: number, page: number)      
+		{
+			var str = WWW.makeRpcUrl("getappchainblocksdesccache", appchain ,size, page);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r as Block[];
+		}
+
 		static async getblock(index: number)      
 		{
 			var str = WWW.makeRpcUrl("getblock", index);
@@ -220,6 +238,24 @@ namespace WebBrowser {
 		static async getappchainrawtransactionsdesc(appchain:string , size: number, page: number) {
 
 			var str = WWW.makeRpcUrl("getappchainrawtransactionsdesc", appchain,size, page);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r as Tx[]; // needs most recent 10 txs returned, needs a sorting by txtype
+		}
+
+		static async getrawtransactionsdesccache(size: number, page: number, txtype: string) {
+
+			var str = WWW.makeRpcUrl("getrawtransactionsdesccache", size, page, txtype);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r as Tx[]; // needs most recent 10 txs returned, needs a sorting by txtype
+		}
+
+		static async getappchainrawtransactionsdesccache(appchain:string , size: number, page: number) {
+
+			var str = WWW.makeRpcUrl("getappchainrawtransactionsdesccache", appchain,size, page);
 			var result = await fetch(str, { "method": "get" });
 			var json = await result.json();
 			var r = json["result"];

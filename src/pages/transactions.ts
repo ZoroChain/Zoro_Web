@@ -40,13 +40,59 @@ namespace WebBrowser {
 
 		constructor(app: App) {
 			this.app = app
+		}
 
+		//更新交易记录
+		public async updateTransactions(pageUtil: PageUtil, txType: string) {			
+			//分页查询交易记录
+			var appchain = locationtool.getParam2();
+            if (appchain && appchain.length == 40){
+				var txs: Tx[] = await WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
+			}else{
+				var txs: Tx[] = await WWW.getrawtransactionsdesc(pageUtil.pageSize, pageUtil.currentPage - 1, txType);				
+			}
+			this.txlist.find("#txlist-page-transactions").empty();
+			if (pageUtil.totalPage - pageUtil.currentPage) {
+				$("#txlist-page-next").removeClass('disabled');
+			} else {
+				$("#txlist-page-next").addClass('disabled');
+			}
+			if (pageUtil.currentPage - 1) {
+				$("#txlist-page-previous").removeClass('disabled');
+			} else {
+				$("#txlist-page-previous").addClass('disabled');
+			}
+
+			let minNum = pageUtil.currentPage * pageUtil.pageSize - pageUtil.pageSize; //       
+			let maxNum = pageUtil.totalCount;
+			let diffNum = maxNum - minNum;
+			if (diffNum > 15) {
+				maxNum = pageUtil.currentPage * pageUtil.pageSize;
+			}
+			let pageMsg = "Transactions " + (minNum + 1) + " to " + maxNum + " of " + pageUtil.totalCount;
+			$("#txlist-page").find("#txlist-page-msg").html(pageMsg);
+
+			txs.forEach((tx) => {			
+				let txid = tx.txid;
+				let html: string = this.getTxLine(txid, tx.type, tx.size.toString(), tx.blockindex.toString());
+				this.txlist.find("#txlist-page-transactions").append(html);
+			});		
+		}
+        /**
+         * async start
+         */
+		public async start() {
+			this.getLangs()
+
+			let type = "";
+			var appchain = locationtool.getParam2();
+            if (appchain && appchain.length == 40){
+				var txCount = await WWW.getappchaintxcount(appchain);
+			}else{
+				var txCount = await WWW.gettxcount(type);
+			}
+			
 			this.txlist = $("#txlist-page");
-			//监听交易列表选择框
-			// $("#TxType").change(() => {
-			// 	this.pageUtil.currentPage = 1;
-			// 	this.updateTransactions(this.pageUtil, <string>$("#TxType").val());// <string>$("#TxType").val()
-			// });
 
 			$("#txlist-page-next").off("click").click(() => {
 				if (this.pageUtil.currentPage == this.pageUtil.totalPage) {
@@ -65,71 +111,6 @@ namespace WebBrowser {
 				}
 			});
 
-		}
-
-		//更新交易记录
-		public async updateTransactions(pageUtil: PageUtil, txType: string) {
-			this.txlist.find("#txlist-page-transactions").empty();
-			//分页查询交易记录
-			var appchain = locationtool.getParam2();
-            if (appchain && appchain.length == 40){
-				var txs: Tx[] = await WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
-				var txCount = await WWW.getappchaintxcount(appchain);
-			}else{
-				var txs: Tx[] = await WWW.getrawtransactionsdesc(pageUtil.pageSize, pageUtil.currentPage - 1, txType);
-				var txCount = await WWW.gettxcount(txType);
-			}
-			
-			pageUtil.totalCount = txCount;
-
-			let listLength = 0;
-			if (txs.length < 15) {
-				this.txlist.find(".page").hide();
-				listLength = txs.length;
-			} else {
-				this.txlist.find(".page").show();
-				listLength = pageUtil.pageSize;
-			}
-			for (var n = 0; n < listLength; n++) {
-			
-				let txid = txs[n].txid;
-				let html: string = await this.getTxLine(txid, txs[n].type, txs[n].size.toString(), txs[n].blockindex.toString());
-				this.txlist.find("#txlist-page-transactions").append(html);
-			}
-
-			let minNum = pageUtil.currentPage * pageUtil.pageSize - pageUtil.pageSize; //       
-			let maxNum = pageUtil.totalCount;
-			let diffNum = maxNum - minNum;
-			if (diffNum > 15) {
-				maxNum = pageUtil.currentPage * pageUtil.pageSize;
-			}
-			let pageMsg = "Transactions " + (minNum + 1) + " to " + maxNum + " of " + pageUtil.totalCount;
-			$("#txlist-page").find("#txlist-page-msg").html(pageMsg);
-			if (pageUtil.totalPage - pageUtil.currentPage) {
-				$("#txlist-page-next").removeClass('disabled');
-			} else {
-				$("#txlist-page-next").addClass('disabled');
-			}
-			if (pageUtil.currentPage - 1) {
-				$("#txlist-page-previous").removeClass('disabled');
-			} else {
-				$("#txlist-page-previous").addClass('disabled');
-			}
-		}
-        /**
-         * async start
-         */
-		public async start() {
-			this.getLangs()
-
-			let type = "";
-			var appchain = locationtool.getParam2();
-            if (appchain && appchain.length == 40){
-				var txCount = await WWW.getappchaintxcount(appchain);
-			}else{
-				var txCount = await WWW.gettxcount(type);
-			}
-			
 			//初始化交易列表
 			this.pageUtil = new PageUtil(txCount, 15); //0
 			this.updateTransactions(this.pageUtil, type);
@@ -138,7 +119,7 @@ namespace WebBrowser {
 		}
 
 
-		async getTxLine(txid: string, type: string, size: string, index: string) // deleted string datatype for string
+		getTxLine(txid: string, type: string, size: string, index: string) // deleted string datatype for string
 		{
 			var id = txid.replace('0x', '');
 			id = id.substring(0, 6) + '...' + id.substring(id.length - 6);
@@ -149,7 +130,6 @@ namespace WebBrowser {
 							<div class="content-nel"><span>`+ size + ` bytes</span></div>
 							<div class="content-nel"><span><a href="`+ Url.href_block(parseInt(index)) + `" target="_self">` + index + `</a></span></div>
 						</div>
-						<a class="end" id="genbtn" style="border-left:none;"></a>
 					</div>`;
 
 			// return `

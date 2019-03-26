@@ -1798,6 +1798,24 @@ var WebBrowser;
                 return r;
             });
         }
+        static getblocksdesccache(size, page) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getblocksdesccache", size, page);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r;
+            });
+        }
+        static getappchainblocksdesccache(appchain, size, page) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getappchainblocksdesccache", appchain, size, page);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r;
+            });
+        }
         static getblock(index) {
             return __awaiter(this, void 0, void 0, function* () {
                 var str = WWW.makeRpcUrl("getblock", index);
@@ -1866,6 +1884,24 @@ var WebBrowser;
         static getappchainrawtransactionsdesc(appchain, size, page) {
             return __awaiter(this, void 0, void 0, function* () {
                 var str = WWW.makeRpcUrl("getappchainrawtransactionsdesc", appchain, size, page);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r; // needs most recent 10 txs returned, needs a sorting by txtype
+            });
+        }
+        static getrawtransactionsdesccache(size, page, txtype) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getrawtransactionsdesccache", size, page, txtype);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r; // needs most recent 10 txs returned, needs a sorting by txtype
+            });
+        }
+        static getappchainrawtransactionsdesccache(appchain, size, page) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getappchainrawtransactionsdesccache", appchain, size, page);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
                 var r = json["result"];
@@ -6552,9 +6588,9 @@ var WebBrowser;
                 //查询地址总数
                 let addrCount = yield WebBrowser.WWW.getaddrcount();
                 //分页查询区块数据
-                let blocks = yield WebBrowser.WWW.getblocksdesc(10, 0);
+                let blocks = yield WebBrowser.WWW.getblocksdesccache(10, 0);
                 //分页查询交易记录
-                let txs = yield WebBrowser.WWW.getrawtransactionsdesc(10, 0, '');
+                let txs = yield WebBrowser.WWW.getrawtransactionsdesccache(10, 0, '');
                 $("#blockHeight").text(WebBrowser.NumberTool.toThousands(blockHeight)); //显示在页面
                 $("#txcount").text(WebBrowser.NumberTool.toThousands(txCount)); //显示在页面
                 $("#addrCount").text(WebBrowser.NumberTool.toThousands(addrCount));
@@ -6676,30 +6712,6 @@ var WebBrowser;
             this.div = document.getElementById("txlist-page");
             this.footer = document.getElementById('footer-box');
             this.app = app;
-            this.txlist = $("#txlist-page");
-            //监听交易列表选择框
-            // $("#TxType").change(() => {
-            // 	this.pageUtil.currentPage = 1;
-            // 	this.updateTransactions(this.pageUtil, <string>$("#TxType").val());// <string>$("#TxType").val()
-            // });
-            $("#txlist-page-next").off("click").click(() => {
-                if (this.pageUtil.currentPage == this.pageUtil.totalPage) {
-                    this.pageUtil.currentPage = this.pageUtil.totalPage;
-                }
-                else {
-                    this.pageUtil.currentPage += 1;
-                    this.updateTransactions(this.pageUtil, ""); // <string>$("#TxType").val()
-                }
-            });
-            $("#txlist-page-previous").off("click").click(() => {
-                if (this.pageUtil.currentPage <= 1) {
-                    this.pageUtil.currentPage = 1;
-                }
-                else {
-                    this.pageUtil.currentPage -= 1;
-                    this.updateTransactions(this.pageUtil, ""); // <string>$("#TxType").val()
-                }
-            });
         }
         close() {
             this.div.hidden = true;
@@ -6723,40 +6735,15 @@ var WebBrowser;
         //更新交易记录
         updateTransactions(pageUtil, txType) {
             return __awaiter(this, void 0, void 0, function* () {
-                this.txlist.find("#txlist-page-transactions").empty();
                 //分页查询交易记录
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
                     var txs = yield WebBrowser.WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
-                    var txCount = yield WebBrowser.WWW.getappchaintxcount(appchain);
                 }
                 else {
                     var txs = yield WebBrowser.WWW.getrawtransactionsdesc(pageUtil.pageSize, pageUtil.currentPage - 1, txType);
-                    var txCount = yield WebBrowser.WWW.gettxcount(txType);
                 }
-                pageUtil.totalCount = txCount;
-                let listLength = 0;
-                if (txs.length < 15) {
-                    this.txlist.find(".page").hide();
-                    listLength = txs.length;
-                }
-                else {
-                    this.txlist.find(".page").show();
-                    listLength = pageUtil.pageSize;
-                }
-                for (var n = 0; n < listLength; n++) {
-                    let txid = txs[n].txid;
-                    let html = yield this.getTxLine(txid, txs[n].type, txs[n].size.toString(), txs[n].blockindex.toString());
-                    this.txlist.find("#txlist-page-transactions").append(html);
-                }
-                let minNum = pageUtil.currentPage * pageUtil.pageSize - pageUtil.pageSize; //       
-                let maxNum = pageUtil.totalCount;
-                let diffNum = maxNum - minNum;
-                if (diffNum > 15) {
-                    maxNum = pageUtil.currentPage * pageUtil.pageSize;
-                }
-                let pageMsg = "Transactions " + (minNum + 1) + " to " + maxNum + " of " + pageUtil.totalCount;
-                $("#txlist-page").find("#txlist-page-msg").html(pageMsg);
+                this.txlist.find("#txlist-page-transactions").empty();
                 if (pageUtil.totalPage - pageUtil.currentPage) {
                     $("#txlist-page-next").removeClass('disabled');
                 }
@@ -6769,6 +6756,19 @@ var WebBrowser;
                 else {
                     $("#txlist-page-previous").addClass('disabled');
                 }
+                let minNum = pageUtil.currentPage * pageUtil.pageSize - pageUtil.pageSize; //       
+                let maxNum = pageUtil.totalCount;
+                let diffNum = maxNum - minNum;
+                if (diffNum > 15) {
+                    maxNum = pageUtil.currentPage * pageUtil.pageSize;
+                }
+                let pageMsg = "Transactions " + (minNum + 1) + " to " + maxNum + " of " + pageUtil.totalCount;
+                $("#txlist-page").find("#txlist-page-msg").html(pageMsg);
+                txs.forEach((tx) => {
+                    let txid = tx.txid;
+                    let html = this.getTxLine(txid, tx.type, tx.size.toString(), tx.blockindex.toString());
+                    this.txlist.find("#txlist-page-transactions").append(html);
+                });
             });
         }
         /**
@@ -6785,6 +6785,25 @@ var WebBrowser;
                 else {
                     var txCount = yield WebBrowser.WWW.gettxcount(type);
                 }
+                this.txlist = $("#txlist-page");
+                $("#txlist-page-next").off("click").click(() => {
+                    if (this.pageUtil.currentPage == this.pageUtil.totalPage) {
+                        this.pageUtil.currentPage = this.pageUtil.totalPage;
+                    }
+                    else {
+                        this.pageUtil.currentPage += 1;
+                        this.updateTransactions(this.pageUtil, ""); // <string>$("#TxType").val()
+                    }
+                });
+                $("#txlist-page-previous").off("click").click(() => {
+                    if (this.pageUtil.currentPage <= 1) {
+                        this.pageUtil.currentPage = 1;
+                    }
+                    else {
+                        this.pageUtil.currentPage -= 1;
+                        this.updateTransactions(this.pageUtil, ""); // <string>$("#TxType").val()
+                    }
+                });
                 //初始化交易列表
                 this.pageUtil = new WebBrowser.PageUtil(txCount, 15); //0
                 this.updateTransactions(this.pageUtil, type);
@@ -6793,32 +6812,29 @@ var WebBrowser;
             });
         }
         getTxLine(txid, type, size, index) {
-            return __awaiter(this, void 0, void 0, function* () {
-                var id = txid.replace('0x', '');
-                id = id.substring(0, 6) + '...' + id.substring(id.length - 6);
-                return `<div class="line">
+            var id = txid.replace('0x', '');
+            id = id.substring(0, 6) + '...' + id.substring(id.length - 6);
+            return `<div class="line">
 						<div class="line-general">
 							<div class="content-nel"><span><a href="` + WebBrowser.Url.href_transaction(txid) + `" target="_self">` + id + `</a></span></div>
 							<div class="content-nel"><span>` + type.replace("Transaction", "") + `</span></div>
 							<div class="content-nel"><span>` + size + ` bytes</span></div>
 							<div class="content-nel"><span><a href="` + WebBrowser.Url.href_block(parseInt(index)) + `" target="_self">` + index + `</a></span></div>
 						</div>
-						<a class="end" id="genbtn" style="border-left:none;"></a>
 					</div>`;
-                // return `
-                // <div class="line">
-                //     <div class="line-general">
-                //         <div class="content-nel"><span><a href="`+ Url.href_transaction(txid) + `" target="_self">` + id + `</a></span></div>
-                //         <div class="content-nel"><span>`+ type.replace("Transaction", "") + `</span></div>
-                //         <div class="content-nel"><span>`+ size + ` bytes</span></div>
-                //         <div class="content-nel"><span><a href="`+ Url.href_block(parseInt(index)) + `" target="_self">` + index + `</a></span></div>
-                //     </div>
-                //     <a onclick="txgeneral(this)" class="end" id="genbtn"><img src="./img/open.svg" /></a>
-                //     <div class="transaction" style="width:100%;display: none;" vins='`+ JSON.stringify(vins) + `' vouts='` + JSON.stringify(vouts) + `'>
-                //     </div>
-                // </div>
-                // `;
-            });
+            // return `
+            // <div class="line">
+            //     <div class="line-general">
+            //         <div class="content-nel"><span><a href="`+ Url.href_transaction(txid) + `" target="_self">` + id + `</a></span></div>
+            //         <div class="content-nel"><span>`+ type.replace("Transaction", "") + `</span></div>
+            //         <div class="content-nel"><span>`+ size + ` bytes</span></div>
+            //         <div class="content-nel"><span><a href="`+ Url.href_block(parseInt(index)) + `" target="_self">` + index + `</a></span></div>
+            //     </div>
+            //     <a onclick="txgeneral(this)" class="end" id="genbtn"><img src="./img/open.svg" /></a>
+            //     <div class="transaction" style="width:100%;display: none;" vins='`+ JSON.stringify(vins) + `' vouts='` + JSON.stringify(vouts) + `'>
+            //     </div>
+            // </div>
+            // `;
         }
         static getTxgeneral(vins, vouts, div) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -8561,7 +8577,7 @@ var WebBrowser;
             this.nodes = {};
             this.nodes[1] = [
                 // 主网nelnode
-                ["CN", "http://47.52.146.36/api/mainnet", "_1", "http://47.52.146.36/api/mainnet"],
+                ["CN", "https://mainnet_znode_hk_01.blacat.org/api/mainnet", "_1", "https://mainnet_znode_hk_01.blacat.org/api/mainnet"],
             ];
             this.nodes[2] = [
                 // 测试网nelnode

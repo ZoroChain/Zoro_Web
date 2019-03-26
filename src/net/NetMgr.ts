@@ -25,7 +25,7 @@ namespace WebBrowser {
             this.nodes[1] = [
                 // 主网nelnode
 
-				["CN", "http://47.52.146.36/api/mainnet", "_1", "http://47.52.146.36/api/mainnet"],
+				["CN", "https://mainnet_znode_hk_01.blacat.org/api/mainnet", "_1", "https://mainnet_znode_hk_01.blacat.org/api/mainnet"],
 
                 // ["CN", "https://nelnode01.9191wyx.com/api/mainnet", "_2"],
 
