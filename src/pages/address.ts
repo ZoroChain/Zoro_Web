@@ -214,8 +214,7 @@ namespace WebBrowser {
 		}
 
 		//更新交易记录
-		public async updateAddrTrasctions(address: string, pageUtil: PageUtil) {
-			$("#addr-trans").empty();
+		public async updateAddrTrasctions(address: string, pageUtil: PageUtil) {			
 			//分页查询交易记录
 			var appchain = locationtool.getParam2();
             if (appchain && appchain.length == 40){
@@ -223,6 +222,7 @@ namespace WebBrowser {
 			}else{
 				var txlist: TransOfAddress[] = await WWW.getaddresstxs(address, pageUtil.pageSize, pageUtil.currentPage - 1);
 			}
+			$("#addr-trans").empty();
 			let listLength = 0;
 			if (txlist) {
 				if (txlist.length < 10) {

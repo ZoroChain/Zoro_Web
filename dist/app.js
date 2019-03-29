@@ -2863,7 +2863,6 @@ var WebBrowser;
         //更新交易记录
         updateAddrTrasctions(address, pageUtil) {
             return __awaiter(this, void 0, void 0, function* () {
-                $("#addr-trans").empty();
                 //分页查询交易记录
                 var appchain = WebBrowser.locationtool.getParam2();
                 if (appchain && appchain.length == 40) {
@@ -2872,6 +2871,7 @@ var WebBrowser;
                 else {
                     var txlist = yield WebBrowser.WWW.getaddresstxs(address, pageUtil.pageSize, pageUtil.currentPage - 1);
                 }
+                $("#addr-trans").empty();
                 let listLength = 0;
                 if (txlist) {
                     if (txlist.length < 10) {
@@ -4130,11 +4130,45 @@ var WebBrowser;
 (function (WebBrowser) {
     class CSSTool {
         static loginbackground_set(element) {
-            element.style.width = "600px";
-            element.style.backgroundColor = "#333542";
+            element.style.width = "100%";
+            element.style.backgroundImage = "url(./img/mainbg.jpg)";
             element.style.textAlign = "center";
-            element.style.margin = "75px auto";
-            element.style.padding = "0";
+            element.style.backgroundRepeat = "round";
+            element.style.marginTop = "20px";
+        }
+        static messagebg_set(element) {
+            element.style.display = "block";
+            element.style.width = "440px";
+            element.style.cssFloat = "left";
+            element.style.marginLeft = "50px";
+            element.style.marginTop = "80px";
+        }
+        static loginhr_set(element) {
+            element.style.display = "block";
+            element.style.width = "240px";
+            element.style.marginLeft = "0px";
+        }
+        static titleFont_set(element) {
+            element.style.display = "block";
+            element.style.width = "100%";
+            element.style.fontSize = "30px";
+            element.style.textAlign = "left";
+            element.style.fontWeight = "bold";
+            element.style.color = "#fff";
+        }
+        static valueFont_set(element) {
+            element.style.display = "block";
+            element.style.width = "100%";
+            element.style.fontSize = "18px";
+            element.style.textAlign = "left";
+            element.style.color = "#fff";
+        }
+        static loginbg_set(element) {
+            element.style.display = "inline-block";
+            element.style.width = "340px";
+            element.style.backgroundColor = "rgb(51,53,66)";
+            element.style.borderRadius = "25px";
+            element.style.margin = "50px";
         }
         //标题
         static name_set(element) {
@@ -4505,32 +4539,52 @@ var WebBrowser;
         }
         showUI() {
             //Test.ZoroTransfer();
-            WebBrowser.Test.Transfer();
+            //Test.Transfer();
             this.login();
         }
         hideUI() {
         }
         login() {
             this.div.removeChild(this.div.firstChild);
+            this.div.className = "wallet-bg";
+            var background = document.createElement('div');
+            this.div.appendChild(background);
+            var messagebackground = document.createElement('div');
+            background.appendChild(messagebackground);
+            messagebackground.className = "message-bg";
+            var titleSpan = document.createElement('span');
+            titleSpan.textContent = "最安全的资产管理";
+            messagebackground.appendChild(titleSpan);
+            titleSpan.className = "title-font";
+            var hr = document.createElement('hr');
+            messagebackground.appendChild(hr);
+            hr.className = "login-hr";
+            var messageSpan = document.createElement('span');
+            messageSpan.textContent = "为全世界，打造最便捷，最安全的虚拟物品创作，购买和销售方式适用于交易游戏代码和视频游戏皮肤等物品或电子产品等物品的任何人。";
+            messagebackground.appendChild(messageSpan);
+            messageSpan.className = "value-font";
             var loginbackground = document.createElement('div');
-            this.div.appendChild(loginbackground);
-            WebBrowser.CSSTool.loginbackground_set(this.div);
+            background.appendChild(loginbackground);
+            loginbackground.className = "login-bg";
             var name = document.createElement('h3');
             name.textContent = "登陆你的钱包";
             loginbackground.appendChild(name);
-            WebBrowser.CSSTool.name_set(name);
+            name.className = "login-title";
             var uploadFiles = document.createElement("div"); //外层div
             loginbackground.appendChild(uploadFiles);
-            WebBrowser.CSSTool.uploadFiles_set(uploadFiles);
+            uploadFiles.className = "upload-file";
             //feile  外层
             var firstFile = document.createElement("div");
             var putIn = document.createElement("div");
             putIn.textContent = "请选择钱包文件";
             firstFile.appendChild(putIn);
-            var fileIcon = document.createElement("i");
-            $(fileIcon).addClass("glyphicon glyphicon-file").css("padding-left", "5px").appendTo(putIn);
+            putIn.className = "putin";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/file.png";
+            putIn.appendChild(fileIcon);
+            fileIcon.className = "file-icon";
             uploadFiles.appendChild(firstFile);
-            WebBrowser.CSSTool.firstFile_set(firstFile);
+            firstFile.className = "first-file";
             //将file添加到feile  外层里
             var file = document.createElement("input");
             firstFile.appendChild(file);

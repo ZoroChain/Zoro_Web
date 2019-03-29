@@ -1,14 +1,18 @@
 ﻿body {
-    background-color: #3d3e4c;
+    background-color: #333645;
+}
+
+jumbotron{
+    background-color: transparent;
 }
 
 .nel {
-    background-color: transparent;
+    background-color: #292c3b;
     color: #fff;
 }
 
 .navbar-nel {
-    background-color: #343543;
+    background-color: #292c3b;
 }
 
 .navbar-nel .navbar-brand {
@@ -252,7 +256,7 @@
 .summary .block {
     height: 340px;
     height: 216px;
-    background-color: #343543;
+    background-color: #292c3b;
     font-family: PingFangSC-Medium;
     font-size: 20px;
     color: #333333;
@@ -304,7 +308,7 @@ table>tbody>tr {
 .table-nel > tbody > tr:nth-of-type(odd) {
     background-color: #2a2838;
 }
-.table-nel{background-color:#343543}
+.table-nel{background-color:#292c3b}
 
 a {
     color: #c8aa74;
@@ -370,7 +374,7 @@ a:hover, a:focus {
 }
 
 .list-nel {
-    background-color: #343543;
+    background-color: #292c3b;
     border-collapse: separate;    
 }
 
@@ -445,6 +449,73 @@ a:hover, a:focus {
 
 /*footer start*/
 .footer-box {
-    background: #343543;
+    background: #292c3b;
 }
 /*footer end*/
+
+/* wallet start */
+.wallet-bg{
+    width: 100%;
+    background-image: url("../img/mainbg.jpg");
+    text-align: center;
+    background-repeat: round;
+    margin-top: 20px;
+}
+.message-bg{
+    display: block;
+    width: 440px;
+    float: left;
+    margin-left: 50px;
+    margin-top: 80px;
+}
+.login-hr{
+    display: block;
+    width: 240px;
+    margin-left: 0px;
+}
+.title-font{
+    display: block;
+    width: 100%;
+    font-size: 30px;
+    text-align: left;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+.value-font{
+    display: block;
+    width:100%;
+    font-size: 18px;
+    text-align: left;
+    color: #FFFFFF;
+}
+.login-bg{
+    display: inline-block;
+    width: 340px;
+    background-color: #292c3b;
+    border-radius: 25px;
+    margin-top: 50px;
+    margin-left: 100px;
+}
+.login-title{
+    color: #FFFFFF;
+    font-size: 18px;
+    border-bottom: 1px solid black;
+    line-height: 60px;
+}
+.upload-file{
+    width: 300px;
+    margin:0 auto;
+    padding: 40px 0 60px 0;
+}
+.file-icon{
+    padding: 5px;
+}
+.first-file{
+    width: 100%;
+    color: #c8aa74;
+    padding: 10px 0;
+    cursor: pointer;
+    position: relative;
+    border:2px groove #c8aa74;
+}
+/* wallet end */

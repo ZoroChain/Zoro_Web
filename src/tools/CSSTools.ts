@@ -5,12 +5,52 @@ namespace WebBrowser
     export class CSSTool
     {   //外层
         public static loginbackground_set(element:HTMLDivElement|HTMLButtonElement|HTMLSpanElement){
-            element.style.width = "600px";
-            element.style.backgroundColor = "#333542";
+            element.style.width = "100%";
+            element.style.backgroundImage = "url(./img/mainbg.jpg)";
             element.style.textAlign = "center";
-            element.style.margin = "75px auto";
-            element.style.padding = "0";
+            element.style.backgroundRepeat = "round"
+            element.style.marginTop = "20px";
         }
+
+        public static messagebg_set(element:HTMLDivElement){
+            element.style.display = "block";
+            element.style.width = "440px";    
+            element.style.cssFloat = "left";
+            element.style.marginLeft = "50px";
+            element.style.marginTop = "80px";        
+        }
+
+        public static loginhr_set(element:HTMLHRElement){
+            element.style.display = "block";
+            element.style.width = "240px";
+            element.style.marginLeft = "0px";
+        }
+
+        public static titleFont_set(element:HTMLSpanElement){
+            element.style.display = "block";
+            element.style.width = "100%";
+            element.style.fontSize = "30px";
+            element.style.textAlign = "left";
+            element.style.fontWeight = "bold";
+            element.style.color = "#fff";
+        }
+
+        public static valueFont_set(element:HTMLSpanElement){
+            element.style.display = "block";
+            element.style.width = "100%";
+            element.style.fontSize = "18px";
+            element.style.textAlign = "left";
+            element.style.color = "#fff";
+        }
+
+        public static loginbg_set(element:HTMLDivElement){
+            element.style.display = "inline-block";
+            element.style.width = "340px";
+            element.style.backgroundColor = "rgb(51,53,66)";
+            element.style.borderRadius = "25px";
+            element.style.margin = "50px";
+        }
+
         //标题
         public static name_set(element:HTMLDivElement|HTMLButtonElement|HTMLSpanElement){
             element.style.color = "#ffffff";

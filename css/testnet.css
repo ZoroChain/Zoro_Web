@@ -1,5 +1,5 @@
 ﻿body {
-    background: #4b5858;
+    background: #364545;
 }
 
 jumbotron{
@@ -7,12 +7,12 @@ jumbotron{
 }
 
 .nel {
-    background-color: #344241;
+    background-color: #2a3a3a;
     color: #fff;
 }
 
 .navbar-nel {
-    background-color: #344241;
+    background-color: #2a3a3a;
 
 }
 
@@ -163,7 +163,7 @@ jumbotron{
 }
 
 #nel-search {
-    background: #344241;
+    background: #2a3a3a;
     border: 1px solid #454F60;
     border-radius: 5px;
 }
@@ -274,7 +274,7 @@ a:hover, a:focus {
 .summary .block {
     height: 340px;
     height: 216px;
-    background-color: #344241;
+    background-color: #2a3a3a;
     font-family: PingFangSC-Medium;
     font-size: 20px;
     color: #333333;
@@ -308,7 +308,7 @@ a:hover, a:focus {
 }
 
 .table-nel{
-    background-color:#344241;
+    background-color:#2a3a3a;
 }
 
 table>thead>tr{
@@ -394,7 +394,7 @@ table>tbody>tr {
 }
 
 .list-nel{
-    background-color: #344241;border-collapse: separate;
+    background-color: #2a3a3a;border-collapse: separate;
 }
 
 .list-body>.line:nth-of-type(odd){
@@ -469,6 +469,51 @@ table>tbody>tr {
 
 /*footer start*/
 .footer-box {
-    background: #344241;
+    background: #2a3a3a;
 }
 /*footer end*/
+
+/* wallet start */
+.wallet-bg{
+    width: 100%;
+    background-image: url("../img/testbg.jpg");
+    text-align: center;
+    background-repeat: round;
+    margin-top: 20px;
+}
+.message-bg{
+    display: block;
+    width: 440px;
+    float: left;
+    margin-left: 50px;
+    margin-top: 80px;
+}
+.login-hr{
+    display: block;
+    width: 240px;
+    margin-left: 0px;
+}
+.title-font{
+    display: block;
+    width: 100%;
+    font-size: 30px;
+    text-align: left;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+.value-font{
+    display: block;
+    width:100%;
+    font-size: 18px;
+    text-align: left;
+    color: #FFFFFF;
+}
+.login-bg{
+    display: inline-block;
+    width: 340px;
+    background-color: #2a3a3a;
+    border-radius: 25px;
+    margin-top: 50px;
+    margin-left: 100px;
+}
+/* wallet end */
