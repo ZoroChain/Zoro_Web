@@ -4589,19 +4589,18 @@ var WebBrowser;
             var file = document.createElement("input");
             firstFile.appendChild(file);
             file.type = "file";
-            WebBrowser.CSSTool.file_set(file);
+            file.className = "file";
             //提示添加file上传的文字
             var fileTip = document.createElement("p");
             fileTip.textContent = '*请上传钱包文件';
-            $(fileTip).attr("id", "fileTip");
             uploadFiles.appendChild(fileTip);
-            WebBrowser.CSSTool.fileTip_set(fileTip);
+            fileTip.className = "file-tip";
             //密码的
             var password = document.createElement("input");
             uploadFiles.appendChild(password);
             password.type = "password";
             password.placeholder = "请输入密码";
-            WebBrowser.CSSTool.password_set(password);
+            password.className = "password";
             $(password).on("input", function () {
                 if (password.value.length) {
                     passwordTip.textContent = '';
@@ -4614,11 +4613,11 @@ var WebBrowser;
             var passwordTip = document.createElement("p");
             passwordTip.textContent = '*密码输入有误';
             uploadFiles.appendChild(passwordTip);
-            WebBrowser.CSSTool.fileTip_set(passwordTip);
+            passwordTip.className = "file-tip";
             var btn = document.createElement("button");
             uploadFiles.appendChild(btn);
-            btn.textContent = "登陆";
-            WebBrowser.CSSTool.btn_set(btn);
+            btn.textContent = "登录";
+            btn.className = "btn-commit";
             btn.onclick = () => {
                 if (wallet.accounts.length > 0 && wallet.accounts[0].nep2key != null) {
                     let nepkey = wallet.accounts[0].nep2key;
@@ -4634,13 +4633,13 @@ var WebBrowser;
                     });
                 }
             };
-            var createWallet = document.createElement("button");
+            var createWallet = document.createElement("a");
             uploadFiles.appendChild(createWallet);
-            createWallet.textContent = "创建钱包";
+            createWallet.textContent = "创建钱包>>";
             createWallet.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Wallet);
             };
-            WebBrowser.CSSTool.createWallet_set(createWallet);
+            createWallet.className = "create-wallet";
             var wallet;
             var reader = new FileReader();
             reader.onload = (e) => {
@@ -4651,7 +4650,7 @@ var WebBrowser;
             file.onchange = (ev) => {
                 if (file.files.length > 0)
                     if (file.files[0].name.includes(".json")) {
-                        putIn.textContent = file.files[0].name;
+                        putIn.textContent = file.files[0].name.substr(0, 6) + "...*.json";
                         fileTip.textContent = '';
                         reader.readAsText(file.files[0]);
                     }

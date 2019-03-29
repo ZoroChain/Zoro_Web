@@ -490,7 +490,7 @@ a:hover, a:focus {
 }
 .login-bg{
     display: inline-block;
-    width: 340px;
+    width: 350px;
     background-color: #292c3b;
     border-radius: 25px;
     margin-top: 50px;
@@ -500,12 +500,12 @@ a:hover, a:focus {
     color: #FFFFFF;
     font-size: 18px;
     border-bottom: 1px solid black;
-    line-height: 60px;
+    line-height: 50px;
 }
 .upload-file{
     width: 300px;
     margin:0 auto;
-    padding: 40px 0 60px 0;
+    padding: 20px 0 60px 0;
 }
 .file-icon{
     padding: 5px;
@@ -517,5 +517,44 @@ a:hover, a:focus {
     cursor: pointer;
     position: relative;
     border:2px groove #c8aa74;
+}
+.file{
+    width:100%;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    top: 8px;
+}
+.file-tip{
+    color: red;
+    text-align: left;
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 0px;
+}
+.password{
+    width: 100%;
+    background-color: #CDCEE0;
+    height: 45px;
+    text-align: center;
+    border: 0;   
+    outline: 0; 
+}
+.btn-commit{
+    width: 100%;
+    background-color: #c8ab73;
+    padding: 14px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color:#000;
+    border: 0;
+    outline: 0; 
+}
+.create-wallet{
+    display: block;
+    outline:0;
+    color: #c8ab73;
+    padding-top: 15px;
+    font-size: 16px;
 }
 /* wallet end */
