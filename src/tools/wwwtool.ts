@@ -144,6 +144,15 @@ namespace WebBrowser {
 			return r as Block[];
 		}
 
+		static async getPageMessage(chainhash: string, hash: string)      
+		{
+			var str = WWW.makeRpcUrl("getpagemessage", chainhash, hash);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r;
+		}
+
 		static async getappchainblocksdesc(appchain:string ,size: number, page: number)      
 		{
 			var str = WWW.makeRpcUrl("getappchainblocksdesc", appchain ,size, page);
@@ -428,6 +437,14 @@ namespace WebBrowser {
 			var json = await result.json();
 			var r = json["result"];
 			return r[0];
+		}
+
+		static async api_getContractState(chainhash:string, nep5: string) { 
+			var str = WWW.makeRpcUrl("getcontractstatemessage", chainhash, nep5);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r;
 		}
 
 		static async api_getallnep5assetofaddress(nep5: string) {  

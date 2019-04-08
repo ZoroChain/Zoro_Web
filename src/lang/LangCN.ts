@@ -200,7 +200,14 @@ namespace WebBrowser
 	        nep5assets_ava: "资产全称",
 			nep5assets_pre: "总量",
 			nep5assets_val: "资产", 
-			nep5assets_id: "小数点后位数", 
+            nep5assets_id: "小数点后位数", 
+            
+            contract_title:"合约信息",			
+            contracthash:"哈希",
+            contractname:"名称",
+            contractauthor:"作者",
+            contractemail:"邮箱",
+            contractdescription:"描述",
 
             //nep5assetinfo
             nep5asset_title:"资产详情",

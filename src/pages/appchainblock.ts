@@ -43,7 +43,7 @@
 		
         private pageUtil: PageUtil;
         private txs: Tx[];
-        public ac:string = locationtool.getParam2();
+        public ac:string = locationtool.getParam();
         close(): void
         {
             this.div.hidden = true;
@@ -52,12 +52,9 @@
 
         start()
         {
-            this.getLangs()
+            this.getLangs()			
 
-
-			
-
-            this.ac = locationtool.getParam2();
+            this.ac = locationtool.getParam();
             //this.div.innerHTML = pages.block;
             this.queryBlock(this.ac, locationtool.getParam3() as number);
             let href = locationtool.getUrl() + "/asset/" + this.ac;

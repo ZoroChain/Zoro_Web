@@ -202,6 +202,13 @@ namespace WebBrowser
 			nep5assets_val: "Symbol",
 			nep5assets_id: "Decimals", 
 
+            contract_title:"Contract Information",			
+            contracthash:"Hash",
+            contractname:"Name",
+            contractauthor:"Author",
+            contractemail:"E-Mail",
+            contractdescription:"Description",
+
             //nep5assetinfo
             nep5asset_title:"Asset Information",
 		    nep5assetid: "Asset ID",

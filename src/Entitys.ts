@@ -94,9 +94,9 @@ namespace WebBrowser
     {
         static href_blocks()
         {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/blocks/" + appchain;
+                return locationtool.getUrl() +  "/blocks/appchain/" + appchain;
             }
             return locationtool.getUrl() + '/blocks';
 		}
@@ -104,35 +104,35 @@ namespace WebBrowser
 			return locationtool.getUrl() + '/appchains';
 		}
 		static href_appchaintransaction(appchain : string , appchaintransaction: string) {
-			return locationtool.getUrl() + '/appchaintransaction/' + appchain + '/' + appchaintransaction;
+			return locationtool.getUrl() + '/appchaintransaction/' + appchaintransaction + '/' + appchain;
 		}
 
 		
 		static href_appchainblock( appchain : string ,index: number) {         
-			return locationtool.getUrl() + '/appchainblock/' + appchain + '/' + index;
+			return locationtool.getUrl() + '/appchainblock/' + index + '/' + appchain;
 		}
 
 		static href_nep5info(nep5id: string) {   
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){      
-                return locationtool.getUrl() + '/nep5info/' + appchain + '/' + nep5id;
+                return locationtool.getUrl() + '/nep5info/' + nep5id + '/' + appchain;
             }
             return locationtool.getUrl() + '/nep5info/' + nep5id;
 		}
 		
         static href_transactions()
         {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/transactions/" + appchain;
+                return locationtool.getUrl() +  "/transactions/appchain/" + appchain;
             }
             return locationtool.getUrl() + '/transactions';
         }
         static href_addresses()
         {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/addresses/" + appchain;
+                return locationtool.getUrl() +  "/addresses/appchain/" + appchain;
             }
             return locationtool.getUrl() +  '/addresses'
         }
@@ -145,9 +145,9 @@ namespace WebBrowser
         }
         static href_block( block: number)
         {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/block/" + appchain + "/"+ block;
+                return locationtool.getUrl() +  "/block/" + block + "/"+ appchain;
             }
             return locationtool.getUrl() +  "/block/" + block;
         }
@@ -156,17 +156,17 @@ namespace WebBrowser
             return locationtool.getUrl() +  '/gui'
         }
 		static href_blockh(block: string) {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/block/" + appchain + "/"+ block;
+                return locationtool.getUrl() +  "/block/" + block + "/"+ appchain;
             }
 			return locationtool.getUrl() + '/block/' + block;
 		}
         static href_transaction( tx: string )
         {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/transaction/" + appchain + "/" + tx;
+                return locationtool.getUrl() +  "/transaction/" + tx + "/" + appchain;
             }else{
                 return locationtool.getUrl() +  "/transaction/" + tx;
             }            
@@ -176,9 +176,9 @@ namespace WebBrowser
 		}
         static href_address( addr: string )
         {
-            var appchain = locationtool.getParam2();                       
+            var appchain = locationtool.getParam3();                       
             if (appchain && appchain.length == 40){
-                return locationtool.getUrl() +  "/address/" + appchain + "/" + addr;
+                return locationtool.getUrl() +  "/address/" + addr + "/" + appchain;
             }else{
                 return locationtool.getUrl() +  "/address/" + addr;
             }           
@@ -200,6 +200,10 @@ namespace WebBrowser
 		}
         static href_nep5(nep5) {
             return locationtool.getUrl() + '/nep5/' + nep5
+        }
+
+        static href_contractstate(contract){
+            return locationtool.getUrl() + '/contract/' + contract;
         }
     }
 

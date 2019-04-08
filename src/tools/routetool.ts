@@ -26,6 +26,7 @@ namespace WebBrowser
 			this.pagelist.push(this.app.appchainblock);
             this.pagelist.push(this.app.appchaintransaction);
             this.pagelist.push(this.app.guiinfo);
+            this.pagelist.push(this.app.contractstate);
 
             this.closePages();
 
@@ -101,9 +102,10 @@ namespace WebBrowser
 				case "appchaintransaction":
 					this.app.navbar.assetBtn.classList.add("active");
                     return this.app.appchaintransaction;
-                    case "gui":
+                case "gui":
                     this.app.navbar.guiBtn.classList.add( "active" );
                     return this.app.guiinfo;
+                
                 // case "nnsevent":
                 //     this.app.navbar.nnsBtn.classList.add("active");
                 //     return this.app.nnses;
@@ -121,6 +123,8 @@ namespace WebBrowser
                     return this.app.assetinfo;
                 case "nep5":
                     return this.app.nep5;
+                case "contract":
+                    return this.app.contractstate;
                 default:
                     return this.app.notfound;
             }

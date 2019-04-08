@@ -57,9 +57,9 @@ namespace WebBrowser {
 			this.getLangs()
 
 			//this.div.innerHTML = pages.transaction;
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-				this.updateTxInfo(locationtool.getParam3()); 
+				this.updateTxInfo(locationtool.getParam()); 
 				var href = locationtool.getUrl() + "/transactions/" + appchain;
 			}else{
 				this.updateTxInfo(locationtool.getParam());
@@ -74,7 +74,7 @@ namespace WebBrowser {
 			this.footer.hidden = false;
 		}
 		public async updateTxInfo(txid: string) {
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var txInfo: Tx = await WWW.getappchainrawtransaction(appchain, txid);
 			}else{
@@ -97,7 +97,7 @@ namespace WebBrowser {
 			$("#transaction-time").text(time);
 
 			$("#txidscriptmethod").empty();
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var txidMethod = await WWW.api_getScriptMethod(txInfo.txid, appchain);
 			}else{
@@ -107,14 +107,14 @@ namespace WebBrowser {
 			if (txidMethod) {
 				$(".txidmethod-warp").show();
 				txidMethod.forEach((item) => {
-					this.loadTxidMethodView(item.calltype, item.method, item.contract);
+					this.loadTxidMethodView(item.calltype, item.method, item.contract, item.name);
 				})
 			} else {
 				$(".txidmethod-warp").hide();
 			}
 
 			$("#txidnep5").empty();
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var txidNep = await WWW.api_getappchainnep5transferbytxid(appchain, txInfo.txid);
 			}else{
@@ -131,13 +131,25 @@ namespace WebBrowser {
 			}
 		}
 
-		async loadTxidMethodView(calltype: string, method: string, contract: string) {
-			let html = `
-                    <tr>
-                    <td>` + calltype + `</td>
-                    <td>` + method + `</td>
-                    <td>` + contract + `</td>
-                    </tr>`
+		async loadTxidMethodView(calltype: string, method: string, contract: string, name:string) {
+			var html = "";
+			if (contract.length > 39) {
+				let href = Url.href_contractstate(contract);
+				html = `
+						<tr>
+						<td>` + calltype + `</td>
+						<td>` + method + `</td>
+						<td><a href="`+ href + `" target="_self">` + name + `</td>
+						</tr>`
+			}else{
+				html = `
+						<tr>
+						<td>` + calltype + `</td>
+						<td>` + method + `</td>
+						<td>` + contract + `</td>
+						</tr>`
+			}
+			
 			$("#txidscriptmethod").append(html);
 		}
 

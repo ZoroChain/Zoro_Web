@@ -34,7 +34,7 @@ namespace WebBrowser
         {
             this.getLangs()
             
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
                 var count = await WWW.api_getappchainHeight(appchain);
             }else{
@@ -68,7 +68,7 @@ namespace WebBrowser
             this.footer.hidden = true;
         }
         public async updateBlocks(pageUtil: PageUtil) {
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
                 var blocks: Block[] = await WWW.getappchainblocksdesc( appchain, pageUtil.pageSize, pageUtil.currentPage - 1 ); //limit this to the 15 by 15 splitting
             }else{

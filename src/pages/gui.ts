@@ -3,7 +3,7 @@
 /// <reference path="../tools/wwwtool.ts"/> 
 /// <reference path="../gui/Base.ts"/>
 /// <reference path="../gui/Login.ts"/>
-/// <reference path="../gui/Wallet.ts"/>
+/// <reference path="../gui/WalletView.ts"/>
 /// <reference path="../gui/MainView.ts"/>
 /// <reference path="../gui/GUIRoute.ts"/>
 namespace WebBrowser
@@ -22,7 +22,6 @@ namespace WebBrowser
 
         initPage(){
             GUI_Route.instance.pushUI(PageName.Login, new GUI_Login(this.div));
-            GUI_Route.instance.pushUI(PageName.Wallet, new GUI_Wallet(this.div));
             GUI_Route.instance.pushUI(PageName.MainView, new GUI_Main(this.div));
         }
 

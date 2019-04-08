@@ -38,7 +38,7 @@
          * addrlistInit
          */
 		public async addrlistInit() {
-			var appchain = locationtool.getParam2();                       
+			var appchain = locationtool.getParam3();                       
             if (appchain && appchain.length == 40){
 				var addrlist: Addr[] = await WWW.getappchainaddrs(appchain, this.pageUtil.pageSize, this.pageUtil.currentPage - 1);
 			}else{
@@ -83,7 +83,7 @@
 
 			this.div.hidden = false;
 
-			var appchain = locationtool.getParam2();                       
+			var appchain = locationtool.getParam();                       
             if (appchain && appchain.length == 40){
 				var prom = await WWW.getappchainaddrcount(appchain);
 			}else{

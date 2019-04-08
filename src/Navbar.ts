@@ -133,16 +133,16 @@ namespace WebBrowser
         {
             window.location.href =locationtool.getUrl() + page;
         }
-        jump()
+        async jump()
         {           
-            let appchain = locationtool.getParam2();
+            let appchain = locationtool.getParam3();
             let search: string = this.searchText.value;
             search = search.trim();
             if (search) {
                 if (search.length == 34) {
                     if (Neotool.verifyPublicKey(search)) {                        
                         if (appchain && appchain.length == 40){
-                            window.open(locationtool.getUrl() + '/address/' + appchain + "/" +search);
+                            window.open(locationtool.getUrl() + '/address/' + search + "/" + appchain);
                         }else{
                             window.open(locationtool.getUrl() + '/address/' + search);
                         }                        
@@ -156,21 +156,37 @@ namespace WebBrowser
                     search = search.replace('0x', '');
                     if (search.length == 64) {
                         if (appchain && appchain.length == 40){
-                            window.open(locationtool.getUrl() + '/transaction/' + appchain + "/" +search);
+                            window.open(locationtool.getUrl() + '/transaction/' + search + "/" + appchain);
                         }else{
                             window.open(locationtool.getUrl() + '/transaction/' + search);
                         }
                     }
-                    else if (search.length == 40) {
+                    else if (search.length == 40 || search.length == 42) {                       
                         if (appchain && appchain.length == 40){
-                            window.open(locationtool.getUrl() + '/nep5/' + appchain + "/" +search);
+                            var page = await WWW.getPageMessage(appchain, search);
+                            switch(page[0]["page"]){
+                                case "nep5asset":
+                                    window.open(locationtool.getUrl() + '/nep5info/' + search + "/" + appchain);
+                                break;
+                                case "contract":
+                                    window.open(locationtool.getUrl() + '/contract/' + search + "/" + appchain);
+                                break;
+                            }                           
                         }else{
-                            window.open(locationtool.getUrl() + '/nep5/' + search);
+                            var page = await WWW.getPageMessage(AppChainTool.RootChain, search);
+                            switch(page[0]["page"]){
+                                case "nep5asset":
+                                    window.open(locationtool.getUrl() + '/nep5info/' + search);
+                                break;
+                                case "contract":
+                                    window.open(locationtool.getUrl() + '/contract/' + search);
+                                break;
+                            }                                 
                         }
                     }
                     else if (!isNaN(Number(search))) {
                         if (appchain && appchain.length == 40){
-                            window.open(locationtool.getUrl() + '/block/' + appchain + "/" +search);
+                            window.open(locationtool.getUrl() + '/block/' + search + "/" + appchain);
                         }else{
                             window.open(locationtool.getUrl() + '/block/' + search);
                         }
@@ -180,7 +196,7 @@ namespace WebBrowser
                         if (length) {
                             let data = this.searchList.children[this.currentLine-1].getAttribute("data");
                             if (appchain && appchain.length == 40){
-                                window.open(locationtool.getUrl() + '/asset/' + appchain + "/" +search);
+                                window.open(locationtool.getUrl() + '/asset/' + search + "/" + appchain);
                             }else{
                                 window.open(locationtool.getUrl() + '/asset/' + data);
                             }

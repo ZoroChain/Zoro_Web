@@ -18,6 +18,7 @@
 /// <reference path="./pages/appchaintransaction.ts"/>
 /// <reference path="./pages/nep5.ts"/>
 /// <reference path="./pages/nep5info.ts"/>
+/// <reference path="./pages/contractstate.ts" />
 
 /// <reference path="./pages/404.ts"/>
 /// <reference path="./tools/locationtool.ts" />
@@ -54,6 +55,7 @@ namespace WebBrowser
         indexpage: Index
         assetinfo: AssetInfo
         guiinfo: GUI
+        contractstate:ContractStateInfo
 
         notfound: Notfound
         nep5: Nep5page
@@ -95,7 +97,8 @@ namespace WebBrowser
 			this.assetinfo = new AssetInfo(this);
 			this.nep5info = new Nep5Info(this);
 			this.appchainblock = new ACBlock(this);
-			this.appchaintransaction = new ACTransaction(this);
+            this.appchaintransaction = new ACTransaction(this);
+            this.contractstate = new ContractStateInfo(this);
 
             this.notfound = new Notfound(this);
             this.nep5 = new Nep5page(this);

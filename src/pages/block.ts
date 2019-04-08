@@ -46,9 +46,9 @@
         start()
         {
             this.getLangs()
-            var appchain = locationtool.getParam2();                       
+            var appchain = locationtool.getParam3();                       
             if (appchain && appchain.length == 40){
-                this.queryBlock(locationtool.getParam3());
+                this.queryBlock(locationtool.getParam());
                 var href = locationtool.getUrl() + "/blocks/" + appchain;
             }else{
                 this.queryBlock(locationtool.getParam());
@@ -83,7 +83,7 @@
         {
             let ajax: Ajax = new Ajax();
             let blocks: Block[] = null;
-            var appchain = locationtool.getParam2();
+            var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
                 if (index.indexOf("0x") < 0){
                     blocks = await WWW.getacblock(appchain, index);

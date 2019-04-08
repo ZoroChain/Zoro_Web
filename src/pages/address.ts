@@ -48,9 +48,9 @@ namespace WebBrowser {
 		async start() {
 			this.getLangs()
 
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
-				var address = locationtool.getParam3();
+				var address = locationtool.getParam();
 				var href = locationtool.getUrl() + "/addresses/" + appchain;
 				var addrMsg = await WWW.api_getappchainaddrMsg(appchain, address);
 				var utxos = await WWW.api_getappchainUTXOCount(appchain, address);
@@ -216,7 +216,7 @@ namespace WebBrowser {
 		//更新交易记录
 		public async updateAddrTrasctions(address: string, pageUtil: PageUtil) {			
 			//分页查询交易记录
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var txlist: TransOfAddress[] = await WWW.getappchainaddresstxs(appchain, address, pageUtil.pageSize, pageUtil.currentPage - 1);
 			}else{
@@ -266,7 +266,7 @@ namespace WebBrowser {
 		public async updateAddrUTXO(address: string, pageUtil: PageUtil) {
 			$("#add-utxos").empty();
 			//分页查询交易记录
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var utxolist: Utxo[] = await WWW.api_getappchainUTXO(appchain, address, pageUtil.pageSize, pageUtil.currentPage);
 			}else{

@@ -45,7 +45,7 @@ namespace WebBrowser {
 		//更新交易记录
 		public async updateTransactions(pageUtil: PageUtil, txType: string) {			
 			//分页查询交易记录
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var txs: Tx[] = await WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
 			}else{
@@ -85,7 +85,7 @@ namespace WebBrowser {
 			this.getLangs()
 
 			let type = "";
-			var appchain = locationtool.getParam2();
+			var appchain = locationtool.getParam3();
             if (appchain && appchain.length == 40){
 				var txCount = await WWW.getappchaintxcount(appchain);
 			}else{

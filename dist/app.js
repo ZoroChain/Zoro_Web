@@ -81,9 +81,9 @@ var WebBrowser;
     WebBrowser.PageUtil = PageUtil;
     class Url {
         static href_blocks() {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/blocks/" + appchain;
+                return WebBrowser.locationtool.getUrl() + "/blocks/appchain/" + appchain;
             }
             return WebBrowser.locationtool.getUrl() + '/blocks';
         }
@@ -91,29 +91,29 @@ var WebBrowser;
             return WebBrowser.locationtool.getUrl() + '/appchains';
         }
         static href_appchaintransaction(appchain, appchaintransaction) {
-            return WebBrowser.locationtool.getUrl() + '/appchaintransaction/' + appchain + '/' + appchaintransaction;
+            return WebBrowser.locationtool.getUrl() + '/appchaintransaction/' + appchaintransaction + '/' + appchain;
         }
         static href_appchainblock(appchain, index) {
-            return WebBrowser.locationtool.getUrl() + '/appchainblock/' + appchain + '/' + index;
+            return WebBrowser.locationtool.getUrl() + '/appchainblock/' + index + '/' + appchain;
         }
         static href_nep5info(nep5id) {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + '/nep5info/' + appchain + '/' + nep5id;
+                return WebBrowser.locationtool.getUrl() + '/nep5info/' + nep5id + '/' + appchain;
             }
             return WebBrowser.locationtool.getUrl() + '/nep5info/' + nep5id;
         }
         static href_transactions() {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/transactions/" + appchain;
+                return WebBrowser.locationtool.getUrl() + "/transactions/appchain/" + appchain;
             }
             return WebBrowser.locationtool.getUrl() + '/transactions';
         }
         static href_addresses() {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/addresses/" + appchain;
+                return WebBrowser.locationtool.getUrl() + "/addresses/appchain/" + appchain;
             }
             return WebBrowser.locationtool.getUrl() + '/addresses';
         }
@@ -124,9 +124,9 @@ var WebBrowser;
             return WebBrowser.locationtool.getUrl() + '/nnsevent';
         }
         static href_block(block) {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/block/" + appchain + "/" + block;
+                return WebBrowser.locationtool.getUrl() + "/block/" + block + "/" + appchain;
             }
             return WebBrowser.locationtool.getUrl() + "/block/" + block;
         }
@@ -134,16 +134,16 @@ var WebBrowser;
             return WebBrowser.locationtool.getUrl() + '/gui';
         }
         static href_blockh(block) {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/block/" + appchain + "/" + block;
+                return WebBrowser.locationtool.getUrl() + "/block/" + block + "/" + appchain;
             }
             return WebBrowser.locationtool.getUrl() + '/block/' + block;
         }
         static href_transaction(tx) {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/transaction/" + appchain + "/" + tx;
+                return WebBrowser.locationtool.getUrl() + "/transaction/" + tx + "/" + appchain;
             }
             else {
                 return WebBrowser.locationtool.getUrl() + "/transaction/" + tx;
@@ -153,9 +153,9 @@ var WebBrowser;
             return WebBrowser.locationtool.getUrl() + "/asset/" + tx;
         }
         static href_address(addr) {
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                return WebBrowser.locationtool.getUrl() + "/address/" + appchain + "/" + addr;
+                return WebBrowser.locationtool.getUrl() + "/address/" + addr + "/" + appchain;
             }
             else {
                 return WebBrowser.locationtool.getUrl() + "/address/" + addr;
@@ -175,6 +175,9 @@ var WebBrowser;
         }
         static href_nep5(nep5) {
             return WebBrowser.locationtool.getUrl() + '/nep5/' + nep5;
+        }
+        static href_contractstate(contract) {
+            return WebBrowser.locationtool.getUrl() + '/contract/' + contract;
         }
     }
     WebBrowser.Url = Url;
@@ -497,73 +500,91 @@ var WebBrowser;
             window.location.href = WebBrowser.locationtool.getUrl() + page;
         }
         jump() {
-            let appchain = WebBrowser.locationtool.getParam2();
-            let search = this.searchText.value;
-            search = search.trim();
-            if (search) {
-                if (search.length == 34) {
-                    if (WebBrowser.Neotool.verifyPublicKey(search)) {
-                        if (appchain && appchain.length == 40) {
-                            window.open(WebBrowser.locationtool.getUrl() + '/address/' + appchain + "/" + search);
-                        }
-                        else {
-                            window.open(WebBrowser.locationtool.getUrl() + '/address/' + search);
-                        }
-                    }
-                    else {
-                        $("#errContent").text(this.app.langmgr.get('nav_errContent'));
-                        $('#errMsg').modal('show');
-                        return false;
-                    }
-                    return;
-                }
-                else {
-                    search = search.replace('0x', '');
-                    if (search.length == 64) {
-                        if (appchain && appchain.length == 40) {
-                            window.open(WebBrowser.locationtool.getUrl() + '/transaction/' + appchain + "/" + search);
-                        }
-                        else {
-                            window.open(WebBrowser.locationtool.getUrl() + '/transaction/' + search);
-                        }
-                    }
-                    else if (search.length == 40) {
-                        if (appchain && appchain.length == 40) {
-                            window.open(WebBrowser.locationtool.getUrl() + '/nep5/' + appchain + "/" + search);
-                        }
-                        else {
-                            window.open(WebBrowser.locationtool.getUrl() + '/nep5/' + search);
-                        }
-                    }
-                    else if (!isNaN(Number(search))) {
-                        if (appchain && appchain.length == 40) {
-                            window.open(WebBrowser.locationtool.getUrl() + '/block/' + appchain + "/" + search);
-                        }
-                        else {
-                            window.open(WebBrowser.locationtool.getUrl() + '/block/' + search);
-                        }
-                    }
-                    else if (search.length > 64) {
-                        let length = this.searchList.children.length;
-                        if (length) {
-                            let data = this.searchList.children[this.currentLine - 1].getAttribute("data");
+            return __awaiter(this, void 0, void 0, function* () {
+                let appchain = WebBrowser.locationtool.getParam3();
+                let search = this.searchText.value;
+                search = search.trim();
+                if (search) {
+                    if (search.length == 34) {
+                        if (WebBrowser.Neotool.verifyPublicKey(search)) {
                             if (appchain && appchain.length == 40) {
-                                window.open(WebBrowser.locationtool.getUrl() + '/asset/' + appchain + "/" + search);
+                                window.open(WebBrowser.locationtool.getUrl() + '/address/' + search + "/" + appchain);
                             }
                             else {
-                                window.open(WebBrowser.locationtool.getUrl() + '/asset/' + data);
+                                window.open(WebBrowser.locationtool.getUrl() + '/address/' + search);
                             }
-                            $("#seach_list").empty();
                         }
+                        else {
+                            $("#errContent").text(this.app.langmgr.get('nav_errContent'));
+                            $('#errMsg').modal('show');
+                            return false;
+                        }
+                        return;
                     }
                     else {
-                        return false;
+                        search = search.replace('0x', '');
+                        if (search.length == 64) {
+                            if (appchain && appchain.length == 40) {
+                                window.open(WebBrowser.locationtool.getUrl() + '/transaction/' + search + "/" + appchain);
+                            }
+                            else {
+                                window.open(WebBrowser.locationtool.getUrl() + '/transaction/' + search);
+                            }
+                        }
+                        else if (search.length == 40 || search.length == 42) {
+                            if (appchain && appchain.length == 40) {
+                                var page = yield WebBrowser.WWW.getPageMessage(appchain, search);
+                                switch (page[0]["page"]) {
+                                    case "nep5asset":
+                                        window.open(WebBrowser.locationtool.getUrl() + '/nep5info/' + search + "/" + appchain);
+                                        break;
+                                    case "contract":
+                                        window.open(WebBrowser.locationtool.getUrl() + '/contract/' + search + "/" + appchain);
+                                        break;
+                                }
+                            }
+                            else {
+                                var page = yield WebBrowser.WWW.getPageMessage(WebBrowser.AppChainTool.RootChain, search);
+                                switch (page[0]["page"]) {
+                                    case "nep5asset":
+                                        window.open(WebBrowser.locationtool.getUrl() + '/nep5info/' + search);
+                                        break;
+                                    case "contract":
+                                        window.open(WebBrowser.locationtool.getUrl() + '/contract/' + search);
+                                        break;
+                                }
+                            }
+                        }
+                        else if (!isNaN(Number(search))) {
+                            if (appchain && appchain.length == 40) {
+                                window.open(WebBrowser.locationtool.getUrl() + '/block/' + search + "/" + appchain);
+                            }
+                            else {
+                                window.open(WebBrowser.locationtool.getUrl() + '/block/' + search);
+                            }
+                        }
+                        else if (search.length > 64) {
+                            let length = this.searchList.children.length;
+                            if (length) {
+                                let data = this.searchList.children[this.currentLine - 1].getAttribute("data");
+                                if (appchain && appchain.length == 40) {
+                                    window.open(WebBrowser.locationtool.getUrl() + '/asset/' + search + "/" + appchain);
+                                }
+                                else {
+                                    window.open(WebBrowser.locationtool.getUrl() + '/asset/' + data);
+                                }
+                                $("#seach_list").empty();
+                            }
+                        }
+                        else {
+                            return false;
+                        }
                     }
                 }
-            }
-            else {
-                return false;
-            }
+                else {
+                    return false;
+                }
+            });
         }
         fuzzyseach() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -1266,9 +1287,9 @@ var WebBrowser;
         }
         start() {
             this.getLangs();
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                this.queryBlock(WebBrowser.locationtool.getParam3());
+                this.queryBlock(WebBrowser.locationtool.getParam());
                 var href = WebBrowser.locationtool.getUrl() + "/blocks/" + appchain;
             }
             else {
@@ -1303,7 +1324,7 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 let ajax = new WebBrowser.Ajax();
                 let blocks = null;
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     if (index.indexOf("0x") < 0) {
                         blocks = yield WebBrowser.WWW.getacblock(appchain, index);
@@ -1405,7 +1426,7 @@ var WebBrowser;
         constructor(app) {
             this.div = document.getElementById("acblock-info");
             this.footer = document.getElementById('footer-box');
-            this.ac = WebBrowser.locationtool.getParam2();
+            this.ac = WebBrowser.locationtool.getParam();
             this.app = app;
         }
         getLangs() {
@@ -1433,7 +1454,7 @@ var WebBrowser;
         }
         start() {
             this.getLangs();
-            this.ac = WebBrowser.locationtool.getParam2();
+            this.ac = WebBrowser.locationtool.getParam();
             //this.div.innerHTML = pages.block;
             this.queryBlock(this.ac, WebBrowser.locationtool.getParam3());
             let href = WebBrowser.locationtool.getUrl() + "/asset/" + this.ac;
@@ -1565,7 +1586,7 @@ var WebBrowser;
         start() {
             return __awaiter(this, void 0, void 0, function* () {
                 this.getLangs();
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var count = yield WebBrowser.WWW.api_getappchainHeight(appchain);
                 }
@@ -1602,7 +1623,7 @@ var WebBrowser;
         }
         updateBlocks(pageUtil) {
             return __awaiter(this, void 0, void 0, function* () {
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var blocks = yield WebBrowser.WWW.getappchainblocksdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1); //limit this to the 15 by 15 splitting
                 }
@@ -1783,6 +1804,15 @@ var WebBrowser;
         static getblocksdesc(size, page) {
             return __awaiter(this, void 0, void 0, function* () {
                 var str = WWW.makeRpcUrl("getblocksdesc", size, page);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r;
+            });
+        }
+        static getPageMessage(chainhash, hash) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getpagemessage", chainhash, hash);
                 var result = yield fetch(str, { "method": "get" });
                 var json = yield result.json();
                 var r = json["result"];
@@ -2095,6 +2125,15 @@ var WebBrowser;
                 var json = yield result.json();
                 var r = json["result"];
                 return r[0];
+            });
+        }
+        static api_getContractState(chainhash, nep5) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getcontractstatemessage", chainhash, nep5);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r;
             });
         }
         static api_getallnep5assetofaddress(nep5) {
@@ -2704,9 +2743,9 @@ var WebBrowser;
         start() {
             return __awaiter(this, void 0, void 0, function* () {
                 this.getLangs();
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
-                    var address = WebBrowser.locationtool.getParam3();
+                    var address = WebBrowser.locationtool.getParam();
                     var href = WebBrowser.locationtool.getUrl() + "/addresses/" + appchain;
                     var addrMsg = yield WebBrowser.WWW.api_getappchainaddrMsg(appchain, address);
                     var utxos = yield WebBrowser.WWW.api_getappchainUTXOCount(appchain, address);
@@ -2864,7 +2903,7 @@ var WebBrowser;
         updateAddrTrasctions(address, pageUtil) {
             return __awaiter(this, void 0, void 0, function* () {
                 //分页查询交易记录
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var txlist = yield WebBrowser.WWW.getappchainaddresstxs(appchain, address, pageUtil.pageSize, pageUtil.currentPage - 1);
                 }
@@ -2918,7 +2957,7 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 $("#add-utxos").empty();
                 //分页查询交易记录
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var utxolist = yield WebBrowser.WWW.api_getappchainUTXO(appchain, address, pageUtil.pageSize, pageUtil.currentPage);
                 }
@@ -3008,7 +3047,7 @@ var WebBrowser;
          */
         addrlistInit() {
             return __awaiter(this, void 0, void 0, function* () {
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var addrlist = yield WebBrowser.WWW.getappchainaddrs(appchain, this.pageUtil.pageSize, this.pageUtil.currentPage - 1);
                 }
@@ -3052,7 +3091,7 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 this.getLangs();
                 this.div.hidden = false;
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam();
                 if (appchain && appchain.length == 40) {
                     var prom = yield WebBrowser.WWW.getappchainaddrcount(appchain);
                 }
@@ -4122,6 +4161,474 @@ var WebBrowser;
         PageName[PageName["TxMessage"] = 8] = "TxMessage";
     })(PageName = WebBrowser.PageName || (WebBrowser.PageName = {}));
 })(WebBrowser || (WebBrowser = {}));
+/// <reference path="./GUIRoute.ts"/>
+/// <reference path="../../lib/neo-ts.d.ts"/>
+var WebBrowser;
+/// <reference path="./GUIRoute.ts"/>
+/// <reference path="../../lib/neo-ts.d.ts"/>
+(function (WebBrowser) {
+    class LoginView {
+        constructor() {
+        }
+        static show(div) {
+            if (div.children.length > 1)
+                div.removeChild(div.lastChild);
+            var loginbackground = document.createElement('div');
+            div.appendChild(loginbackground);
+            loginbackground.className = "login-bg";
+            var name = document.createElement('h3');
+            name.textContent = "登陆你的钱包";
+            loginbackground.appendChild(name);
+            name.className = "login-title";
+            var uploadFiles = document.createElement("div"); //外层div
+            loginbackground.appendChild(uploadFiles);
+            uploadFiles.className = "upload-file";
+            //feile  外层
+            var firstFile = document.createElement("div");
+            var putIn = document.createElement("div");
+            putIn.textContent = "请选择钱包文件";
+            firstFile.appendChild(putIn);
+            putIn.className = "putin";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/file.png";
+            putIn.appendChild(fileIcon);
+            fileIcon.className = "file-icon";
+            uploadFiles.appendChild(firstFile);
+            firstFile.className = "first-file";
+            //将file添加到feile  外层里
+            var file = document.createElement("input");
+            firstFile.appendChild(file);
+            file.type = "file";
+            file.className = "file";
+            //提示添加file上传的文字
+            var fileTip = document.createElement("p");
+            fileTip.textContent = '*请上传钱包文件';
+            uploadFiles.appendChild(fileTip);
+            fileTip.className = "file-tip";
+            //密码的
+            var password = document.createElement("input");
+            uploadFiles.appendChild(password);
+            password.type = "password";
+            password.placeholder = "请输入密码";
+            password.className = "password";
+            $(password).on("input", function () {
+                if (password.value.length) {
+                    passwordTip.textContent = '';
+                }
+                else {
+                    passwordTip.textContent = '*密码输入有误';
+                }
+            });
+            //密码提示的
+            var passwordTip = document.createElement("p");
+            passwordTip.textContent = '*密码输入有误';
+            uploadFiles.appendChild(passwordTip);
+            passwordTip.className = "file-tip";
+            var btn = document.createElement("button");
+            uploadFiles.appendChild(btn);
+            btn.textContent = "登录";
+            btn.className = "btn-commit";
+            btn.onclick = () => {
+                if (wallet.accounts.length > 0 && wallet.accounts[0].nep2key != null) {
+                    let nepkey = wallet.accounts[0].nep2key;
+                    var s = wallet.scrypt;
+                    ThinNeo.Helper.GetPrivateKeyFromNep2(nepkey, password.value, s.N, s.r, s.p, (info, result) => {
+                        if (info == "finish") {
+                            WebBrowser.GUITool.prikey = result;
+                            var wif = ThinNeo.Helper.GetWifFromPrivateKey(WebBrowser.GUITool.prikey);
+                            WebBrowser.GUITool.pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(WebBrowser.GUITool.prikey);
+                            WebBrowser.GUITool.address = ThinNeo.Helper.GetAddressFromPublicKey(WebBrowser.GUITool.pubkey);
+                            localStorage.setItem("prikey", WebBrowser.GUITool.prikey);
+                            localStorage.setItem("address", WebBrowser.GUITool.address);
+                            WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
+                        }
+                    });
+                }
+            };
+            var createWallet = document.createElement("a");
+            uploadFiles.appendChild(createWallet);
+            createWallet.textContent = "创建钱包>>";
+            createWallet.onclick = () => {
+                WebBrowser.WalletView.show(div);
+            };
+            createWallet.className = "create-wallet";
+            var wallet;
+            var reader = new FileReader();
+            reader.onload = (e) => {
+                var walletstr = reader.result;
+                wallet = new ThinNeo.nep6wallet();
+                wallet.fromJsonStr(walletstr);
+            };
+            file.onchange = (ev) => {
+                if (file.files.length > 0)
+                    if (file.files[0].name.includes(".json")) {
+                        putIn.textContent = file.files[0].name.substr(0, 6) + "...*.json";
+                        fileTip.textContent = '';
+                        reader.readAsText(file.files[0]);
+                    }
+            };
+        }
+    }
+    WebBrowser.LoginView = LoginView;
+})(WebBrowser || (WebBrowser = {}));
+/// <reference path="../tools/wwwtool.ts"/>
+/// <reference path="../tools/AppChainTool.ts"/>
+/// <reference path="../../lib/neo-ts.d.ts"/>
+var WebBrowser;
+/// <reference path="../tools/wwwtool.ts"/>
+/// <reference path="../tools/AppChainTool.ts"/>
+/// <reference path="../../lib/neo-ts.d.ts"/>
+(function (WebBrowser) {
+    class Test {
+        static getTransaction(s) {
+            var tran = new ThinNeo.ZoroTransaction();
+            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+            tran.extdata = new ThinNeo.ZoroInvokeTransData();
+            var steam = new Neo.IO.MemoryStream(s.hexToBytes());
+            var buffer = new Neo.IO.BinaryReader(steam);
+            tran.Deserialize(buffer);
+            console.log(tran.GetHash().reverse().toHexString());
+        }
+        static ZoroTransfer() {
+            return __awaiter(this, void 0, void 0, function* () {
+                var bcp = "0000000000000000000000000000000000000001";
+                var chainHash = "";
+                var wif = "L4ooZWvkj6QM9AjPREmF2SZZFYgEFAxWPzYJY6jdr4XJNx62Smbf";
+                var targetwif = "L17Cq1FEbZJ8bc8Y8HcqVCgxsNpWY6LHDoau9DBD98m8vtGcVpuQ";
+                var prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
+                var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
+                // var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
+                // var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
+                //address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
+                var sb = new ThinNeo.ScriptBuilder();
+                var a = [];
+                a.push("(hex160)" + bcp);
+                //a.push("(hex160)" + address.reverse().toHexString());
+                a.push("(addr)AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
+                sb.EmitParamJson(a);
+                // sb.EmitPushBytes(address);
+                // sb.EmitPushBytes(this.getUint160(bcp));           
+                sb.EmitPushString("BalanceOf");
+                sb.EmitSysCall("Zoro.NativeNEP5.Call");
+                var data = sb.ToArray();
+                var scriptPublish = data.toHexString();
+                var array = [];
+                array.push(chainHash);
+                array.push(scriptPublish);
+                var postdata = WebBrowser.WWW.makeZoroRpcPostBody("invokescript", array);
+                var result = yield fetch(WebBrowser.WWW.api, { "method": "post", "body": JSON.stringify(postdata) });
+                var json = yield result.json();
+                alert(JSON.stringify(json));
+            });
+        }
+        static Transfer() {
+            return __awaiter(this, void 0, void 0, function* () {
+                var bcp = "0000000000000000000000000000000000000001";
+                var chainHash = "";
+                var wif = "L4ooZWvkj6QM9AjPREmF2SZZFYgEFAxWPzYJY6jdr4XJNx62Smbf";
+                var targetwif = "L17Cq1FEbZJ8bc8Y8HcqVCgxsNpWY6LHDoau9DBD98m8vtGcVpuQ";
+                let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
+                var targetScriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(targetwif)));
+                var sb = new ThinNeo.ScriptBuilder();
+                sb.EmitPushBytes(this.getUint160(bcp));
+                sb.EmitPushString("Decimals");
+                sb.EmitSysCall("Zoro.NativeNEP5.Call");
+                var data = sb.ToArray();
+                var scriptPublish = data.toHexString();
+                var array = [];
+                array.push(chainHash);
+                array.push(scriptPublish);
+                var json = yield WebBrowser.WWW.rpc_invokeScript(array);
+                var decimals = parseInt(json["stack"][0]["value"]);
+                var value = 1;
+                value = 1 * Math.pow(10, decimals);
+                // sb = new ThinNeo.ScriptBuilder();
+                // sb.EmitPushNumber(new Neo.BigInteger(value));
+                // sb.EmitPushBytes(ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp"));
+                // //sb.EmitPushBytes(targetScriptHash);
+                // sb.EmitPushBytes(scriptHash);           
+                // sb.EmitPushBytes(this.getUint160(bcp));
+                // sb.EmitPushString("Transfer");
+                // sb.EmitSysCall("Zoro.NativeNEP5.Call");
+                sb = new ThinNeo.ScriptBuilder();
+                array = [];
+                array.push("(addr)AcQLYjGbQU2bEQ8RKFXUcf8XvromfUQodq");
+                array.push("(addr)AbN2K2trYzgx8WMg2H7U7JHH6RQVzz2fnx");
+                array.push("(bytes)f8c86f9cfaade7d2863403b706497caaba47f633598fd684cf71dc1546a87e02");
+                sb.EmitParamJson(array);
+                sb.EmitPushString("exchange");
+                sb.EmitAppCall("7e465b65c8ba9bd255ba93947732502e30985007".hexToBytes().reverse());
+                scriptPublish = sb.ToArray().toHexString();
+                array = [];
+                array.push(chainHash);
+                array.push(scriptPublish);
+                this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.One);
+            });
+        }
+        static makeTransaction(script, wif, gasPrice) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var chainHash = "";
+                var rawdata = this.getTransactionString(script, wif, Neo.Fixed8.Zero, Neo.Fixed8.One);
+                this.getTransaction(rawdata);
+                return;
+                var postRawArray = [];
+                postRawArray.push(chainHash);
+                postRawArray.push(rawdata);
+                var gaspostdata = WebBrowser.WWW.makeZoroRpcPostBody("estimategas", postRawArray);
+                var result = yield fetch("http://localhost:59908/api/testnet", { "method": "post", "body": JSON.stringify(gaspostdata) });
+                var json = yield result.json();
+                var estimategas = json["result"][0]["gas"];
+                estimategas = Neo.Fixed8.parse(estimategas + "");
+                var rawdata = this.getTransactionString(script, wif, estimategas, Neo.Fixed8.One);
+                var postRawArray = [];
+                postRawArray.push(chainHash);
+                postRawArray.push(rawdata);
+                var postdata = WebBrowser.WWW.makeZoroRpcPostBody("sendrawtransaction", postRawArray);
+                var result = yield fetch("http://localhost:59908/api/testnet", { "method": "post", "body": JSON.stringify(postdata) });
+                var json = yield result.json();
+                var postResult1 = json;
+            });
+        }
+        static getTransactionString(script, wif, gasLimit, gasPrice) {
+            var exData = new ThinNeo.ZoroInvokeTransData();
+            exData.gasLimit = gasLimit;
+            exData.gasPrice = gasPrice;
+            exData.script = script;
+            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
+            var tran = new ThinNeo.ZoroTransaction();
+            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
+            tran.version = 0;
+            tran.nonce = ThinNeo.ZoroTransaction.GetNonce();
+            tran.Account = scriptHash;
+            tran.attributes = [];
+            tran.extdata = exData;
+            console.log("gasLimit = " + gasLimit);
+            console.log("gasPrice = " + gasPrice);
+            console.log("scriptHash = " + scriptHash);
+            var msg = tran.GetMessage();
+            var signdata = ThinNeo.Helper.Sign(msg, ThinNeo.Helper.GetPrivateKeyFromWIF(wif));
+            tran.AddWitness(signdata, ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)), ThinNeo.Helper.GetAddressFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif))));
+            var data = tran.GetRawData();
+            alert("txid=" + tran.GetHash().reverse().toHexString());
+            return data.toHexString();
+        }
+        static getUint160(value) {
+            if (value == null) {
+                throw "err";
+            }
+            if (value.startsWith("0x")) {
+                value = value.substring(2);
+            }
+            if (value.length != 40) {
+                throw "err";
+            }
+            return value.hexToBytes().reverse();
+        }
+    }
+    WebBrowser.Test = Test;
+})(WebBrowser || (WebBrowser = {}));
+/// <reference path="./Base.ts"/>
+/// <reference path="./GUIRoute.ts"/>
+/// <reference path="./LoginView.ts"/>
+/// <reference path="../tools/Test.ts"/>
+var WebBrowser;
+/// <reference path="./Base.ts"/>
+/// <reference path="./GUIRoute.ts"/>
+/// <reference path="./LoginView.ts"/>
+/// <reference path="../tools/Test.ts"/>
+(function (WebBrowser) {
+    class GUI_Login {
+        constructor(div) {
+            this.div = div;
+        }
+        showUI() {
+            //Test.ZoroTransfer();
+            //Test.Transfer();
+            if (localStorage.getItem("prikey")) {
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
+            }
+            else
+                this.login();
+        }
+        hideUI() {
+        }
+        login() {
+            this.div.removeChild(this.div.firstChild);
+            this.div.className = "wallet-bg";
+            var background = document.createElement('div');
+            this.div.appendChild(background);
+            var messagebackground = document.createElement('div');
+            background.appendChild(messagebackground);
+            messagebackground.className = "message-bg";
+            var titleSpan = document.createElement('span');
+            titleSpan.textContent = "最安全的资产管理";
+            messagebackground.appendChild(titleSpan);
+            titleSpan.className = "title-font";
+            var hr = document.createElement('hr');
+            messagebackground.appendChild(hr);
+            hr.className = "login-hr";
+            var messageSpan = document.createElement('span');
+            messageSpan.textContent = "为全世界，打造最便捷，最安全的虚拟物品创作，购买和销售方式适用于交易游戏代码和视频游戏皮肤等物品或电子产品等物品的任何人。";
+            messagebackground.appendChild(messageSpan);
+            messageSpan.className = "value-font";
+            WebBrowser.LoginView.show(background);
+        }
+    }
+    WebBrowser.GUI_Login = GUI_Login;
+})(WebBrowser || (WebBrowser = {}));
+var WebBrowser;
+(function (WebBrowser) {
+    class DownView {
+        constructor() {
+        }
+        static show(div, url, walletName) {
+            if (div.children.length > 1)
+                div.removeChild(div.lastChild);
+            var loginbackground = document.createElement('div');
+            div.appendChild(loginbackground);
+            loginbackground.className = "login-bg";
+            var name = document.createElement('h3');
+            name.textContent = "您的钱包文件已创建";
+            loginbackground.appendChild(name);
+            name.className = "login-title";
+            var uploadFiles = document.createElement("div"); //外层div
+            loginbackground.appendChild(uploadFiles);
+            uploadFiles.className = "upload-file";
+            var text1 = document.createElement('h5');
+            text1.textContent = "点击“下载”来保存您的文件";
+            text1.style.color = "#eeeeee";
+            text1.style.fontSize = "14px";
+            text1.style.padding = "5px 0";
+            uploadFiles.appendChild(text1);
+            var text2 = document.createElement('h5');
+            text2.textContent = "不要丢失！如果丢失，将无法恢复";
+            text2.style.color = "#eeeeee";
+            text2.style.fontSize = "14px";
+            text2.style.padding = "5px 0";
+            uploadFiles.appendChild(text2);
+            var downLoad = document.createElement('button');
+            uploadFiles.appendChild(downLoad);
+            downLoad.textContent = "下载文件";
+            downLoad.className = "btn-commit";
+            var b = true;
+            downLoad.onclick = () => {
+                var downurl = document.createElement("a");
+                loginbackground.appendChild(downurl);
+                downurl.download = walletName + ".json";
+                downurl.href = url;
+                if (b) {
+                    downurl.click();
+                    b = false;
+                }
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
+            };
+            var returnLogin = document.createElement('a');
+            uploadFiles.appendChild(returnLogin);
+            returnLogin.textContent = "返回登录>>";
+            returnLogin.className = "create-wallet";
+            returnLogin.onclick = () => {
+                WebBrowser.LoginView.show(div);
+            };
+        }
+    }
+    WebBrowser.DownView = DownView;
+})(WebBrowser || (WebBrowser = {}));
+///<reference path="./DownView.ts" />
+var WebBrowser;
+///<reference path="./DownView.ts" />
+(function (WebBrowser) {
+    class WalletView {
+        constructor() {
+        }
+        static show(div) {
+            if (div.children.length > 1)
+                div.removeChild(div.lastChild);
+            var loginbackground = document.createElement('div');
+            div.appendChild(loginbackground);
+            loginbackground.className = "login-bg";
+            var name = document.createElement('h3');
+            name.textContent = "创建您的钱包";
+            loginbackground.appendChild(name);
+            name.className = "login-title";
+            var uploadFiles = document.createElement("div"); //外层div
+            loginbackground.appendChild(uploadFiles);
+            uploadFiles.className = "upload-file";
+            var walletName = document.createElement("input");
+            uploadFiles.appendChild(walletName);
+            walletName.type = "text";
+            walletName.placeholder = "输入钱包名";
+            walletName.className = "password";
+            var moneyTip = document.createElement("p");
+            moneyTip.textContent = '*钱包名不能为空';
+            uploadFiles.appendChild(moneyTip);
+            moneyTip.className = "file-tip";
+            var password = document.createElement("input");
+            uploadFiles.appendChild(password);
+            password.type = "password";
+            password.placeholder = "输入密码";
+            password.className = "password";
+            //密码提示的
+            var passwordTip = document.createElement("p");
+            passwordTip.textContent = '*请输入密码';
+            uploadFiles.appendChild(passwordTip);
+            passwordTip.className = "file-tip";
+            var repassword = document.createElement("input");
+            uploadFiles.appendChild(repassword);
+            repassword.type = "password";
+            repassword.placeholder = "重复密码";
+            repassword.className = "password";
+            //重复密码
+            var repeatTip = document.createElement("p");
+            repeatTip.textContent = '*请输入相同的密码';
+            uploadFiles.appendChild(repeatTip);
+            repeatTip.className = "file-tip";
+            var create = document.createElement('button');
+            uploadFiles.appendChild(create);
+            create.textContent = "新建";
+            create.className = "btn-commit";
+            create.onclick = () => {
+                try {
+                    var array = new Uint8Array(32);
+                    var key = Neo.Cryptography.RandomNumberGenerator.getRandomValues(array);
+                    var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(key);
+                    var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
+                    var wallet = new ThinNeo.nep6wallet();
+                    wallet.scrypt = new ThinNeo.nep6ScryptParameters();
+                    wallet.scrypt.N = 16384;
+                    wallet.scrypt.r = 8;
+                    wallet.scrypt.p = 8;
+                    wallet.accounts = [];
+                    wallet.accounts[0] = new ThinNeo.nep6account();
+                    wallet.accounts[0].address = addr;
+                    ThinNeo.Helper.GetNep2FromPrivateKey(key, repassword.value, wallet.scrypt.N, wallet.scrypt.r, wallet.scrypt.p, (info, result) => {
+                        if (info == "finish") {
+                            wallet.accounts[0].nep2key = result;
+                            wallet.accounts[0].contract = new ThinNeo.contract();
+                            WebBrowser.GUITool.prikey = key;
+                            WebBrowser.GUITool.pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(key);
+                            WebBrowser.GUITool.address = ThinNeo.Helper.GetAddressFromPublicKey(WebBrowser.GUITool.pubkey);
+                            wallet.accounts[0].contract.script = ThinNeo.Helper.GetAddressCheckScriptFromPublicKey(pubkey).toHexString();
+                            var jsonstr = JSON.stringify(wallet.toJson());
+                            var blob = new Blob([ThinNeo.Helper.String2Bytes(jsonstr)]);
+                            var downLoadUrl = URL.createObjectURL(blob);
+                            WebBrowser.DownView.show(div, downLoadUrl, walletName.value);
+                        }
+                    });
+                }
+                catch (e) {
+                }
+            };
+            var returnLogin = document.createElement('a');
+            uploadFiles.appendChild(returnLogin);
+            returnLogin.textContent = "返回登录>>";
+            returnLogin.className = "create-wallet";
+            returnLogin.onclick = () => {
+                WebBrowser.LoginView.show(div);
+            };
+        }
+    }
+    WebBrowser.WalletView = WalletView;
+})(WebBrowser || (WebBrowser = {}));
 /// <reference path="../tools/wwwtool.ts"/>
 /// <reference path="../../lib/neo-ts.d.ts"/>
 var WebBrowser;
@@ -4366,452 +4873,6 @@ var WebBrowser;
         }
     }
     WebBrowser.CSSTool = CSSTool;
-})(WebBrowser || (WebBrowser = {}));
-/// <reference path="../tools/wwwtool.ts"/>
-/// <reference path="../tools/AppChainTool.ts"/>
-/// <reference path="../../lib/neo-ts.d.ts"/>
-var WebBrowser;
-/// <reference path="../tools/wwwtool.ts"/>
-/// <reference path="../tools/AppChainTool.ts"/>
-/// <reference path="../../lib/neo-ts.d.ts"/>
-(function (WebBrowser) {
-    class Test {
-        static getTransaction(s) {
-            var tran = new ThinNeo.ZoroTransaction();
-            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
-            tran.extdata = new ThinNeo.ZoroInvokeTransData();
-            var steam = new Neo.IO.MemoryStream(s.hexToBytes());
-            var buffer = new Neo.IO.BinaryReader(steam);
-            tran.Deserialize(buffer);
-            console.log(tran.GetHash().reverse().toHexString());
-        }
-        static ZoroTransfer() {
-            return __awaiter(this, void 0, void 0, function* () {
-                var bcp = "0000000000000000000000000000000000000001";
-                var chainHash = "";
-                var wif = "L4ooZWvkj6QM9AjPREmF2SZZFYgEFAxWPzYJY6jdr4XJNx62Smbf";
-                var targetwif = "L17Cq1FEbZJ8bc8Y8HcqVCgxsNpWY6LHDoau9DBD98m8vtGcVpuQ";
-                var prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
-                var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
-                // var address = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(pubkey);
-                // var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
-                //address = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
-                var sb = new ThinNeo.ScriptBuilder();
-                var a = [];
-                a.push("(hex160)" + bcp);
-                //a.push("(hex160)" + address.reverse().toHexString());
-                a.push("(addr)AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp");
-                sb.EmitParamJson(a);
-                // sb.EmitPushBytes(address);
-                // sb.EmitPushBytes(this.getUint160(bcp));           
-                sb.EmitPushString("BalanceOf");
-                sb.EmitSysCall("Zoro.NativeNEP5.Call");
-                var data = sb.ToArray();
-                var scriptPublish = data.toHexString();
-                var array = [];
-                array.push(chainHash);
-                array.push(scriptPublish);
-                var postdata = WebBrowser.WWW.makeZoroRpcPostBody("invokescript", array);
-                var result = yield fetch(WebBrowser.WWW.api, { "method": "post", "body": JSON.stringify(postdata) });
-                var json = yield result.json();
-                alert(JSON.stringify(json));
-            });
-        }
-        static Transfer() {
-            return __awaiter(this, void 0, void 0, function* () {
-                var bcp = "0000000000000000000000000000000000000001";
-                var chainHash = "";
-                var wif = "L4ooZWvkj6QM9AjPREmF2SZZFYgEFAxWPzYJY6jdr4XJNx62Smbf";
-                var targetwif = "L17Cq1FEbZJ8bc8Y8HcqVCgxsNpWY6LHDoau9DBD98m8vtGcVpuQ";
-                let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
-                var targetScriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(targetwif)));
-                var sb = new ThinNeo.ScriptBuilder();
-                sb.EmitPushBytes(this.getUint160(bcp));
-                sb.EmitPushString("Decimals");
-                sb.EmitSysCall("Zoro.NativeNEP5.Call");
-                var data = sb.ToArray();
-                var scriptPublish = data.toHexString();
-                var array = [];
-                array.push(chainHash);
-                array.push(scriptPublish);
-                var json = yield WebBrowser.WWW.rpc_invokeScript(array);
-                var decimals = parseInt(json["stack"][0]["value"]);
-                var value = 1;
-                value = 1 * Math.pow(10, decimals);
-                // sb = new ThinNeo.ScriptBuilder();
-                // sb.EmitPushNumber(new Neo.BigInteger(value));
-                // sb.EmitPushBytes(ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress("AWN6jngST5ytpNnY1dhBQG7QHd7V8SqSCp"));
-                // //sb.EmitPushBytes(targetScriptHash);
-                // sb.EmitPushBytes(scriptHash);           
-                // sb.EmitPushBytes(this.getUint160(bcp));
-                // sb.EmitPushString("Transfer");
-                // sb.EmitSysCall("Zoro.NativeNEP5.Call");
-                sb = new ThinNeo.ScriptBuilder();
-                array = [];
-                array.push("(addr)AcQLYjGbQU2bEQ8RKFXUcf8XvromfUQodq");
-                array.push("(addr)AbN2K2trYzgx8WMg2H7U7JHH6RQVzz2fnx");
-                array.push("(bytes)f8c86f9cfaade7d2863403b706497caaba47f633598fd684cf71dc1546a87e02");
-                sb.EmitParamJson(array);
-                sb.EmitPushString("exchange");
-                sb.EmitAppCall("7e465b65c8ba9bd255ba93947732502e30985007".hexToBytes().reverse());
-                scriptPublish = sb.ToArray().toHexString();
-                array = [];
-                array.push(chainHash);
-                array.push(scriptPublish);
-                this.makeTransaction(sb.ToArray(), wif, Neo.Fixed8.One);
-            });
-        }
-        static makeTransaction(script, wif, gasPrice) {
-            return __awaiter(this, void 0, void 0, function* () {
-                var chainHash = "";
-                var rawdata = this.getTransactionString(script, wif, Neo.Fixed8.Zero, Neo.Fixed8.One);
-                this.getTransaction(rawdata);
-                return;
-                var postRawArray = [];
-                postRawArray.push(chainHash);
-                postRawArray.push(rawdata);
-                var gaspostdata = WebBrowser.WWW.makeZoroRpcPostBody("estimategas", postRawArray);
-                var result = yield fetch("http://localhost:59908/api/testnet", { "method": "post", "body": JSON.stringify(gaspostdata) });
-                var json = yield result.json();
-                var estimategas = json["result"][0]["gas"];
-                estimategas = Neo.Fixed8.parse(estimategas + "");
-                var rawdata = this.getTransactionString(script, wif, estimategas, Neo.Fixed8.One);
-                var postRawArray = [];
-                postRawArray.push(chainHash);
-                postRawArray.push(rawdata);
-                var postdata = WebBrowser.WWW.makeZoroRpcPostBody("sendrawtransaction", postRawArray);
-                var result = yield fetch("http://localhost:59908/api/testnet", { "method": "post", "body": JSON.stringify(postdata) });
-                var json = yield result.json();
-                var postResult1 = json;
-            });
-        }
-        static getTransactionString(script, wif, gasLimit, gasPrice) {
-            var exData = new ThinNeo.ZoroInvokeTransData();
-            exData.gasLimit = gasLimit;
-            exData.gasPrice = gasPrice;
-            exData.script = script;
-            let scriptHash = ThinNeo.Helper.GetPublicKeyScriptHashFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)));
-            var tran = new ThinNeo.ZoroTransaction();
-            tran.type = ThinNeo.ZoroTransactionType.InvocationTransaction;
-            tran.version = 0;
-            tran.nonce = ThinNeo.ZoroTransaction.GetNonce();
-            tran.Account = scriptHash;
-            tran.attributes = [];
-            tran.extdata = exData;
-            console.log("gasLimit = " + gasLimit);
-            console.log("gasPrice = " + gasPrice);
-            console.log("scriptHash = " + scriptHash);
-            var msg = tran.GetMessage();
-            var signdata = ThinNeo.Helper.Sign(msg, ThinNeo.Helper.GetPrivateKeyFromWIF(wif));
-            tran.AddWitness(signdata, ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif)), ThinNeo.Helper.GetAddressFromPublicKey(ThinNeo.Helper.GetPublicKeyFromPrivateKey(ThinNeo.Helper.GetPrivateKeyFromWIF(wif))));
-            var data = tran.GetRawData();
-            alert("txid=" + tran.GetHash().reverse().toHexString());
-            return data.toHexString();
-        }
-        static getUint160(value) {
-            if (value == null) {
-                throw "err";
-            }
-            if (value.startsWith("0x")) {
-                value = value.substring(2);
-            }
-            if (value.length != 40) {
-                throw "err";
-            }
-            return value.hexToBytes().reverse();
-        }
-    }
-    WebBrowser.Test = Test;
-})(WebBrowser || (WebBrowser = {}));
-/// <reference path="./Base.ts"/>
-/// <reference path="./GUIRoute.ts"/>
-/// <reference path="../tools/CSSTools.ts"/>
-/// <reference path="../tools/Test.ts"/>
-var WebBrowser;
-/// <reference path="./Base.ts"/>
-/// <reference path="./GUIRoute.ts"/>
-/// <reference path="../tools/CSSTools.ts"/>
-/// <reference path="../tools/Test.ts"/>
-(function (WebBrowser) {
-    class GUI_Login {
-        constructor(div) {
-            this.div = div;
-        }
-        showUI() {
-            //Test.ZoroTransfer();
-            //Test.Transfer();
-            this.login();
-        }
-        hideUI() {
-        }
-        login() {
-            this.div.removeChild(this.div.firstChild);
-            this.div.className = "wallet-bg";
-            var background = document.createElement('div');
-            this.div.appendChild(background);
-            var messagebackground = document.createElement('div');
-            background.appendChild(messagebackground);
-            messagebackground.className = "message-bg";
-            var titleSpan = document.createElement('span');
-            titleSpan.textContent = "最安全的资产管理";
-            messagebackground.appendChild(titleSpan);
-            titleSpan.className = "title-font";
-            var hr = document.createElement('hr');
-            messagebackground.appendChild(hr);
-            hr.className = "login-hr";
-            var messageSpan = document.createElement('span');
-            messageSpan.textContent = "为全世界，打造最便捷，最安全的虚拟物品创作，购买和销售方式适用于交易游戏代码和视频游戏皮肤等物品或电子产品等物品的任何人。";
-            messagebackground.appendChild(messageSpan);
-            messageSpan.className = "value-font";
-            var loginbackground = document.createElement('div');
-            background.appendChild(loginbackground);
-            loginbackground.className = "login-bg";
-            var name = document.createElement('h3');
-            name.textContent = "登陆你的钱包";
-            loginbackground.appendChild(name);
-            name.className = "login-title";
-            var uploadFiles = document.createElement("div"); //外层div
-            loginbackground.appendChild(uploadFiles);
-            uploadFiles.className = "upload-file";
-            //feile  外层
-            var firstFile = document.createElement("div");
-            var putIn = document.createElement("div");
-            putIn.textContent = "请选择钱包文件";
-            firstFile.appendChild(putIn);
-            putIn.className = "putin";
-            var fileIcon = document.createElement("img");
-            fileIcon.src = "./img/file.png";
-            putIn.appendChild(fileIcon);
-            fileIcon.className = "file-icon";
-            uploadFiles.appendChild(firstFile);
-            firstFile.className = "first-file";
-            //将file添加到feile  外层里
-            var file = document.createElement("input");
-            firstFile.appendChild(file);
-            file.type = "file";
-            file.className = "file";
-            //提示添加file上传的文字
-            var fileTip = document.createElement("p");
-            fileTip.textContent = '*请上传钱包文件';
-            uploadFiles.appendChild(fileTip);
-            fileTip.className = "file-tip";
-            //密码的
-            var password = document.createElement("input");
-            uploadFiles.appendChild(password);
-            password.type = "password";
-            password.placeholder = "请输入密码";
-            password.className = "password";
-            $(password).on("input", function () {
-                if (password.value.length) {
-                    passwordTip.textContent = '';
-                }
-                else {
-                    passwordTip.textContent = '*密码输入有误';
-                }
-            });
-            //密码提示的
-            var passwordTip = document.createElement("p");
-            passwordTip.textContent = '*密码输入有误';
-            uploadFiles.appendChild(passwordTip);
-            passwordTip.className = "file-tip";
-            var btn = document.createElement("button");
-            uploadFiles.appendChild(btn);
-            btn.textContent = "登录";
-            btn.className = "btn-commit";
-            btn.onclick = () => {
-                if (wallet.accounts.length > 0 && wallet.accounts[0].nep2key != null) {
-                    let nepkey = wallet.accounts[0].nep2key;
-                    var s = wallet.scrypt;
-                    ThinNeo.Helper.GetPrivateKeyFromNep2(nepkey, password.value, s.N, s.r, s.p, (info, result) => {
-                        if (info == "finish") {
-                            WebBrowser.GUITool.prikey = result;
-                            var wif = ThinNeo.Helper.GetWifFromPrivateKey(WebBrowser.GUITool.prikey);
-                            WebBrowser.GUITool.pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(WebBrowser.GUITool.prikey);
-                            WebBrowser.GUITool.address = ThinNeo.Helper.GetAddressFromPublicKey(WebBrowser.GUITool.pubkey);
-                            WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
-                        }
-                    });
-                }
-            };
-            var createWallet = document.createElement("a");
-            uploadFiles.appendChild(createWallet);
-            createWallet.textContent = "创建钱包>>";
-            createWallet.onclick = () => {
-                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Wallet);
-            };
-            createWallet.className = "create-wallet";
-            var wallet;
-            var reader = new FileReader();
-            reader.onload = (e) => {
-                var walletstr = reader.result;
-                wallet = new ThinNeo.nep6wallet();
-                wallet.fromJsonStr(walletstr);
-            };
-            file.onchange = (ev) => {
-                if (file.files.length > 0)
-                    if (file.files[0].name.includes(".json")) {
-                        putIn.textContent = file.files[0].name.substr(0, 6) + "...*.json";
-                        fileTip.textContent = '';
-                        reader.readAsText(file.files[0]);
-                    }
-            };
-        }
-    }
-    WebBrowser.GUI_Login = GUI_Login;
-})(WebBrowser || (WebBrowser = {}));
-/// <reference path="./Base.ts"/>
-/// <reference path="../tools/CSSTools.ts"/>
-var WebBrowser;
-/// <reference path="./Base.ts"/>
-/// <reference path="../tools/CSSTools.ts"/>
-(function (WebBrowser) {
-    class GUI_Wallet {
-        constructor(div) {
-            this.div = div;
-        }
-        showUI() {
-            this.createWallet();
-        }
-        hideUI() {
-        }
-        createWallet() {
-            this.div.removeChild(this.div.firstChild);
-            Neo.Cryptography.RandomNumberGenerator.startCollectors();
-            var loginbackground = document.createElement('div');
-            this.div.appendChild(loginbackground);
-            var name = document.createElement('h3');
-            name.textContent = "创建您的钱包";
-            name.style.color = "#ffffff";
-            loginbackground.appendChild(name);
-            WebBrowser.CSSTool.name_set(name);
-            var uploadFiles = document.createElement("div"); //外层div
-            loginbackground.appendChild(uploadFiles);
-            WebBrowser.CSSTool.uploadFiles_set(uploadFiles);
-            var walletName = document.createElement("input");
-            uploadFiles.appendChild(walletName);
-            walletName.type = "text";
-            walletName.placeholder = "输入钱包名";
-            WebBrowser.CSSTool.password_set(walletName);
-            var moneyTip = document.createElement("p");
-            moneyTip.textContent = '*钱包名不能为空';
-            uploadFiles.appendChild(moneyTip);
-            WebBrowser.CSSTool.fileTip_set(moneyTip);
-            var password = document.createElement("input");
-            uploadFiles.appendChild(password);
-            password.type = "password";
-            password.placeholder = "输入密码";
-            WebBrowser.CSSTool.password_set(password);
-            //密码提示的
-            var passwordTip = document.createElement("p");
-            passwordTip.textContent = '*请输入密码';
-            uploadFiles.appendChild(passwordTip);
-            WebBrowser.CSSTool.fileTip_set(passwordTip);
-            var repassword = document.createElement("input");
-            uploadFiles.appendChild(repassword);
-            repassword.type = "password";
-            repassword.placeholder = "重复密码";
-            WebBrowser.CSSTool.password_set(repassword);
-            //重复密码
-            var repeatTip = document.createElement("p");
-            repeatTip.textContent = '*请输入相同的密码';
-            uploadFiles.appendChild(repeatTip);
-            WebBrowser.CSSTool.fileTip_set(repeatTip);
-            var create = document.createElement('button');
-            uploadFiles.appendChild(create);
-            create.textContent = "新建";
-            WebBrowser.CSSTool.btn_set(create);
-            create.onclick = () => {
-                try {
-                    var array = new Uint8Array(32);
-                    var key = Neo.Cryptography.RandomNumberGenerator.getRandomValues(array);
-                    var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(key);
-                    var addr = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
-                    var wallet = new ThinNeo.nep6wallet();
-                    wallet.scrypt = new ThinNeo.nep6ScryptParameters();
-                    wallet.scrypt.N = 16384;
-                    wallet.scrypt.r = 8;
-                    wallet.scrypt.p = 8;
-                    wallet.accounts = [];
-                    wallet.accounts[0] = new ThinNeo.nep6account();
-                    wallet.accounts[0].address = addr;
-                    ThinNeo.Helper.GetNep2FromPrivateKey(key, repassword.value, wallet.scrypt.N, wallet.scrypt.r, wallet.scrypt.p, (info, result) => {
-                        if (info == "finish") {
-                            wallet.accounts[0].nep2key = result;
-                            wallet.accounts[0].contract = new ThinNeo.contract();
-                            WebBrowser.GUITool.prikey = key;
-                            WebBrowser.GUITool.pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(key);
-                            WebBrowser.GUITool.address = ThinNeo.Helper.GetAddressFromPublicKey(WebBrowser.GUITool.pubkey);
-                            wallet.accounts[0].contract.script = ThinNeo.Helper.GetAddressCheckScriptFromPublicKey(pubkey).toHexString();
-                            var jsonstr = JSON.stringify(wallet.toJson());
-                            var blob = new Blob([ThinNeo.Helper.String2Bytes(jsonstr)]);
-                            var downLoadUrl = URL.createObjectURL(blob);
-                            this.downloadWallet(downLoadUrl, walletName.value);
-                        }
-                    });
-                }
-                catch (e) {
-                }
-            };
-            var returnLogin = document.createElement('a');
-            uploadFiles.appendChild(returnLogin);
-            returnLogin.textContent = "返回登录>>";
-            returnLogin.style.paddingTop = '5px';
-            returnLogin.style.display = 'block';
-            returnLogin.onclick = () => {
-                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Login);
-            };
-        }
-        downloadWallet(url, walletName) {
-            this.div.removeChild(this.div.firstChild);
-            var loginbackground = document.createElement('div');
-            this.div.appendChild(loginbackground);
-            var name = document.createElement('h3');
-            name.textContent = "您的钱包文件已创建";
-            name.style.color = "#ffffff";
-            loginbackground.appendChild(name);
-            WebBrowser.CSSTool.name_set(name);
-            var uploadFiles = document.createElement("div"); //外层div
-            loginbackground.appendChild(uploadFiles);
-            WebBrowser.CSSTool.uploadFiles_set(uploadFiles);
-            var text1 = document.createElement('h5');
-            text1.textContent = "点击“下载”来保存您的文件";
-            text1.style.color = "#eeeeee";
-            text1.style.fontSize = "18px";
-            text1.style.padding = "5px 0";
-            uploadFiles.appendChild(text1);
-            var text2 = document.createElement('h5');
-            text2.textContent = "不要丢失！如果丢失，将无法恢复";
-            text2.style.color = "#eeeeee";
-            text2.style.fontSize = "18px";
-            text2.style.padding = "5px 0";
-            uploadFiles.appendChild(text2);
-            var downLoad = document.createElement('button');
-            uploadFiles.appendChild(downLoad);
-            downLoad.textContent = "下载文件";
-            WebBrowser.CSSTool.btn_set(downLoad);
-            var b = true;
-            downLoad.onclick = () => {
-                var downurl = document.createElement("a");
-                loginbackground.appendChild(downurl);
-                downurl.download = walletName + ".json";
-                downurl.href = url;
-                if (b) {
-                    downurl.click();
-                    b = false;
-                }
-                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.MainView);
-            };
-            var returnLogin = document.createElement('a');
-            uploadFiles.appendChild(returnLogin);
-            returnLogin.textContent = "返回登录>>";
-            returnLogin.style.paddingTop = "5px";
-            returnLogin.style.display = "block";
-            returnLogin.onclick = () => {
-                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Login);
-            };
-        }
-    }
-    WebBrowser.GUI_Wallet = GUI_Wallet;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="./Base.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
@@ -6396,7 +6457,7 @@ var WebBrowser;
 /// <reference path="../tools/wwwtool.ts"/> 
 /// <reference path="../gui/Base.ts"/>
 /// <reference path="../gui/Login.ts"/>
-/// <reference path="../gui/Wallet.ts"/>
+/// <reference path="../gui/WalletView.ts"/>
 /// <reference path="../gui/MainView.ts"/>
 /// <reference path="../gui/GUIRoute.ts"/>
 var WebBrowser;
@@ -6405,7 +6466,7 @@ var WebBrowser;
 /// <reference path="../tools/wwwtool.ts"/> 
 /// <reference path="../gui/Base.ts"/>
 /// <reference path="../gui/Login.ts"/>
-/// <reference path="../gui/Wallet.ts"/>
+/// <reference path="../gui/WalletView.ts"/>
 /// <reference path="../gui/MainView.ts"/>
 /// <reference path="../gui/GUIRoute.ts"/>
 (function (WebBrowser) {
@@ -6425,7 +6486,6 @@ var WebBrowser;
         }
         initPage() {
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Login, new WebBrowser.GUI_Login(this.div));
-            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Wallet, new WebBrowser.GUI_Wallet(this.div));
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.MainView, new WebBrowser.GUI_Main(this.div));
         }
         start() {
@@ -6789,7 +6849,7 @@ var WebBrowser;
         updateTransactions(pageUtil, txType) {
             return __awaiter(this, void 0, void 0, function* () {
                 //分页查询交易记录
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var txs = yield WebBrowser.WWW.getappchainrawtransactionsdesc(appchain, pageUtil.pageSize, pageUtil.currentPage - 1);
                 }
@@ -6831,7 +6891,7 @@ var WebBrowser;
             return __awaiter(this, void 0, void 0, function* () {
                 this.getLangs();
                 let type = "";
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var txCount = yield WebBrowser.WWW.getappchaintxcount(appchain);
                 }
@@ -7009,9 +7069,9 @@ var WebBrowser;
         start() {
             this.getLangs();
             //this.div.innerHTML = pages.transaction;
-            var appchain = WebBrowser.locationtool.getParam2();
+            var appchain = WebBrowser.locationtool.getParam3();
             if (appchain && appchain.length == 40) {
-                this.updateTxInfo(WebBrowser.locationtool.getParam3());
+                this.updateTxInfo(WebBrowser.locationtool.getParam());
                 var href = WebBrowser.locationtool.getUrl() + "/transactions/" + appchain;
             }
             else {
@@ -7026,7 +7086,7 @@ var WebBrowser;
         }
         updateTxInfo(txid) {
             return __awaiter(this, void 0, void 0, function* () {
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var txInfo = yield WebBrowser.WWW.getappchainrawtransaction(appchain, txid);
                 }
@@ -7047,7 +7107,7 @@ var WebBrowser;
                 let time = WebBrowser.DateTool.getTime(block.time);
                 $("#transaction-time").text(time);
                 $("#txidscriptmethod").empty();
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var txidMethod = yield WebBrowser.WWW.api_getScriptMethod(txInfo.txid, appchain);
                 }
@@ -7058,14 +7118,14 @@ var WebBrowser;
                 if (txidMethod) {
                     $(".txidmethod-warp").show();
                     txidMethod.forEach((item) => {
-                        this.loadTxidMethodView(item.calltype, item.method, item.contract);
+                        this.loadTxidMethodView(item.calltype, item.method, item.contract, item.name);
                     });
                 }
                 else {
                     $(".txidmethod-warp").hide();
                 }
                 $("#txidnep5").empty();
-                var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
                 if (appchain && appchain.length == 40) {
                     var txidNep = yield WebBrowser.WWW.api_getappchainnep5transferbytxid(appchain, txInfo.txid);
                 }
@@ -7084,14 +7144,26 @@ var WebBrowser;
                 }
             });
         }
-        loadTxidMethodView(calltype, method, contract) {
+        loadTxidMethodView(calltype, method, contract, name) {
             return __awaiter(this, void 0, void 0, function* () {
-                let html = `
-                    <tr>
-                    <td>` + calltype + `</td>
-                    <td>` + method + `</td>
-                    <td>` + contract + `</td>
-                    </tr>`;
+                var html = "";
+                if (contract.length > 39) {
+                    let href = WebBrowser.Url.href_contractstate(contract);
+                    html = `
+						<tr>
+						<td>` + calltype + `</td>
+						<td>` + method + `</td>
+						<td><a href="` + href + `" target="_self">` + name + `</td>
+						</tr>`;
+                }
+                else {
+                    html = `
+						<tr>
+						<td>` + calltype + `</td>
+						<td>` + method + `</td>
+						<td>` + contract + `</td>
+						</tr>`;
+                }
                 $("#txidscriptmethod").append(html);
             });
         }
@@ -7144,7 +7216,7 @@ var WebBrowser;
         constructor(app) {
             this.div = document.getElementById("actransaction-info");
             this.footer = document.getElementById('footer-box');
-            this.ac = WebBrowser.locationtool.getParam2();
+            this.ac = WebBrowser.locationtool.getParam();
             this.app = app;
         }
         getLangs() {
@@ -7575,7 +7647,7 @@ var WebBrowser;
                     "nep5name",
                     "nep5assettotalsupply",
                     "nep5symbol",
-                    "nep5decimals",
+                    "nep5decimals"
                 ];
                 page_lang.forEach(lang => {
                     document.getElementById(lang).textContent = this.app.langmgr.get(lang);
@@ -7586,60 +7658,22 @@ var WebBrowser;
         start() {
             return __awaiter(this, void 0, void 0, function* () {
                 this.getLangs();
-                var nep5assetid = WebBrowser.locationtool.getParam3();
-                if (nep5assetid) {
-                    var appchain = WebBrowser.locationtool.getParam2();
+                var appchain = WebBrowser.locationtool.getParam3();
+                if (appchain) {
+                    var nep5assetid = WebBrowser.locationtool.getParam();
                     var href = WebBrowser.locationtool.getUrl() + "/asset/" + appchain;
                 }
                 else {
                     var href = WebBrowser.locationtool.getUrl();
-                    var nep5assetid = WebBrowser.locationtool.getParam2();
+                    var nep5assetid = WebBrowser.locationtool.getParam();
+                }
+                if (!nep5assetid.startsWith('0x')) {
+                    nep5assetid = '0x' + nep5assetid;
                 }
                 let html = '<a href="' + href + '" target="_self">&lt&lt&lt' + this.app.langmgr.get("back_chainmessage") + '</a>';
                 $("#nep5asset").empty();
                 $("#nep5asset").append(html);
                 this.loadAssetInfoView(nep5assetid);
-                // var assetType = locationtool.getType();
-                // if (assetType == 'nep5') {
-                //     //$(".asset-nep5-warp").show();
-                //     $(".nep5-tran-warp").show();
-                // } else {
-                //     //$(".asset-nep5-warp").hide();
-                //     $(".nep5-tran-warp").hide();
-                // }
-                //资产排行
-                // var rankcount = await WWW.api_getrankbyassetcount(nep5assetid);
-                // this.rankPageUtil = new PageUtil(rankcount[0].count, 10);
-                //this.updateAssetBalanceView(nep5assetid, this.rankPageUtil);
-                //排行翻页
-                // $("#assets-balance-next").off("click").click(() => {
-                //     if (this.rankPageUtil.currentPage == this.rankPageUtil.totalPage) {
-                //         this.rankPageUtil.currentPage = this.rankPageUtil.totalPage;
-                //     } else {
-                //         this.rankPageUtil.currentPage += 1;
-                //         this.updateAssetBalanceView(nep5assetid, this.rankPageUtil);
-                //     }
-                // });
-                // $("#assets-balance-previous").off("click").click(() => {
-                //     if (this.rankPageUtil.currentPage <= 1) {
-                //         this.rankPageUtil.currentPage = 1;
-                //     } else {
-                //         this.rankPageUtil.currentPage -= 1;
-                //         this.updateAssetBalanceView(nep5assetid, this.rankPageUtil);
-                //     }
-                // });
-                // $("#assets-input").val('');
-                // $("#assets-input").off("input").on('input', () => {
-                //     this.doGoPage(nep5assetid,false)
-                // });
-                // $("#assets-input").off("keydown").keydown((e) => {
-                //     if (e.keyCode == 13) {
-                //         this.doGoPage(nep5assetid,true);
-                //     }
-                // });
-                // $("#assets-gopage").off("click").click(() => {
-                //     this.doGoPage(nep5assetid,true)
-                // });
                 this.div.hidden = false;
                 this.footer.hidden = false;
             });
@@ -7668,7 +7702,7 @@ var WebBrowser;
         loadAssetInfoView(nep5assetid) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (WebBrowser.locationtool.getParam3()) {
-                    var appchain = WebBrowser.locationtool.getParam2();
+                    var appchain = WebBrowser.locationtool.getParam3();
                     var asset = yield WebBrowser.WWW.api_getappchainnep5(appchain, nep5assetid);
                 }
                 else {
@@ -7777,6 +7811,73 @@ var WebBrowser;
         }
     }
     WebBrowser.Nep5Info = Nep5Info;
+})(WebBrowser || (WebBrowser = {}));
+var WebBrowser;
+(function (WebBrowser) {
+    class ContractStateInfo {
+        constructor(app) {
+            this.div = document.getElementById("contract-info");
+            this.footer = document.getElementById('footer-box');
+            this.app = app;
+        }
+        getLangs() {
+            if (this.langType != this.app.langmgr.type) {
+                let page_lang = [
+                    "contract_title",
+                    "contracthash",
+                    "contractname",
+                    "contractauthor",
+                    "contractemail",
+                    "contractdescription"
+                ];
+                page_lang.forEach(lang => {
+                    document.getElementById(lang).textContent = this.app.langmgr.get(lang);
+                });
+                this.langType = this.app.langmgr.type;
+            }
+        }
+        start() {
+            return __awaiter(this, void 0, void 0, function* () {
+                this.getLangs();
+                var appchain = WebBrowser.locationtool.getParam3();
+                if (appchain) {
+                    var contract = WebBrowser.locationtool.getParam();
+                    var href = WebBrowser.locationtool.getUrl() + "/asset/" + appchain;
+                }
+                else {
+                    var href = WebBrowser.locationtool.getUrl();
+                    var contract = WebBrowser.locationtool.getParam();
+                }
+                let html = '<a href="' + href + '" target="_self">&lt&lt&lt' + this.app.langmgr.get("back_chainmessage") + '</a>';
+                $("#contract").empty();
+                $("#contract").append(html);
+                this.loadAssetInfoView(contract);
+                this.div.hidden = false;
+                this.footer.hidden = false;
+            });
+        }
+        close() {
+            this.div.hidden = true;
+            this.footer.hidden = true;
+        }
+        loadAssetInfoView(contract) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (WebBrowser.locationtool.getParam3()) {
+                    var appchain = WebBrowser.locationtool.getParam3();
+                    var contractstate = yield WebBrowser.WWW.api_getContractState(appchain, contract);
+                }
+                else {
+                    var contractstate = yield WebBrowser.WWW.api_getContractState("", contract);
+                }
+                $("#contract_hash").text(contractstate[0].contract);
+                $("#contract_name").text(contractstate[0].name);
+                $("#contract_author").text(contractstate[0].author);
+                $("#contract_email").text(contractstate[0].email);
+                $("#contract_decimals").text(contractstate[0].description);
+            });
+        }
+    }
+    WebBrowser.ContractStateInfo = ContractStateInfo;
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="../app.ts"/>
 var WebBrowser;
@@ -7922,6 +8023,7 @@ var WebBrowser;
             this.pagelist.push(this.app.appchainblock);
             this.pagelist.push(this.app.appchaintransaction);
             this.pagelist.push(this.app.guiinfo);
+            this.pagelist.push(this.app.contractstate);
             this.closePages();
             var hash = location.hash;
             if (hash == "") {
@@ -8003,6 +8105,8 @@ var WebBrowser;
                     return this.app.assetinfo;
                 case "nep5":
                     return this.app.nep5;
+                case "contract":
+                    return this.app.contractstate;
                 default:
                     return this.app.notfound;
             }
@@ -8205,6 +8309,12 @@ var WebBrowser;
                 nep5assets_pre: "总量",
                 nep5assets_val: "资产",
                 nep5assets_id: "小数点后位数",
+                contract_title: "合约信息",
+                contracthash: "哈希",
+                contractname: "名称",
+                contractauthor: "作者",
+                contractemail: "邮箱",
+                contractdescription: "描述",
                 //nep5assetinfo
                 nep5asset_title: "资产详情",
                 nep5assetid: "资产ID",
@@ -8436,6 +8546,12 @@ var WebBrowser;
                 nep5assets_pre: "Total Supply",
                 nep5assets_val: "Symbol",
                 nep5assets_id: "Decimals",
+                contract_title: "Contract Information",
+                contracthash: "Hash",
+                contractname: "Name",
+                contractauthor: "Author",
+                contractemail: "E-Mail",
+                contractdescription: "Description",
                 //nep5assetinfo
                 nep5asset_title: "Asset Information",
                 nep5assetid: "Asset ID",
@@ -8780,6 +8896,7 @@ var WebBrowser;
 /// <reference path="./pages/appchaintransaction.ts"/>
 /// <reference path="./pages/nep5.ts"/>
 /// <reference path="./pages/nep5info.ts"/>
+/// <reference path="./pages/contractstate.ts" />
 /// <reference path="./pages/404.ts"/>
 /// <reference path="./tools/locationtool.ts" />
 /// <reference path="./tools/numbertool.ts" />
@@ -8809,6 +8926,7 @@ var WebBrowser;
 /// <reference path="./pages/appchaintransaction.ts"/>
 /// <reference path="./pages/nep5.ts"/>
 /// <reference path="./pages/nep5info.ts"/>
+/// <reference path="./pages/contractstate.ts" />
 /// <reference path="./pages/404.ts"/>
 /// <reference path="./tools/locationtool.ts" />
 /// <reference path="./tools/numbertool.ts" />
@@ -8856,6 +8974,7 @@ var WebBrowser;
             this.nep5info = new WebBrowser.Nep5Info(this);
             this.appchainblock = new WebBrowser.ACBlock(this);
             this.appchaintransaction = new WebBrowser.ACTransaction(this);
+            this.contractstate = new WebBrowser.ContractStateInfo(this);
             this.notfound = new WebBrowser.Notfound(this);
             this.nep5 = new WebBrowser.Nep5page(this);
             this.routet = new WebBrowser.Route(this);

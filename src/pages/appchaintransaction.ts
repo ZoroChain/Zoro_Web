@@ -49,7 +49,7 @@ namespace WebBrowser {
 		div: HTMLDivElement = document.getElementById("actransaction-info") as HTMLDivElement;
 		footer: HTMLDivElement = document.getElementById('footer-box') as HTMLDivElement;
 
-		public ac:string = locationtool.getParam2();
+		public ac:string = locationtool.getParam();
 
 		start() {
 			this.getLangs()

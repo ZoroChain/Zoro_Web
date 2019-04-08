@@ -73,10 +73,10 @@
 								</li>
 							</ul>
 						</li>
-						<li id="asset-btn">
+						<li id="asset-btn" style="display:none">
 							<a id="assetsa">Assets</a>
 						</li>
-						<li id="gui-btn">
+						<li id="gui-btn" style="display:none">
                             <a id="guia">WEB-GUI</a>
                         </li>
 						<!-- <li id="wallet-btn">
@@ -362,7 +362,7 @@
 		<div id="nep5asset-info" style="min-height: 619px;">
             <div class="title">
                 <span id="nep5asset_title">Asset Information</span>
-                <div class="go-back" id="nep5asset">111</div>
+                <div class="go-back" id="nep5asset">return</div>
             </div>
             <div class="list-nel">
                 <div class="list-body">
@@ -374,8 +374,26 @@
                     <div class="line"><div class="title-nel"><span id="nep5decimals">Decimals</span></div><div class="content-nel"><span id="nep5_decimals"></span></div></div>
                 </div>
             </div>
-
-            <!-- <div class="asset-nep5-warp">
+		</div>
+		
+		<!-- 合约创建信息展示页面 -->
+		<div id="contract-info" style="min-height: 619px;">
+            <div class="title">
+                <span id="contract_title">Contract Information</span>
+                <div class="go-back" id="contract">return</div>
+            </div>
+            <div class="list-nel">
+                <div class="list-body">
+					<div class="line"></div>
+					<div class="line"><div class="title-nel"><span id="contracthash">Hash</span></div><div class="content-nel"><span id="contract_hash"></span></div></div>
+                    <div class="line"><div class="title-nel"><span id="contractname">Name</span></div> <div class="content-nel"><span id="contract_name"></span></div></div>
+                    <div class="line"><div class="title-nel"><span id="contractauthor">Author</span></div> <div class="content-nel"><span id="contract_author"></span></div></div>
+                    <div class="line"><div class="title-nel"><span id="contractemail">E-Mail</span></div> <div class="content-nel"><span id="contract_email"></span></div></div>                    
+                    <div class="line"><div class="title-nel"><span id="contractdescription">Description</span></div><div class="content-nel"><span id="contract_description"></span></div></div>
+                </div>
+            </div>
+		</div>
+		 <!-- <div class="asset-nep5-warp">
                 <div class="title"><span>Balance Rank</span></div>
                 <table class="table cool table-nel">
                     <thead>
@@ -406,7 +424,6 @@
                     </div>
                 </div>
             </div> -->
-		</div>
 		<!-- 地址页面 -->
 		<div id="addrs-page" class="container-nel" hidden style="min-height: 619px;">
 			<div class="title">
