@@ -124,6 +124,7 @@ namespace WebBrowser
             tran_method_calltype:"CallType",
             tran_method_method:"Method",
             tran_method_contract:"Contract",
+            tran_method_hash:"Hash",
 
             tran_nep5: "Nep5",
             tran_nep5_asset: "Asset",

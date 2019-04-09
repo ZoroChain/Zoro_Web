@@ -7050,6 +7050,7 @@ var WebBrowser;
                     "tran_method_calltype",
                     "tran_method_method",
                     "tran_method_contract",
+                    "tran_method_hash",
                     "tran_nep5",
                     "tran_nep5_asset",
                     "tran_nep5_from",
@@ -7154,6 +7155,7 @@ var WebBrowser;
 						<td>` + calltype + `</td>
 						<td>` + method + `</td>
 						<td><a href="` + href + `" target="_self">` + name + `</td>
+						<td>` + contract + `</td>
 						</tr>`;
                 }
                 else {
@@ -7161,6 +7163,7 @@ var WebBrowser;
 						<tr>
 						<td>` + calltype + `</td>
 						<td>` + method + `</td>
+						<td>` + contract + `</td>
 						<td>` + contract + `</td>
 						</tr>`;
                 }
@@ -8252,6 +8255,7 @@ var WebBrowser;
                 tran_method_calltype: "调用方式",
                 tran_method_method: "调用方法",
                 tran_method_contract: "调用地址",
+                tran_method_hash: "哈希",
                 tran_nep5: "Nep5",
                 tran_nep5_asset: "资产",
                 tran_nep5_from: "转出",
@@ -8489,6 +8493,7 @@ var WebBrowser;
                 tran_method_calltype: "CallType",
                 tran_method_method: "Method",
                 tran_method_contract: "Contract",
+                tran_method_hash: "Hash",
                 tran_nep5: "Nep5",
                 tran_nep5_asset: "Asset",
                 tran_nep5_from: "From",

@@ -126,6 +126,7 @@ namespace WebBrowser
             tran_method_calltype:"调用方式",
             tran_method_method:"调用方法",
             tran_method_contract:"调用地址",
+            tran_method_hash:"哈希",
 
             tran_nep5: "Nep5",
             tran_nep5_asset: "资产",

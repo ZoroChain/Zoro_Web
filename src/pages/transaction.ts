@@ -28,6 +28,7 @@ namespace WebBrowser {
 					"tran_method_calltype",
 					"tran_method_method",
 					"tran_method_contract",
+					"tran_method_hash",
 
 					"tran_nep5",
 					"tran_nep5_asset",
@@ -140,12 +141,14 @@ namespace WebBrowser {
 						<td>` + calltype + `</td>
 						<td>` + method + `</td>
 						<td><a href="`+ href + `" target="_self">` + name + `</td>
+						<td>` + contract + `</td>
 						</tr>`
 			}else{
 				html = `
 						<tr>
 						<td>` + calltype + `</td>
 						<td>` + method + `</td>
+						<td>` + contract + `</td>
 						<td>` + contract + `</td>
 						</tr>`
 			}
