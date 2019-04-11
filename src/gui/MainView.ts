@@ -21,6 +21,7 @@ namespace WebBrowser
         mainMenu():void{
 
             this.div.removeChild(this.div.firstChild);
+            this.div.className = "main-view-bg";
 
             var background = document.createElement('div') as HTMLDivElement;
             this.div.appendChild(background);

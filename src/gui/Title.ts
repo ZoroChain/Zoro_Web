@@ -56,7 +56,7 @@ namespace WebBrowser
         }
 
         showTitle(title):void{                       
-            $("#gui-info").width($(window).width());
+            //$("#gui-info").width($(window).width());
             $("#removeContainer").removeClass("container");
             var asset = document.createElement("button") as HTMLButtonElement;
             title.appendChild(asset);
@@ -122,7 +122,7 @@ namespace WebBrowser
             
             var address = document.createElement('span') as HTMLSpanElement;
             title.appendChild(address);
-            address.textContent = "地址：" + GUITool.address;
+            address.textContent = "地址：" + localStorage.address;
             CSSTool.titleBtn_set(address);
         }
 

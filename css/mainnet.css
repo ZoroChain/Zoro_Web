@@ -558,3 +558,11 @@ a:hover, a:focus {
     font-size: 16px;
 }
 /* wallet end */
+/* MainView start */
+.main-view-bg{
+    width: 100%;
+    text-align: center;
+    background-repeat: round;
+    margin-top: 20px;
+}
+/* MainView end */

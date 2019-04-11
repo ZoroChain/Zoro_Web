@@ -4504,7 +4504,7 @@ var WebBrowser;
             text2.textContent = "不要丢失！如果丢失，将无法恢复";
             text2.style.color = "#eeeeee";
             text2.style.fontSize = "14px";
-            text2.style.padding = "5px 0";
+            text2.style.paddingBottom = "50px";
             uploadFiles.appendChild(text2);
             var downLoad = document.createElement('button');
             uploadFiles.appendChild(downLoad);
@@ -6319,7 +6319,7 @@ var WebBrowser;
             // }        
             var address = document.createElement('span');
             title.appendChild(address);
-            address.textContent = "地址：" + WebBrowser.GUITool.address;
+            address.textContent = "地址：" + localStorage.address;
             WebBrowser.CSSTool.titleBtn_set(address);
         }
         addSelect() {
@@ -6444,6 +6444,7 @@ var WebBrowser;
         }
         mainMenu() {
             this.div.removeChild(this.div.firstChild);
+            this.div.className = "main-view-bg";
             var background = document.createElement('div');
             this.div.appendChild(background);
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Title, new WebBrowser.GUI_Title(background));

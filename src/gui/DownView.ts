@@ -34,7 +34,7 @@ namespace WebBrowser
             text2.textContent = "不要丢失！如果丢失，将无法恢复";
             text2.style.color = "#eeeeee";
             text2.style.fontSize = "14px";
-            text2.style.padding = "5px 0";
+            text2.style.paddingBottom = "50px";
             uploadFiles.appendChild(text2);
 
             var downLoad = document.createElement('button') as HTMLButtonElement;
