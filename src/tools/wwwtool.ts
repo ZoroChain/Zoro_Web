@@ -328,6 +328,14 @@ namespace WebBrowser {
 			var r = json["result"];
 			return r;
 		}
+
+		static async api_getBalance(addr:string){
+			var str = WWW.makeRpcUrl("getbalance", addr);
+			var result = await fetch(str, { "method": "get" });
+			var json = await result.json();
+			var r = json["result"];
+			return r;
+		}
 		static async api_getAllAppchains()        
 		{
 			var str = WWW.makeRpcUrl("getallappchains");

@@ -476,7 +476,7 @@ table>tbody>tr {
 /* wallet start */
 .wallet-bg{
     width: 100%;
-    background-image: url("../img/testbg.jpg");
+    background-image: url("../img/mainbg.jpg");
     text-align: center;
     background-repeat: round;
     margin-top: 20px;
@@ -510,10 +510,175 @@ table>tbody>tr {
 }
 .login-bg{
     display: inline-block;
-    width: 340px;
-    background-color: #2a3a3a;
+    width: 350px;
+    background-color: #292c3b;
     border-radius: 25px;
     margin-top: 50px;
     margin-left: 100px;
 }
+.login-title{
+    color: #FFFFFF;
+    font-size: 18px;
+    border-bottom: 1px solid black;
+    line-height: 50px;
+}
+.upload-file{
+    width: 300px;
+    margin:0 auto;
+    padding: 20px 0 60px 0;
+}
+.file-icon{
+    padding: 5px;
+}
+.first-file{
+    width: 100%;
+    color: #c8aa74;
+    padding: 10px 0;
+    cursor: pointer;
+    position: relative;
+    border:2px groove #c8aa74;
+}
+.file{
+    width:100%;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    top: 8px;
+}
+.file-tip{
+    color: red;
+    text-align: left;
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 0px;
+}
+.password{
+    width: 100%;
+    background-color: #CDCEE0;
+    height: 45px;
+    text-align: center;
+    border: 0;   
+    outline: 0; 
+}
+.btn-commit{
+    width: 100%;
+    background-color: #c8ab73;
+    padding: 14px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color:#000;
+    border: 0;
+    outline: 0; 
+}
+.create-wallet{
+    display: block;
+    outline:0;
+    color: #c8ab73;
+    padding-top: 15px;
+    font-size: 16px;
+}
 /* wallet end */
+/* MainView start */
+.main-view-bg{
+    width: 100%;
+    text-align: center;
+    background-repeat: round;
+    margin-top: 20px;
+}
+.navTitle-bg{
+    width:1140px;
+    margin: 0 auto;   
+}
+.title-bg{
+    display:inline-block;
+    width: 200px;
+    border-style: solid;
+    border-color: #22222277;
+    border-width: 1px;
+    margin-top:80px;
+    background: #3b3d4a;
+}
+.title-btn{
+    width: 100%;
+    float: left;
+    color: white;
+    padding: 10px 30px;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;   
+    text-align: start;
+    line-height: 32px;
+}
+.title-btn-on{   
+    background:#30323d;
+}
+.title-btn-off{
+    background: #3b3d4a;
+}
+.button-icon{
+    float: left;
+    padding: 0 5px;
+}
+.main-value-bg{
+    display:block;
+    width: 850px;
+    float: right;
+    border-style: solid;
+    border-color: #22222277;
+    border-width: 1px;
+    margin-top:80px;
+    background: #3b3d4a;
+}
+.main-view-title{
+    float: left;
+    margin-top: 30px;
+    margin-left: 58px;
+    text-align: center;
+    line-height: 25px;
+    margin-bottom: 10px;
+}
+.textcss{
+    float: left;
+    font-size: 25px;
+    color: white;
+}
+.title-img{
+    float: left;
+    margin-left: 25px;
+    margin-top: 5px;
+}
+.height-num{
+    float: left;
+    color: white;
+    font-size: 14px;
+    margin-left: 5px;
+}
+.asset-item-bg{
+    width: 90%;
+    margin: 0 auto;
+    display: table;
+}
+.item-bg{
+    background: #40424f;
+    width: 45%;
+    float: left;
+    margin: 5px 15px;
+    line-height: 46px;
+    border-style: solid;
+    border-width: 1px;
+}
+.item-name{
+    float: left;
+    margin-left: 10px;
+    color:white;
+    font-size: 18px;
+}
+.item-num{
+    float: right;
+    margin-right: 10px;
+    color: rgb(202,161,111);
+    font-size: 18px;
+}
+/* MainView end */

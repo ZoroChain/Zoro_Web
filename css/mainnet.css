@@ -565,4 +565,100 @@ a:hover, a:focus {
     background-repeat: round;
     margin-top: 20px;
 }
+.navTitle-bg{
+    width:1140px;
+    margin: 0 auto;   
+}
+.title-bg{
+    display:inline-block;
+    width: 200px;
+    border-style: solid;
+    border-color: #22222277;
+    border-width: 1px;
+    margin-top:80px;
+    background: #3b3d4a;
+}
+.title-btn{
+    width: 100%;
+    float: left;
+    color: white;
+    padding: 10px 30px;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;   
+    text-align: start;
+    line-height: 32px;
+}
+.title-btn-on{   
+    background:#30323d;
+}
+.title-btn-off{
+    background: #3b3d4a;
+}
+.button-icon{
+    float: left;
+    padding: 0 5px;
+}
+.main-value-bg{
+    display:block;
+    width: 850px;
+    float: right;
+    border-style: solid;
+    border-color: #22222277;
+    border-width: 1px;
+    margin-top:80px;
+    background: #3b3d4a;
+}
+.main-view-title{
+    float: left;
+    margin-top: 30px;
+    margin-left: 58px;
+    text-align: center;
+    line-height: 25px;
+    margin-bottom: 10px;
+}
+.textcss{
+    float: left;
+    font-size: 25px;
+    color: white;
+}
+.title-img{
+    float: left;
+    margin-left: 25px;
+    margin-top: 5px;
+}
+.height-num{
+    float: left;
+    color: white;
+    font-size: 14px;
+    margin-left: 5px;
+}
+.asset-item-bg{
+    width: 90%;
+    margin: 0 auto;
+    display: table;
+}
+.item-bg{
+    background: #40424f;
+    width: 45%;
+    float: left;
+    margin: 5px 15px;
+    line-height: 46px;
+    border-style: solid;
+    border-width: 1px;
+}
+.item-name{
+    float: left;
+    margin-left: 10px;
+    color:white;
+    font-size: 18px;
+}
+.item-num{
+    float: right;
+    margin-right: 10px;
+    color: rgb(202,161,111);
+    font-size: 18px;
+}
 /* MainView end */

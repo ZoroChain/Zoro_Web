@@ -2001,6 +2001,15 @@ var WebBrowser;
                 return r;
             });
         }
+        static api_getBalance(addr) {
+            return __awaiter(this, void 0, void 0, function* () {
+                var str = WWW.makeRpcUrl("getbalance", addr);
+                var result = yield fetch(str, { "method": "get" });
+                var json = yield result.json();
+                var r = json["result"];
+                return r;
+            });
+        }
         static api_getAllAppchains() {
             return __awaiter(this, void 0, void 0, function* () {
                 var str = WWW.makeRpcUrl("getallappchains");
@@ -4159,6 +4168,7 @@ var WebBrowser;
         PageName[PageName["AppChain"] = 6] = "AppChain";
         PageName[PageName["Contract"] = 7] = "Contract";
         PageName[PageName["TxMessage"] = 8] = "TxMessage";
+        PageName[PageName["Message"] = 9] = "Message";
     })(PageName = WebBrowser.PageName || (WebBrowser.PageName = {}));
 })(WebBrowser || (WebBrowser = {}));
 /// <reference path="./GUIRoute.ts"/>
@@ -4894,126 +4904,154 @@ var WebBrowser;
                 if (div.firstChild)
                     div.removeChild(div.firstChild);
                 var zoroChainBackGround = document.createElement('div');
-                zoroChainBackGround.style.width = "1140px";
+                zoroChainBackGround.style.width = "100%";
                 zoroChainBackGround.style.margin = '0 auto';
                 div.appendChild(zoroChainBackGround);
                 //zoro
                 var zoroChain = document.createElement('div');
-                WebBrowser.CSSTool.zoroChain_set(zoroChain);
+                zoroChain.className = "main-view-title";
                 zoroChainBackGround.appendChild(zoroChain);
                 var name = document.createElement('div');
-                WebBrowser.CSSTool.assets_setname(name);
                 name.textContent = 'ZORO CHAIN';
+                name.className = "textcss";
                 zoroChain.appendChild(name);
-                var BCP = document.createElement('div');
-                var bcpnum = yield WebBrowser.AppChainTool.getNativeBalanceOf("0000000000000000000000000000000000000000");
-                var BCPTitle = document.createElement('div');
-                var BCPData = document.createElement('div');
-                WebBrowser.CSSTool.BCP_set(BCP);
-                WebBrowser.CSSTool.flowLeft_set(BCPTitle);
-                BCPTitle.textContent = 'BCP';
-                BCPData.textContent = bcpnum;
-                BCPData.style.color = '#C1A26F';
-                WebBrowser.CSSTool.flowRight_set(BCPData);
-                BCP.appendChild(BCPTitle);
-                BCP.appendChild(BCPData);
-                zoroChain.appendChild(BCP);
-                //neo
-                var neoChain = document.createElement('div');
-                WebBrowser.CSSTool.zoroChain_set(neoChain);
-                neoChain.style.marginLeft = '60px';
-                zoroChainBackGround.appendChild(neoChain);
-                var name = document.createElement('div');
-                name.textContent = 'NEO CHAIN';
-                WebBrowser.CSSTool.assets_setname(name);
-                neoChain.appendChild(name);
-                var utxo = yield WebBrowser.WWW.rpc_getUTXO(WebBrowser.GUITool.address);
-                var GAS = document.createElement('div');
-                WebBrowser.CSSTool.BCP_set(GAS);
-                var GASTitle = document.createElement("div");
-                var GASData = document.createElement("div");
-                WebBrowser.CSSTool.flowLeft_set(GASTitle);
-                WebBrowser.CSSTool.flowRight_set(GASData);
-                GASTitle.textContent = 'GAS';
-                GASData.textContent = WebBrowser.AppChainTool.GAS.toFixed(8).toString();
-                GASData.style.color = '#C1A26F';
-                GAS.appendChild(GASTitle);
-                GAS.appendChild(GASData);
-                neoChain.appendChild(GAS);
-                var CGAS = document.createElement('div');
-                WebBrowser.CSSTool.BCP_set(CGAS);
-                var CGASTitle = document.createElement('div');
-                var CGASData = document.createElement('div');
-                CGASData.style.color = '#C1A26F';
-                WebBrowser.CSSTool.flowLeft_set(CGASTitle);
-                WebBrowser.CSSTool.flowRight_set(CGASData);
-                var CgasNum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.CGAS, WebBrowser.GUITool.address);
-                CGASTitle.textContent = 'CGAS';
-                CGASData.textContent = CgasNum;
-                CGAS.appendChild(CGASTitle);
-                CGAS.appendChild(CGASData);
-                neoChain.appendChild(CGAS);
-                var NEO = document.createElement('div');
-                WebBrowser.CSSTool.BCP_set(NEO);
-                var NEOTitle = document.createElement('div');
-                var NEOData = document.createElement('div');
-                NEOData.style.color = '#C1A26F';
-                WebBrowser.CSSTool.flowLeft_set(NEOTitle);
-                WebBrowser.CSSTool.flowRight_set(NEOData);
-                NEOTitle.textContent = 'NEO';
-                NEOData.textContent = WebBrowser.AppChainTool.NEO.toFixed(8).toString();
-                NEO.appendChild(NEOTitle);
-                NEO.appendChild(NEOData);
-                neoChain.appendChild(NEO);
-                var CNEO = document.createElement('div');
-                var CneoNum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.CNEO, WebBrowser.GUITool.address);
-                WebBrowser.CSSTool.BCP_set(CNEO);
-                var CNEOTitle = document.createElement('div');
-                var CNEOData = document.createElement('div');
-                CNEOData.style.color = '#C1A26F';
-                WebBrowser.CSSTool.flowLeft_set(CNEOTitle);
-                WebBrowser.CSSTool.flowRight_set(CNEOData);
-                CNEOTitle.textContent = 'CNEO';
-                CNEOData.textContent = CneoNum;
-                CNEO.appendChild(CNEOTitle);
-                CNEO.appendChild(CNEOData);
-                neoChain.appendChild(CNEO);
-                var NBCP = document.createElement('div');
-                var bcpnum = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.neoBCP, WebBrowser.GUITool.address);
-                WebBrowser.CSSTool.BCP_set(NBCP);
-                var NBCPTitle = document.createElement('div');
-                var NBCPData = document.createElement('div');
-                NBCPData.style.color = '#C1A26F';
-                WebBrowser.CSSTool.flowLeft_set(NBCPTitle);
-                WebBrowser.CSSTool.flowRight_set(NBCPData);
-                NBCPTitle.textContent = 'BCP';
-                NBCPData.textContent = bcpnum;
-                NBCP.appendChild(NBCPTitle);
-                NBCP.appendChild(NBCPData);
-                neoChain.appendChild(NBCP);
-                //appchain
-                let title = WebBrowser.GUI_Route.instance.getUI(WebBrowser.PageName.Title);
-                if (WebBrowser.GUITool.chainHash == "0000000000000000000000000000000000000000" || WebBrowser.GUITool.chainHash == "NEO" || title.height.textContent == "N/A") {
-                    return;
-                }
-                var appChain = document.createElement('div');
-                appChain.style.width = "30%";
-                appChain.style.cssFloat = "left";
-                zoroChainBackGround.appendChild(appChain);
-                var name = document.createElement('span');
-                name.style.width = "100%";
-                name.style.cssFloat = "left";
-                name.style.color = "#eeeeee";
-                name.textContent = 'APP CHAIN';
-                appChain.appendChild(name);
-                var BCP = document.createElement('span');
-                BCP.style.width = "100%";
-                BCP.style.cssFloat = "left";
-                BCP.style.color = "#eeeeee";
-                var bcpnum = yield WebBrowser.AppChainTool.getNativeBalanceOf(WebBrowser.GUITool.chainHash);
-                BCP.textContent = 'BCP = ' + bcpnum;
-                appChain.appendChild(BCP);
+                var img = document.createElement('img');
+                img.src = "./img/height.png";
+                zoroChain.appendChild(img);
+                img.className = "title-img";
+                var height = document.createElement('span');
+                height.textContent = "1234";
+                zoroChain.appendChild(height);
+                height.className = "height-num";
+                var itemsbg = document.createElement('div');
+                itemsbg.className = "asset-item-bg";
+                zoroChainBackGround.appendChild(itemsbg);
+                var balance = yield WebBrowser.WWW.api_getBalance(localStorage.address);
+                if (balance)
+                    for (var i = 0; i < balance.length; i++)
+                        this.additem(itemsbg, balance[i].symbol, balance[i].balance);
+                // var BCP = document.createElement('div') as HTMLSpanElement;
+                // var bcpnum = await AppChainTool.getNativeBalanceOf("0000000000000000000000000000000000000000");
+                // var BCPTitle = document.createElement('div');
+                // var BCPData = document.createElement('div');
+                // CSSTool.BCP_set(BCP);
+                // CSSTool.flowLeft_set(BCPTitle);
+                // BCPTitle.textContent = 'BCP';
+                // BCPData.textContent = bcpnum;
+                // BCPData.style.color = '#C1A26F';
+                // CSSTool.flowRight_set(BCPData);
+                // BCP.appendChild(BCPTitle);
+                // BCP.appendChild(BCPData);
+                // zoroChain.appendChild(BCP);
+                // //neo
+                // var neoChain = document.createElement('div') as HTMLDivElement;
+                // CSSTool.zoroChain_set(neoChain);
+                // neoChain.style.marginLeft = '60px';
+                // zoroChainBackGround.appendChild(neoChain);
+                // var name = document.createElement('div') as HTMLSpanElement;
+                // name.textContent = 'NEO CHAIN';
+                // CSSTool.assets_setname(name);
+                // neoChain.appendChild(name);
+                // var utxo = await WWW.rpc_getUTXO(GUITool.address);
+                // var GAS = document.createElement('div') as HTMLSpanElement;
+                // CSSTool.BCP_set(GAS);
+                // var GASTitle = document.createElement("div");
+                // var GASData = document.createElement("div");
+                // CSSTool.flowLeft_set(GASTitle);
+                // CSSTool.flowRight_set(GASData);
+                // GASTitle.textContent = 'GAS';
+                // GASData.textContent = AppChainTool.GAS.toFixed(8).toString();
+                // GASData.style.color = '#C1A26F';
+                // GAS.appendChild(GASTitle);
+                // GAS.appendChild(GASData);
+                // neoChain.appendChild(GAS);
+                // var CGAS = document.createElement('div') as HTMLSpanElement;
+                // CSSTool.BCP_set(CGAS);
+                // var CGASTitle = document.createElement('div');
+                // var CGASData = document.createElement('div');
+                // CGASData.style.color = '#C1A26F';
+                // CSSTool.flowLeft_set(CGASTitle);
+                // CSSTool.flowRight_set(CGASData);
+                // var CgasNum = await WWW.rpc_getBalanceOf(AppChainTool.CGAS, GUITool.address);
+                // CGASTitle.textContent = 'CGAS';
+                // CGASData.textContent = CgasNum;
+                // CGAS.appendChild(CGASTitle);
+                // CGAS.appendChild(CGASData);
+                // neoChain.appendChild(CGAS);
+                // var NEO = document.createElement('div') as HTMLSpanElement;
+                // CSSTool.BCP_set(NEO);
+                // var NEOTitle = document.createElement('div');
+                // var NEOData = document.createElement('div');
+                // NEOData.style.color = '#C1A26F';
+                // CSSTool.flowLeft_set(NEOTitle);
+                // CSSTool.flowRight_set(NEOData);
+                // NEOTitle.textContent = 'NEO';
+                // NEOData.textContent = AppChainTool.NEO.toFixed(8).toString();
+                // NEO.appendChild(NEOTitle);  
+                // NEO.appendChild(NEOData);           
+                // neoChain.appendChild(NEO);
+                // var CNEO = document.createElement('div') as HTMLSpanElement;
+                // var CneoNum = await WWW.rpc_getBalanceOf(AppChainTool.CNEO, GUITool.address);
+                // CSSTool.BCP_set(CNEO);
+                // var CNEOTitle = document.createElement('div');
+                // var CNEOData = document.createElement('div');
+                // CNEOData.style.color = '#C1A26F';
+                // CSSTool.flowLeft_set(CNEOTitle);
+                // CSSTool.flowRight_set(CNEOData);
+                // CNEOTitle.textContent = 'CNEO';
+                // CNEOData.textContent = CneoNum;
+                // CNEO.appendChild(CNEOTitle);  
+                // CNEO.appendChild(CNEOData);   
+                // neoChain.appendChild(CNEO);
+                // var NBCP = document.createElement('div') as HTMLSpanElement;
+                // var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, GUITool.address) as string;
+                // CSSTool.BCP_set(NBCP);
+                // var NBCPTitle = document.createElement('div');
+                // var NBCPData = document.createElement('div');
+                // NBCPData.style.color = '#C1A26F';
+                // CSSTool.flowLeft_set(NBCPTitle);
+                // CSSTool.flowRight_set(NBCPData);
+                // NBCPTitle.textContent = 'BCP';
+                // NBCPData.textContent = bcpnum;
+                // NBCP.appendChild(NBCPTitle);  
+                // NBCP.appendChild(NBCPData); 
+                // neoChain.appendChild(NBCP);
+                // //appchain
+                // let title = GUI_Route.instance.getUI(PageName.Title) as GUI_Title;
+                // if (GUITool.chainHash == "0000000000000000000000000000000000000000" || GUITool.chainHash == "NEO" || title.height.textContent == "N/A"){
+                //     return;
+                // }
+                // var appChain = document.createElement('div') as HTMLDivElement;
+                // appChain.style.width = "30%";
+                // appChain.style.cssFloat = "left";
+                // zoroChainBackGround.appendChild(appChain);
+                // var name = document.createElement('span') as HTMLSpanElement;
+                // name.style.width = "100%";
+                // name.style.cssFloat = "left";
+                // name.style.color = "#eeeeee";
+                // name.textContent = 'APP CHAIN';
+                // appChain.appendChild(name);
+                // var BCP = document.createElement('span') as HTMLSpanElement;
+                // BCP.style.width = "100%";
+                // BCP.style.cssFloat = "left";
+                // BCP.style.color = "#eeeeee";
+                // var bcpnum = await AppChainTool.getNativeBalanceOf(GUITool.chainHash);
+                // BCP.textContent = 'BCP = ' + bcpnum;
+                // appChain.appendChild(BCP);
             });
+        }
+        additem(itemsbg, nametext, numtext) {
+            var itembg = document.createElement('div');
+            itembg.className = "item-bg";
+            itemsbg.appendChild(itembg);
+            var name = document.createElement('span');
+            name.textContent = nametext;
+            name.className = "item-name";
+            itembg.appendChild(name);
+            var num = document.createElement('span');
+            num.textContent = numtext;
+            num.className = "item-num";
+            itembg.appendChild(num);
         }
     }
     WebBrowser.GUI_Asset = GUI_Asset;
@@ -6205,12 +6243,48 @@ var WebBrowser;
     }
     WebBrowser.GUI_TxMessage = GUI_TxMessage;
 })(WebBrowser || (WebBrowser = {}));
+var WebBrowser;
+(function (WebBrowser) {
+    class GUI_Message {
+        constructor(div) {
+            this.div = div;
+        }
+        showUI() {
+            this.mainTransaction(this.div);
+            WebBrowser.GUI_Route.instance.hideUI(WebBrowser.PageName.Title);
+        }
+        hideUI() {
+        }
+        mainTransaction(div) {
+            if (div.firstChild)
+                div.removeChild(div.firstChild);
+            var transactionBackGround = document.createElement('div');
+            transactionBackGround.style.width = "100%";
+            transactionBackGround.style.cssFloat = "left";
+            div.appendChild(transactionBackGround);
+            var TransactionText = document.createElement('span');
+            TransactionText.style.color = "#eeeeee";
+            TransactionText.textContent = "交易记录";
+            transactionBackGround.appendChild(TransactionText);
+            var txidText = document.createElement('span');
+            txidText.style.color = "#eeeeee";
+            txidText.textContent = "TXID";
+            transactionBackGround.appendChild(txidText);
+            var timeText = document.createElement('span');
+            timeText.style.color = "#eeeeee";
+            timeText.textContent = "Date";
+            transactionBackGround.appendChild(timeText);
+        }
+    }
+    WebBrowser.GUI_Message = GUI_Message;
+})(WebBrowser || (WebBrowser = {}));
 /// <reference path="./Base.ts"/>
 /// <reference path="./Asset.ts"/>
 /// <reference path="./Charge.ts"/>
 /// <reference path="./AppChain.ts"/>
 /// <reference path="./Contract.ts"/>
 /// <reference path="./TxMessage.ts"/>
+/// <reference path="./Message.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
 var WebBrowser;
 /// <reference path="./Base.ts"/>
@@ -6219,28 +6293,27 @@ var WebBrowser;
 /// <reference path="./AppChain.ts"/>
 /// <reference path="./Contract.ts"/>
 /// <reference path="./TxMessage.ts"/>
+/// <reference path="./Message.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
 (function (WebBrowser) {
     class GUI_Title {
         constructor(div) {
             this.div = div;
-            this.div.style.width = "100%";
-            this.div.style.background = '#3D3E4C';
             var navTitle = document.createElement("div");
-            navTitle.style.width = "1140px";
-            navTitle.style.margin = '0 auto';
             this.div.appendChild(navTitle);
+            navTitle.className = "navTitle-bg";
             this.title = document.createElement('div');
             navTitle.appendChild(this.title);
-            WebBrowser.CSSTool.title_set(this.title);
+            this.title.className = "title-bg";
             this.mainValueBackGround = document.createElement('div');
-            this.mainValueBackGround.style.width = "100%";
-            this.div.appendChild(this.mainValueBackGround);
+            navTitle.appendChild(this.mainValueBackGround);
+            this.mainValueBackGround.className = "main-value-bg";
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Asset, new WebBrowser.GUI_Asset(this.mainValueBackGround));
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Charge, new WebBrowser.GUI_Charge(this.mainValueBackGround));
-            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.AppChain, new WebBrowser.GUI_AppChain(this.mainValueBackGround));
+            //GUI_Route.instance.pushUI(PageName.AppChain, new GUI_AppChain(this.mainValueBackGround));
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Contract, new WebBrowser.GUI_Contract(this.mainValueBackGround));
             WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.TxMessage, new WebBrowser.GUI_TxMessage(this.mainValueBackGround));
+            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Message, new WebBrowser.GUI_Message(this.mainValueBackGround));
         }
         showUI() {
             this.showTitle(this.title);
@@ -6259,68 +6332,94 @@ var WebBrowser;
             }
         }
         showTitle(title) {
-            $("#gui-info").width($(window).width());
+            //$("#gui-info").width($(window).width());
             $("#removeContainer").removeClass("container");
             var asset = document.createElement("button");
             title.appendChild(asset);
-            $(asset).css("background", "#333542");
-            WebBrowser.CSSTool.titleBtn_set(asset);
+            asset.className = "title-btn title-btn-off";
             asset.textContent = "资产";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/01_token.png";
+            asset.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             asset.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Asset);
-                this.addSelect();
-                $(asset).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) => {
+                    value.className = "title-btn title-btn-off";
+                });
+                asset.className = "title-btn title-btn-on";
             };
             asset.click();
             var charge = document.createElement("button");
             title.appendChild(charge);
-            $(charge).css("background", "#3D3E4C");
-            WebBrowser.CSSTool.titleBtn_set(charge);
+            charge.className = "title-btn title-btn-off";
             charge.textContent = "转账";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/02_charge.png";
+            charge.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             charge.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Charge);
-                $(charge).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) => {
+                    value.className = "title-btn title-btn-off";
+                });
+                charge.className = "title-btn title-btn-on";
             };
-            var appChain = document.createElement("button");
-            title.appendChild(appChain);
-            $(appChain).css("background", "#3D3E4C");
-            WebBrowser.CSSTool.titleBtn_set(appChain);
-            appChain.textContent = "应用链";
-            appChain.onclick = () => {
-                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.AppChain);
-                $(appChain).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
-            };
+            // var appChain = document.createElement("button") as HTMLButtonElement;
+            // title.appendChild(appChain)
+            // $(appChain).css("background","#3D3E4C");
+            // appChain.className = "title-btn-on";
+            // appChain.textContent = "应用链";
+            // appChain.onclick = () => {
+            //     GUI_Route.instance.showUI(PageName.AppChain);
+            //     $(appChain).css("background","#333542").siblings("button").css("background","#3D3E4C");
+            // }
             var contract = document.createElement("button");
             WebBrowser.CSSTool.titleBtn_set(contract);
             title.appendChild(contract);
-            $(contract).css("background", "#3D3E4C");
             contract.textContent = "发布合约";
-            WebBrowser.CSSTool.titleBtn_set(contract);
+            contract.className = "title-btn title-btn-off";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/03_contract.png";
+            contract.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             contract.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Contract);
-                $(contract).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) => {
+                    value.className = "title-btn title-btn-off";
+                });
+                contract.className = "title-btn title-btn-on";
             };
             var transaction = document.createElement("button");
             title.appendChild(transaction);
-            $(transaction).css("background", "#3D3E4C");
             transaction.textContent = "交易记录";
-            WebBrowser.CSSTool.titleBtn_set(transaction);
+            transaction.className = "title-btn title-btn-off";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/04_txmessage.png";
+            transaction.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             transaction.onclick = () => {
                 WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.TxMessage);
-                $(transaction).css("background", "#333542").siblings("button").css("background", "#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) => {
+                    value.className = "title-btn title-btn-off";
+                });
+                transaction.className = "title-btn title-btn-on";
             };
-            // var message = document.createElement("button") as HTMLButtonElement;
-            // title.appendChild(message)
-            // $(message).css("background","#3D3E4C");
-            // message.textContent = "信息";
-            // CSSTool.titleBtn_set(message);
-            // message.onclick = () => {
-            //     $(message).css("background","#333542").siblings("button").css("background","#3D3E4C");
-            // }        
-            var address = document.createElement('span');
-            title.appendChild(address);
-            address.textContent = "地址：" + localStorage.address;
-            WebBrowser.CSSTool.titleBtn_set(address);
+            var message = document.createElement("button");
+            title.appendChild(message);
+            message.textContent = "信息";
+            message.className = "title-btn title-btn-off";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/05_message.png";
+            message.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
+            message.onclick = () => {
+                WebBrowser.GUI_Route.instance.showUI(WebBrowser.PageName.Message);
+                document.querySelectorAll(".title-btn").forEach((value) => {
+                    value.className = "title-btn title-btn-off";
+                });
+                message.className = "title-btn title-btn-on";
+            };
         }
         addSelect() {
             this.hideUI();

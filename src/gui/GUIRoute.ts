@@ -42,6 +42,7 @@ namespace WebBrowser
         Charge,
         AppChain,
         Contract,
-        TxMessage
+        TxMessage,
+        Message
     }
 }

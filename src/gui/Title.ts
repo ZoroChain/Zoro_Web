@@ -4,6 +4,7 @@
 /// <reference path="./AppChain.ts"/>
 /// <reference path="./Contract.ts"/>
 /// <reference path="./TxMessage.ts"/>
+/// <reference path="./Message.ts"/>
 /// <reference path="../tools/CSSTools.ts"/>
 namespace WebBrowser
 {
@@ -19,28 +20,25 @@ namespace WebBrowser
 
         constructor(div:HTMLDivElement){
             this.div = div;
-            this.div.style.width = "100%";
-            this.div.style.background = '#3D3E4C';
             
             var navTitle = document.createElement("div");
-            navTitle.style.width = "1140px";
-            navTitle.style.margin = '0 auto';
             this.div.appendChild(navTitle);
-
+            navTitle.className = "navTitle-bg";
              
             this.title = document.createElement('div') as HTMLDivElement;
             navTitle.appendChild(this.title);
-            CSSTool.title_set(this.title);
+            this.title.className = "title-bg";
 
             this.mainValueBackGround = document.createElement('div') as HTMLDivElement;
-            this.mainValueBackGround.style.width = "100%";
-            this.div.appendChild(this.mainValueBackGround);
+            navTitle.appendChild(this.mainValueBackGround);
+            this.mainValueBackGround.className = "main-value-bg";
 
             GUI_Route.instance.pushUI(PageName.Asset, new GUI_Asset(this.mainValueBackGround));
             GUI_Route.instance.pushUI(PageName.Charge, new GUI_Charge(this.mainValueBackGround));
-            GUI_Route.instance.pushUI(PageName.AppChain, new GUI_AppChain(this.mainValueBackGround));
+            //GUI_Route.instance.pushUI(PageName.AppChain, new GUI_AppChain(this.mainValueBackGround));
             GUI_Route.instance.pushUI(PageName.Contract, new GUI_Contract(this.mainValueBackGround));
             GUI_Route.instance.pushUI(PageName.TxMessage, new GUI_TxMessage(this.mainValueBackGround));
+            GUI_Route.instance.pushUI(PageName.Message, new GUI_Message(this.mainValueBackGround));
         }
 
         showUI(){           
@@ -60,70 +58,96 @@ namespace WebBrowser
             $("#removeContainer").removeClass("container");
             var asset = document.createElement("button") as HTMLButtonElement;
             title.appendChild(asset);
-            $(asset).css("background","#333542");
-            CSSTool.titleBtn_set(asset);
+            asset.className = "title-btn title-btn-off";
             asset.textContent = "资产";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/01_token.png";
+            asset.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             asset.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Asset);
-                this.addSelect();
-                $(asset).css("background","#333542").siblings("button").css("background","#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) =>{
+                    value.className = "title-btn title-btn-off";
+                });
+                asset.className = "title-btn title-btn-on";
             }
             asset.click();
 
             var charge = document.createElement("button") as HTMLButtonElement;
-            title.appendChild(charge)
-            $(charge).css("background","#3D3E4C");
-            CSSTool.titleBtn_set(charge);
+            title.appendChild(charge);
+            charge.className = "title-btn title-btn-off";
             charge.textContent = "转账";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/02_charge.png";
+            charge.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             charge.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Charge);
-                $(charge).css("background","#333542").siblings("button").css("background","#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) =>{
+                    value.className = "title-btn title-btn-off";
+                });
+                charge.className = "title-btn title-btn-on";
             }
 
-            var appChain = document.createElement("button") as HTMLButtonElement;
-            title.appendChild(appChain)
-            $(appChain).css("background","#3D3E4C");
-            CSSTool.titleBtn_set(appChain);
-            appChain.textContent = "应用链";
-            appChain.onclick = () => {
-                GUI_Route.instance.showUI(PageName.AppChain);
-                $(appChain).css("background","#333542").siblings("button").css("background","#3D3E4C");
-            }
+            // var appChain = document.createElement("button") as HTMLButtonElement;
+            // title.appendChild(appChain)
+            // $(appChain).css("background","#3D3E4C");
+            // appChain.className = "title-btn-on";
+            // appChain.textContent = "应用链";
+            // appChain.onclick = () => {
+            //     GUI_Route.instance.showUI(PageName.AppChain);
+            //     $(appChain).css("background","#333542").siblings("button").css("background","#3D3E4C");
+            // }
 
             var contract = document.createElement("button") as HTMLButtonElement;
             CSSTool.titleBtn_set(contract);
             title.appendChild(contract)
-            $(contract).css("background","#3D3E4C");
             contract.textContent = "发布合约";
-            CSSTool.titleBtn_set(contract);
+            contract.className = "title-btn title-btn-off";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/03_contract.png";
+            contract.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             contract.onclick = () => {
                 GUI_Route.instance.showUI(PageName.Contract);
-                $(contract).css("background","#333542").siblings("button").css("background","#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) =>{
+                    value.className = "title-btn title-btn-off";
+                });
+                contract.className = "title-btn title-btn-on";
             }
 
             var transaction = document.createElement("button") as HTMLButtonElement;
-            title.appendChild(transaction)
-            $(transaction).css("background","#3D3E4C");
+            title.appendChild(transaction);
             transaction.textContent = "交易记录";
-            CSSTool.titleBtn_set(transaction);
+            transaction.className = "title-btn title-btn-off";
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/04_txmessage.png";
+            transaction.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
             transaction.onclick = () => {
                 GUI_Route.instance.showUI(PageName.TxMessage);
-                $(transaction).css("background","#333542").siblings("button").css("background","#3D3E4C");
+                document.querySelectorAll(".title-btn").forEach((value) =>{
+                    value.className = "title-btn title-btn-off";
+                });
+                transaction.className = "title-btn title-btn-on";
             }
 
-            // var message = document.createElement("button") as HTMLButtonElement;
-            // title.appendChild(message)
-            // $(message).css("background","#3D3E4C");
-            // message.textContent = "信息";
-            // CSSTool.titleBtn_set(message);
-            // message.onclick = () => {
-            //     $(message).css("background","#333542").siblings("button").css("background","#3D3E4C");
-            // }        
-            
-            var address = document.createElement('span') as HTMLSpanElement;
-            title.appendChild(address);
-            address.textContent = "地址：" + localStorage.address;
-            CSSTool.titleBtn_set(address);
+            var message = document.createElement("button") as HTMLButtonElement;
+            title.appendChild(message)
+            message.textContent = "信息";
+            message.className = "title-btn title-btn-off";           
+            var fileIcon = document.createElement("img");
+            fileIcon.src = "./img/05_message.png";
+            message.appendChild(fileIcon);
+            fileIcon.className = "button-icon";
+
+            message.onclick = () => {
+                GUI_Route.instance.showUI(PageName.Message);
+                document.querySelectorAll(".title-btn").forEach((value) =>{
+                    value.className = "title-btn title-btn-off";
+                });
+                message.className = "title-btn title-btn-on";
+            }                   
         }
 
         addSelect(){
