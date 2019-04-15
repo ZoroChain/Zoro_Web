@@ -21,8 +21,10 @@ namespace WebBrowser
         }
 
         initPage(){
-            GUI_Route.instance.pushUI(PageName.Login, new GUI_Login(this.div));
-            GUI_Route.instance.pushUI(PageName.MainView, new GUI_Main(this.div));
+            var backgroundPage = document.createElement('div') as HTMLDivElement;
+            this.div.appendChild(backgroundPage);
+            GUI_Route.instance.pushUI(PageName.Login, new GUI_Login(backgroundPage));
+            GUI_Route.instance.pushUI(PageName.MainView, new GUI_Main(backgroundPage));
         }
 
         div: HTMLDivElement = document.getElementById('gui-info') as HTMLDivElement;

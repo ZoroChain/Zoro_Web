@@ -55,7 +55,7 @@ namespace WebBrowser
 
         showTitle(title):void{                       
             //$("#gui-info").width($(window).width());
-            $("#removeContainer").removeClass("container");
+            //$("#removeContainer").removeClass("container");
             var asset = document.createElement("button") as HTMLButtonElement;
             title.appendChild(asset);
             asset.className = "title-btn title-btn-off";

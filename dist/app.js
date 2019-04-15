@@ -4045,12 +4045,17 @@ var WebBrowser;
         }
     }
     AppChainTool.zoroBCP = "0000000000000000000000000000000000000001";
-    AppChainTool.neoBCP = "04e31cee0443bb916534dad2adf508458920e66d";
+    AppChainTool.neoBCP = "d49d37845d0b0bf4ba7575509c44c6e9e98e6b6b";
     AppChainTool.CNEO = "c074a05e9dcf0141cbe6b4b3475dd67baf4dcb60";
     AppChainTool.CGAS = "74f2dc36a68fdc4682034178eb2220729231db76";
     AppChainTool.Neotransfer = "0x04e31cee0443bb916534dad2adf508458920e66d";
     AppChainTool.Zorotransfer = "0x67147557c0b6431e9b9297de26b46d9889434e49";
     AppChainTool.RootChain = "0000000000000000000000000000000000000000";
+    //跨链相关参数
+    AppChainTool.zoroBank = "0xb6a0b10d8cb60392068c16212f5e79fcacb18e67";
+    AppChainTool.zoroBankAddr = "ARDSBp77KGwnFctq4ETkdsesoE2LY28uwA";
+    AppChainTool.neoBank = "0x816c36f0318b3fdd4630c50ec76f16323e63f059";
+    AppChainTool.neoBankAddr = "APyRkzuadaczn1xSvQ3WXn5uEH6u5HK5K5";
     AppChainTool.id_GAS = "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7";
     AppChainTool.id_NEO = "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b";
     AppChainTool.GAS = 0;
@@ -4463,7 +4468,8 @@ var WebBrowser;
         hideUI() {
         }
         login() {
-            this.div.removeChild(this.div.firstChild);
+            if (this.div.firstChild)
+                this.div.removeChild(this.div.firstChild);
             this.div.className = "wallet-bg";
             var background = document.createElement('div');
             this.div.appendChild(background);
@@ -4920,7 +4926,7 @@ var WebBrowser;
                 zoroChain.appendChild(img);
                 img.className = "title-img";
                 var height = document.createElement('span');
-                height.textContent = "1234";
+                height.textContent = (yield WebBrowser.WWW.api_getZoroHeight(WebBrowser.AppChainTool.RootChain)) + "";
                 zoroChain.appendChild(height);
                 height.className = "height-num";
                 var itemsbg = document.createElement('div');
@@ -4930,114 +4936,34 @@ var WebBrowser;
                 if (balance)
                     for (var i = 0; i < balance.length; i++)
                         this.additem(itemsbg, balance[i].symbol, balance[i].balance);
-                // var BCP = document.createElement('div') as HTMLSpanElement;
-                // var bcpnum = await AppChainTool.getNativeBalanceOf("0000000000000000000000000000000000000000");
-                // var BCPTitle = document.createElement('div');
-                // var BCPData = document.createElement('div');
-                // CSSTool.BCP_set(BCP);
-                // CSSTool.flowLeft_set(BCPTitle);
-                // BCPTitle.textContent = 'BCP';
-                // BCPData.textContent = bcpnum;
-                // BCPData.style.color = '#C1A26F';
-                // CSSTool.flowRight_set(BCPData);
-                // BCP.appendChild(BCPTitle);
-                // BCP.appendChild(BCPData);
-                // zoroChain.appendChild(BCP);
-                // //neo
-                // var neoChain = document.createElement('div') as HTMLDivElement;
-                // CSSTool.zoroChain_set(neoChain);
-                // neoChain.style.marginLeft = '60px';
-                // zoroChainBackGround.appendChild(neoChain);
-                // var name = document.createElement('div') as HTMLSpanElement;
-                // name.textContent = 'NEO CHAIN';
-                // CSSTool.assets_setname(name);
-                // neoChain.appendChild(name);
-                // var utxo = await WWW.rpc_getUTXO(GUITool.address);
-                // var GAS = document.createElement('div') as HTMLSpanElement;
-                // CSSTool.BCP_set(GAS);
-                // var GASTitle = document.createElement("div");
-                // var GASData = document.createElement("div");
-                // CSSTool.flowLeft_set(GASTitle);
-                // CSSTool.flowRight_set(GASData);
-                // GASTitle.textContent = 'GAS';
-                // GASData.textContent = AppChainTool.GAS.toFixed(8).toString();
-                // GASData.style.color = '#C1A26F';
-                // GAS.appendChild(GASTitle);
-                // GAS.appendChild(GASData);
-                // neoChain.appendChild(GAS);
-                // var CGAS = document.createElement('div') as HTMLSpanElement;
-                // CSSTool.BCP_set(CGAS);
-                // var CGASTitle = document.createElement('div');
-                // var CGASData = document.createElement('div');
-                // CGASData.style.color = '#C1A26F';
-                // CSSTool.flowLeft_set(CGASTitle);
-                // CSSTool.flowRight_set(CGASData);
-                // var CgasNum = await WWW.rpc_getBalanceOf(AppChainTool.CGAS, GUITool.address);
-                // CGASTitle.textContent = 'CGAS';
-                // CGASData.textContent = CgasNum;
-                // CGAS.appendChild(CGASTitle);
-                // CGAS.appendChild(CGASData);
-                // neoChain.appendChild(CGAS);
-                // var NEO = document.createElement('div') as HTMLSpanElement;
-                // CSSTool.BCP_set(NEO);
-                // var NEOTitle = document.createElement('div');
-                // var NEOData = document.createElement('div');
-                // NEOData.style.color = '#C1A26F';
-                // CSSTool.flowLeft_set(NEOTitle);
-                // CSSTool.flowRight_set(NEOData);
-                // NEOTitle.textContent = 'NEO';
-                // NEOData.textContent = AppChainTool.NEO.toFixed(8).toString();
-                // NEO.appendChild(NEOTitle);  
-                // NEO.appendChild(NEOData);           
-                // neoChain.appendChild(NEO);
-                // var CNEO = document.createElement('div') as HTMLSpanElement;
-                // var CneoNum = await WWW.rpc_getBalanceOf(AppChainTool.CNEO, GUITool.address);
-                // CSSTool.BCP_set(CNEO);
-                // var CNEOTitle = document.createElement('div');
-                // var CNEOData = document.createElement('div');
-                // CNEOData.style.color = '#C1A26F';
-                // CSSTool.flowLeft_set(CNEOTitle);
-                // CSSTool.flowRight_set(CNEOData);
-                // CNEOTitle.textContent = 'CNEO';
-                // CNEOData.textContent = CneoNum;
-                // CNEO.appendChild(CNEOTitle);  
-                // CNEO.appendChild(CNEOData);   
-                // neoChain.appendChild(CNEO);
-                // var NBCP = document.createElement('div') as HTMLSpanElement;
-                // var bcpnum = await WWW.rpc_getBalanceOf(AppChainTool.neoBCP, GUITool.address) as string;
-                // CSSTool.BCP_set(NBCP);
-                // var NBCPTitle = document.createElement('div');
-                // var NBCPData = document.createElement('div');
-                // NBCPData.style.color = '#C1A26F';
-                // CSSTool.flowLeft_set(NBCPTitle);
-                // CSSTool.flowRight_set(NBCPData);
-                // NBCPTitle.textContent = 'BCP';
-                // NBCPData.textContent = bcpnum;
-                // NBCP.appendChild(NBCPTitle);  
-                // NBCP.appendChild(NBCPData); 
-                // neoChain.appendChild(NBCP);
-                // //appchain
-                // let title = GUI_Route.instance.getUI(PageName.Title) as GUI_Title;
-                // if (GUITool.chainHash == "0000000000000000000000000000000000000000" || GUITool.chainHash == "NEO" || title.height.textContent == "N/A"){
-                //     return;
-                // }
-                // var appChain = document.createElement('div') as HTMLDivElement;
-                // appChain.style.width = "30%";
-                // appChain.style.cssFloat = "left";
-                // zoroChainBackGround.appendChild(appChain);
-                // var name = document.createElement('span') as HTMLSpanElement;
-                // name.style.width = "100%";
-                // name.style.cssFloat = "left";
-                // name.style.color = "#eeeeee";
-                // name.textContent = 'APP CHAIN';
-                // appChain.appendChild(name);
-                // var BCP = document.createElement('span') as HTMLSpanElement;
-                // BCP.style.width = "100%";
-                // BCP.style.cssFloat = "left";
-                // BCP.style.color = "#eeeeee";
-                // var bcpnum = await AppChainTool.getNativeBalanceOf(GUITool.chainHash);
-                // BCP.textContent = 'BCP = ' + bcpnum;
-                // appChain.appendChild(BCP);
+                //NEO
+                var zoroChain = document.createElement('div');
+                zoroChain.className = "main-view-title";
+                zoroChainBackGround.appendChild(zoroChain);
+                var name = document.createElement('div');
+                name.textContent = 'NEO CHAIN';
+                name.className = "textcss";
+                zoroChain.appendChild(name);
+                var img = document.createElement('img');
+                img.src = "./img/height.png";
+                zoroChain.appendChild(img);
+                img.className = "title-img";
+                var height = document.createElement('span');
+                height.textContent = (yield WebBrowser.WWW.api_getNEOHeight()) + "";
+                zoroChain.appendChild(height);
+                height.className = "height-num";
+                var itemsbg = document.createElement('div');
+                itemsbg.className = "asset-item-bg";
+                zoroChainBackGround.appendChild(itemsbg);
+                var utxo = yield WebBrowser.WWW.rpc_getUTXO(localStorage.address);
+                this.additem(itemsbg, "NEO", WebBrowser.AppChainTool.NEO.toFixed(8).toString());
+                this.additem(itemsbg, "GAS", WebBrowser.AppChainTool.GAS.toFixed(8).toString());
+                var cneo = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.CGAS, localStorage.address);
+                this.additem(itemsbg, "CNEO", cneo);
+                var cgas = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.CGAS, localStorage.address);
+                this.additem(itemsbg, "CGAS", cgas);
+                var bcp = yield WebBrowser.WWW.rpc_getBalanceOf(WebBrowser.AppChainTool.neoBCP, localStorage.address);
+                this.additem(itemsbg, "BCP", bcp);
             });
         }
         additem(itemsbg, nametext, numtext) {
@@ -5088,36 +5014,32 @@ var WebBrowser;
             downBackGround.style.cssFloat = "left";
             chargeBackGround.appendChild(downBackGround);
             var transfer = document.createElement("div");
-            WebBrowser.CSSTool.transfer_set(transfer);
+            transfer.className = "charge-title-bg";
             upBackGround.appendChild(transfer);
             var normalcharge = document.createElement("button");
             transfer.appendChild(normalcharge);
-            WebBrowser.CSSTool.transfer_btn(normalcharge);
-            WebBrowser.CSSTool.flowLeft_set(normalcharge);
-            normalcharge.style.borderTop = '1px solid #C8AB73';
+            normalcharge.className = "charge-title-item";
             normalcharge.textContent = "普通转账";
             normalcharge.onclick = () => {
                 this.normalCharge(downBackGround);
-                $(normalcharge).css({ "borderTop": "1px solid #C8AB73", "background": '#3C3E4B' }).siblings().css({ "borderTop": "1px solid #333542", "background": "#333542" });
+                var item = document.querySelectorAll('.charge-title-item');
+                for (var i = 0; i < item.length; i++) {
+                    item[i].className = "charge-title-item";
+                }
+                normalcharge.className = "charge-title-item charge-on";
             };
             normalcharge.click();
-            var singlecharge = document.createElement("button");
-            transfer.appendChild(singlecharge);
-            WebBrowser.CSSTool.transfer_btn(singlecharge);
-            WebBrowser.CSSTool.flowLeft_set(singlecharge);
-            singlecharge.textContent = "单链转账";
-            singlecharge.onclick = () => {
-                this.singleCharge(downBackGround);
-                $(singlecharge).css({ "borderTop": "1px solid #C8AB73", "background": '#3C3E4B' }).siblings().css({ "borderTop": "1px solid #333542", "background": "#333542" });
-            };
             var chainCharge = document.createElement("button");
             transfer.appendChild(chainCharge);
-            WebBrowser.CSSTool.transfer_btn(chainCharge);
-            WebBrowser.CSSTool.flowLeft_set(chainCharge);
+            chainCharge.className = "charge-title-item";
             chainCharge.textContent = "跨链转账";
             chainCharge.onclick = () => {
                 this.chainCharge(downBackGround);
-                $(chainCharge).css({ "borderTop": "1px solid #C8AB73", "background": '#3C3E4B' }).siblings().css({ "borderTop": "1px solid #333542", "background": "#333542" });
+                var item = document.querySelectorAll('.charge-title-item');
+                for (var i = 0; i < item.length; i++) {
+                    item[i].className = "charge-title-item";
+                }
+                chainCharge.className = "charge-title-item charge-on";
             };
         }
         singleCharge(div) {
@@ -6333,7 +6255,7 @@ var WebBrowser;
         }
         showTitle(title) {
             //$("#gui-info").width($(window).width());
-            $("#removeContainer").removeClass("container");
+            //$("#removeContainer").removeClass("container");
             var asset = document.createElement("button");
             title.appendChild(asset);
             asset.className = "title-btn title-btn-off";
@@ -6542,7 +6464,8 @@ var WebBrowser;
         hideUI() {
         }
         mainMenu() {
-            this.div.removeChild(this.div.firstChild);
+            if (this.div.firstChild)
+                this.div.removeChild(this.div.firstChild);
             this.div.className = "main-view-bg";
             var background = document.createElement('div');
             this.div.appendChild(background);
@@ -6585,8 +6508,10 @@ var WebBrowser;
             }
         }
         initPage() {
-            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Login, new WebBrowser.GUI_Login(this.div));
-            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.MainView, new WebBrowser.GUI_Main(this.div));
+            var backgroundPage = document.createElement('div');
+            this.div.appendChild(backgroundPage);
+            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.Login, new WebBrowser.GUI_Login(backgroundPage));
+            WebBrowser.GUI_Route.instance.pushUI(WebBrowser.PageName.MainView, new WebBrowser.GUI_Main(backgroundPage));
         }
         start() {
             this.getLangs();

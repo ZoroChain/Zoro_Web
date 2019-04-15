@@ -476,7 +476,7 @@ table>tbody>tr {
 /* wallet start */
 .wallet-bg{
     width: 100%;
-    background-image: url("../img/mainbg.jpg");
+    background-image: url("../img/testbg.jpg");
     text-align: center;
     background-repeat: round;
     margin-top: 20px;
@@ -511,7 +511,7 @@ table>tbody>tr {
 .login-bg{
     display: inline-block;
     width: 350px;
-    background-color: #292c3b;
+    background-color: rgb(42,58,58);
     border-radius: 25px;
     margin-top: 50px;
     margin-left: 100px;
@@ -596,7 +596,7 @@ table>tbody>tr {
     border-color: #22222277;
     border-width: 1px;
     margin-top:80px;
-    background: #3b3d4a;
+    background: rgb(55,69,70);
 }
 .title-btn{
     width: 100%;
@@ -612,10 +612,10 @@ table>tbody>tr {
     line-height: 32px;
 }
 .title-btn-on{   
-    background:#30323d;
+    background:rgb(42,58,58);
 }
 .title-btn-off{
-    background: #3b3d4a;
+    background: rgb(55,69,70);
 }
 .button-icon{
     float: left;
@@ -629,7 +629,7 @@ table>tbody>tr {
     border-color: #22222277;
     border-width: 1px;
     margin-top:80px;
-    background: #3b3d4a;
+    background: rgb(55,69,70);
 }
 .main-view-title{
     float: left;
@@ -659,9 +659,10 @@ table>tbody>tr {
     width: 90%;
     margin: 0 auto;
     display: table;
+    margin-bottom: 20px;
 }
 .item-bg{
-    background: #40424f;
+    background: rgb(48,64,64);;
     width: 45%;
     float: left;
     margin: 5px 15px;
@@ -680,5 +681,23 @@ table>tbody>tr {
     margin-right: 10px;
     color: rgb(202,161,111);
     font-size: 18px;
+}
+.charge-title-bg{
+    width: 100%;
+    display: flex;
+    border-bottom: 1px solid rgb(71,73,87);
+}
+.charge-title-item{
+    float: left;
+    padding: 20px 50px;  
+    font-size: 20px;
+    color:rgb(122,124,137);  
+    background: rgb(55,69,70);
+    border: 0;
+    outline: 0; 
+}
+.charge-on{
+    border-bottom: 1px solid rgb(200,171,115);
+    color:white;
 }
 /* MainView end */

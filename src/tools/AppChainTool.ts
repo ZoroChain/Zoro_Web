@@ -5,15 +5,21 @@ namespace WebBrowser
 {
     export class AppChainTool
     {
-        static zoroBCP = "0000000000000000000000000000000000000001";
-        static neoBCP = "04e31cee0443bb916534dad2adf508458920e66d";
-        static CNEO = "c074a05e9dcf0141cbe6b4b3475dd67baf4dcb60";
-        static CGAS = "74f2dc36a68fdc4682034178eb2220729231db76";
+        static readonly zoroBCP = "0000000000000000000000000000000000000001";
+        static readonly neoBCP = "d49d37845d0b0bf4ba7575509c44c6e9e98e6b6b";
+        static readonly CNEO = "c074a05e9dcf0141cbe6b4b3475dd67baf4dcb60";
+        static readonly CGAS = "74f2dc36a68fdc4682034178eb2220729231db76";
 
-        static Neotransfer = "0x04e31cee0443bb916534dad2adf508458920e66d";
-        static Zorotransfer = "0x67147557c0b6431e9b9297de26b46d9889434e49";
+        static readonly Neotransfer = "0x04e31cee0443bb916534dad2adf508458920e66d";
+        static readonly Zorotransfer = "0x67147557c0b6431e9b9297de26b46d9889434e49";
 
-        static RootChain = "0000000000000000000000000000000000000000";
+        static readonly RootChain = "0000000000000000000000000000000000000000";
+
+        //跨链相关参数
+        static readonly zoroBank = "0xb6a0b10d8cb60392068c16212f5e79fcacb18e67";
+        static readonly zoroBankAddr = "ARDSBp77KGwnFctq4ETkdsesoE2LY28uwA";
+        static readonly neoBank = "0x816c36f0318b3fdd4630c50ec76f16323e63f059";
+        static readonly neoBankAddr = "APyRkzuadaczn1xSvQ3WXn5uEH6u5HK5K5";
 
         static readonly id_GAS: string = "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7";
         static readonly id_NEO: string = "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b";

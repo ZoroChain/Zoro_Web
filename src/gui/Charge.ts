@@ -38,61 +38,51 @@ namespace WebBrowser
             chargeBackGround.appendChild(downBackGround);
 
             var transfer = document.createElement("div");
-            CSSTool.transfer_set(transfer);
+            transfer.className = "charge-title-bg";
             upBackGround.appendChild(transfer);
 
             var normalcharge = document.createElement("button") as HTMLButtonElement;
             transfer.appendChild(normalcharge);
-            CSSTool.transfer_btn(normalcharge);
-            CSSTool.flowLeft_set(normalcharge);
-            normalcharge.style.borderTop = '1px solid #C8AB73';
+            normalcharge.className = "charge-title-item";
             normalcharge.textContent = "普通转账";
             
             normalcharge.onclick = () => {
                 this.normalCharge(downBackGround);
-                $(normalcharge).css({"borderTop":"1px solid #C8AB73","background" : '#3C3E4B'}).siblings().css({"borderTop":"1px solid #333542","background":"#333542"});
+                var item = document.querySelectorAll('.charge-title-item');
+                for (var i = 0; i < item.length; i++){
+                    item[i].className = "charge-title-item";
+                }
+                normalcharge.className = "charge-title-item charge-on";
             }
             normalcharge.click();
 
-            var singlecharge = document.createElement("button") as HTMLButtonElement;
-            transfer.appendChild(singlecharge);
-            CSSTool.transfer_btn(singlecharge);
-            CSSTool.flowLeft_set(singlecharge);
-            singlecharge.textContent = "单链转账";
-            singlecharge.onclick = () => {
-                this.singleCharge(downBackGround);
-                $(singlecharge).css({"borderTop":"1px solid #C8AB73","background" : '#3C3E4B'}).siblings().css({"borderTop":"1px solid #333542","background":"#333542"});
-            }
-
             var chainCharge = document.createElement("button") as HTMLButtonElement;
             transfer.appendChild(chainCharge);
-            CSSTool.transfer_btn(chainCharge);
-            CSSTool.flowLeft_set(chainCharge);        
+            chainCharge.className = "charge-title-item";
             chainCharge.textContent = "跨链转账";
             chainCharge.onclick = () => {
                 this.chainCharge(downBackGround);
-                $(chainCharge).css({"borderTop":"1px solid #C8AB73","background" : '#3C3E4B'}).siblings().css({"borderTop":"1px solid #333542","background":"#333542"});
-            }
+                var item = document.querySelectorAll('.charge-title-item');
+                for (var i = 0; i < item.length; i++){
+                    item[i].className = "charge-title-item";
+                }
+                chainCharge.className = "charge-title-item charge-on";}
         }
 
         async singleCharge(div:HTMLDivElement){
             if (div.firstChild)div.removeChild(div.firstChild);
 
-            var singlebackground = document.createElement('div') as HTMLDivElement;
-            CSSTool.normalbackground_set(singlebackground);
+            var singlebackground = document.createElement('div') as HTMLDivElement;            
             div.appendChild(singlebackground);
             
             var top = document.createElement("div");
-            top.style.width = '100%';
-            top.style.overflow = 'hidden';
             top.style.margin = '15px 0';
             singlebackground.appendChild(top);
 
             var asset = document.createElement('span') as HTMLSpanElement;
             top.appendChild(asset);
-            asset.style.color = "#eeeeee";
             asset.textContent = "链名";
-            CSSTool.flowLeft_set(asset);
+            asset.className = "asset-name";
 
             var select = document.createElement("select") as HTMLSelectElement;
             top.appendChild(select);
@@ -107,8 +97,7 @@ namespace WebBrowser
 
             var coin = document.createElement('span') as HTMLSpanElement;
             balance.appendChild(coin);
-            coin.style.paddingRight = "15px";
-            coin.style.color = "#eeeeee";
+            coin.className = "asset-name";
             coin.textContent = "余额";
 
             var coinNum = document.createElement('span') as HTMLSpanElement;
@@ -116,14 +105,6 @@ namespace WebBrowser
             coinNum.style.color = "#C8AB73";
             coinNum.textContent = await CoinTool.getGold("default", GUITool.address, "NEO");
             select.onchange = async (e) => {
-                coinNum.textContent = await CoinTool.getGold("default", GUITool.address, (select.childNodes[select.selectedIndex] as HTMLOptionElement).value);
-            }
-
-            var button = document.createElement("button") as HTMLButtonElement;
-            balance.appendChild(button);
-            button.textContent = "刷新";
-            CSSTool.break_set(button);
-            button.onclick = async () => {
                 coinNum.textContent = await CoinTool.getGold("default", GUITool.address, (select.childNodes[select.selectedIndex] as HTMLOptionElement).value);
             }
   
@@ -134,14 +115,12 @@ namespace WebBrowser
 
             var addrText = document.createElement('span') as HTMLSpanElement;
             address.appendChild(addrText);
-            addrText.style.color = "#eeeeee";
+            addrText.className = "asset-name";
             addrText.textContent = "地址";
 
             var addr = document.createElement('input') as HTMLInputElement;
             address.appendChild(addr);
-            CSSTool.password_set(addr);
             addr.placeholder = '请输入地址';
-            CSSTool.addr_set(addr);
             addrText.appendChild(addr);
 
             var editMoney = document.createElement("div");
@@ -151,7 +130,7 @@ namespace WebBrowser
 
             var goldText = document.createElement('span') as HTMLSpanElement;
             editMoney.appendChild(goldText);
-            goldText.style.color = "#eeeeee";
+            goldText.className = "asset-name";
             goldText.textContent = "金额";
 
             var gold = document.createElement('input') as HTMLInputElement;
@@ -164,7 +143,7 @@ namespace WebBrowser
             var btnSend = document.createElement('button') as HTMLButtonElement;
             singlebackground.appendChild(btnSend);
             btnSend.textContent = "发送";
-            CSSTool.btn_set(btnSend);
+            btnSend.className = "btn-commit"
             btnSend.style.width = '50%';
             btnSend.onclick = async () => {
                 if (coinNum.textContent == "0") return;

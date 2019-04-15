@@ -19,7 +19,7 @@ namespace WebBrowser
         }
 
         mainMenu():void{
-
+            if(this.div.firstChild)
             this.div.removeChild(this.div.firstChild);
             this.div.className = "main-view-bg";
 

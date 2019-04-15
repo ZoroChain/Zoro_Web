@@ -25,6 +25,7 @@ namespace WebBrowser
         }
 
         login():void{
+            if(this.div.firstChild)
             this.div.removeChild(this.div.firstChild);
             this.div.className = "wallet-bg";
            
